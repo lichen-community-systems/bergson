@@ -24,7 +24,7 @@
 
             tick: {
                 funcName: "flock.clock.raf.tick",
-                args: ["{that}", "{arguments}.0"]
+                args: ["{that}"]
             },
 
             stop: {
@@ -38,8 +38,10 @@
         that.requestID = requestAnimationFrame(that.tick);
     };
 
-    flock.clock.raf.tick = function (that, now) {
+    flock.clock.raf.tick = function (that) {
         flock.clock.raf.requestNextTick(that);
+
+        var now = performance.now();
         that.time = now;
         that.events.onTick.fire(now);
     };

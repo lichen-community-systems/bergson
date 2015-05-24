@@ -18,17 +18,21 @@
         ok(diff <= tolerance, msg + " Difference was: " + diff + "ms.");
     };
 
-    flock.test.clock.eachTick = function (numTicks, clock, fn) {
+    flock.test.clock.manualTicker = function (numTicks, clock) {
         for (var i = 0; i < numTicks; i++) {
             clock.tick();
-            fn(clock);
         }
     };
 
-    flock.test.clock.testRealtimeInitialState = function (clock, expectedRate) {
-        QUnit.equal(clock.options.rate, expectedRate,
-            "The clock should be initialized to the default rate.");
-        flock.test.assertTimeEqual(clock.time, performance.now(), 3,
-            "The clock should be initialized with the current time.");
-    };
+
+    fluid.defaults("flock.test.clock.tester.manual", {
+        gradeNames: ["fluid.eventedComponent", "autoInit"],
+
+        invokers: {
+            start: {
+                funcName: "flock.test.clock.manualTicker",
+                args: ["{that}.options.numTicks", "{clock}"]
+            }
+        }
+    });
 }());
