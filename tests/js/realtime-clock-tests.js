@@ -10,17 +10,10 @@
         });
     };
 
-    var testClockInitialState = function (clock, expectedRate) {
-        QUnit.equal(clock.options.rate, expectedRate,
-            "The clock should be initialized to the default rate.");
-        flock.test.assertTimeEqual(clock.time, performance.now(), 2,
-            "The clock should be initialized with the current time.");
-    };
-
     var testClockTimeIncrement = function (numTicks, clock) {
         var time = performance.now();
 
-        flock.test.eachClockTick(numTicks, clock, function () {
+        flock.test.clock.eachTick(numTicks, clock, function () {
             flock.test.assertTimeEqual(clock.time, performance.now(), 2,
                 "The clock time should reflect the current real time.");
         });
@@ -35,14 +28,14 @@
 
     QUnit.test("Initialization, default options", function () {
         var clock = createRealtimeClock();
-        testClockInitialState(clock, 1);
+        flock.test.clock.testRealtimeInitialState(clock, 1);
     });
 
     QUnit.test("Initialization, 30 fps", function () {
         var rate = 30,
             clock = createRealtimeClock(rate);
 
-        testClockInitialState(clock, rate);
+        flock.test.clock.testRealtimeInitialState(clock, rate);
     });
 
     QUnit.asyncTest("tick() time update", function () {

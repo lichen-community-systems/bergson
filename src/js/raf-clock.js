@@ -13,7 +13,6 @@
                   // to match the refresh rate of their display.
 
         members: {
-            raf: window.requestAnimationFrame || window.webkitRequestAnimationFrame,
             requestID: null
         },
 
@@ -36,17 +35,17 @@
     });
 
     flock.clock.raf.requestNextTick = function (that) {
-        that.requestID = that.raf(that.tick);
+        that.requestID = requestAnimationFrame(that.tick);
     };
 
     flock.clock.raf.tick = function (that, now) {
+        flock.clock.raf.requestNextTick(that);
         that.time = now;
         that.events.onTick.fire(now);
-        flock.clock.raf.requestNextTick(that);
     };
 
     flock.clock.raf.stop = function (that) {
-        window.cancelAnimationFrame(that.requestID);
+        cancelAnimationFrame(that.requestID);
     };
 
 }());

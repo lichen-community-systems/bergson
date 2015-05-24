@@ -25,7 +25,7 @@
         var time = clock.time,
             expectedTickDuration = 1 / rate;
 
-        flock.test.eachClockTick(numTicks, clock, function () {
+        flock.test.clock.eachTick(numTicks, clock, function () {
             time += expectedTickDuration;
             QUnit.equal(clock.time, time,
                 "The clock should have been incremented by 1/" + rate + " of a second.");
