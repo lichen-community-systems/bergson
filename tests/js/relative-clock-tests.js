@@ -12,27 +12,46 @@
         ]
     });
 
-    QUnit.test("Initialization, default options", function () {
-        flock.test.clock.relativeManual.tester();
+    fluid.defaults("flock.test.clock.relativeClockTestSuite", {
+        gradeNames: ["flock.test.clock.testSuite", "autoInit"],
+
+        dynamicComponents: {
+            tester: {
+                type: "flock.test.clock.relativeManual.tester"
+            }
+        },
+
+        tests: [
+            {
+                name: "Initialization, default options",
+                testerOptions: {},
+                initOnly: true
+            },
+            {
+                name: "Initialization, 30 fps",
+                testerOptions: {
+                    expected: {
+                        rate: 30,
+                        tickDuration: 1/30
+                    }
+                },
+                initOnly: true
+            },
+            {
+                name: "tick() time update",
+                async: false,
+                testerOptions: {
+                    expected: {
+                        rate: 30,
+                        tickDuration: 1/30
+                    }
+                }
+            }
+
+        ]
     });
 
-    QUnit.test("Initialization, 30 fps", function () {
-        flock.test.clock.relativeManual.tester({
-            expected: {
-                rate: 30,
-                tickDuration: 1/30
-            }
-        });
-    });
-
-    QUnit.test("tick() time update", function () {
-        var tester = flock.test.clock.relativeManual.tester({
-            expected: {
-                rate: 30,
-                tickDuration: 1/30
-            }
-        });
-        tester.start();
-    });
+    var suite = flock.test.clock.relativeClockTestSuite();
+    suite.run();
 
 }());

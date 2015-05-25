@@ -29,7 +29,7 @@
     };
 
     flock.test.clock.testCase.realtime.testTick = function (clock) {
-        flock.test.assertTimeEqual(clock.time, performance.now(), 2,
+        flock.test.assertTimeEqual(clock.time, performance.now(), 3,
             "The clock time should reflect the current real time.");
     };
 

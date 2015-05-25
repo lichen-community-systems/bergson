@@ -26,46 +26,6 @@
     };
 
 
-    fluid.defaults("flock.test.clock.raf.tester", {
-        gradeNames: [
-            "flock.test.clock.tester.external",
-            "flock.test.clock.tester.realtime",
-            "autoInit"
-        ],
-
-        expected: {
-            rate: 60
-        },
-
-        components: {
-            testCase: {
-                type: "flock.test.clock.raf.testCase"
-            },
-
-            clock: {
-                type: "flock.clock.raf"
-            }
-        }
-    });
-
-    QUnit.test("Initial state, default options", function () {
-        flock.test.clock.raf.tester();
-    });
-
-    QUnit.test("Initial state, 30 fps", function () {
-        flock.test.clock.raf.tester({
-            expected: {
-                rate: 30
-            }
-        });
-    });
-
-    QUnit.asyncTest("tick() time update", function () {
-        var tester = flock.test.clock.raf.tester();
-        tester.start();
-    });
-
-
     fluid.defaults("flock.test.clock.raf.refreshRateTestCase", {
         gradeNames: [
             "fluid.standardRelayComponent",
@@ -120,15 +80,68 @@
             avg);
     };
 
-    QUnit.asyncTest("tick() should run at the refresh rate", function () {
-        var tester = flock.test.clock.raf.tester({
-            components: {
-                testCase: {
-                    type: "flock.test.clock.raf.refreshRateTestCase"
-                }
+
+    fluid.defaults("flock.test.clock.raf.tester", {
+        gradeNames: [
+            "flock.test.clock.tester.external",
+            "flock.test.clock.tester.realtime",
+            "autoInit"
+        ],
+
+        expected: {
+            rate: 60
+        },
+
+        components: {
+            testCase: {
+                type: "flock.test.clock.raf.testCase"
+            },
+
+            clock: {
+                type: "flock.clock.raf"
             }
-        });
-        tester.clock.start();
+        }
     });
 
+    fluid.defaults("flock.test.clock.rafClockTestSuite", {
+        gradeNames: ["flock.test.clock.testSuite", "autoInit"],
+
+        dynamicComponents: {
+            tester: {
+                type: "flock.test.clock.raf.tester"
+            }
+        },
+
+        tests: [
+            {
+                name: "Initial state, default options",
+                initOnly: true
+            },
+            {
+                name: "Initial state, 30 fps",
+                initOnly: true,
+                testerOptions: {
+                    expected: {
+                        rate: 30
+                    }
+                }
+            },
+            {
+                name: "tick() time update"
+            },
+            {
+                name: "tick() should run at the refresh rate",
+                testerOptions: {
+                    components: {
+                        testCase: {
+                            type: "flock.test.clock.raf.refreshRateTestCase"
+                        }
+                    }
+                }
+            }
+        ]
+    });
+
+    var testSuite = flock.test.clock.rafClockTestSuite();
+    testSuite.run();
 }());

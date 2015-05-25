@@ -85,4 +85,40 @@
         }
     };
 
+
+    fluid.defaults("flock.test.clock.testSuite", {
+        gradeNames: ["fluid.standardRelayComponent", "autoInit"],
+
+        tests: [],
+
+        invokers: {
+            run: "flock.test.clock.testSuite.runTests({that})"
+        },
+
+        dynamicComponents: {
+            tester: {
+                createOnEvent: "onTest",
+                type: "flock.test.clock.tester",
+                options: "{arguments}.0"
+            }
+        },
+
+        events: {
+            onTest: null
+        }
+    });
+
+    flock.test.clock.testSuite.runTests = function (that) {
+        fluid.each(that.options.tests, function (test) {
+            var testFnName = test.initOnly || test.async === false ? "test" : "asyncTest";
+            QUnit[testFnName](test.name, function () {
+                that.events.onTest.fire(test.testerOptions);
+
+                if (!test.initOnly) {
+                    that.tester.start();
+                }
+            });
+        });
+    };
+
 }());

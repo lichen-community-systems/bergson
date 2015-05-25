@@ -12,26 +12,42 @@
         ]
     });
 
-    QUnit.test("Initialization, default options", function () {
-        flock.test.clock.realtimeManual.tester();
-    });
+    fluid.defaults("flock.test.clock.realtimeClockTestSuite", {
+        gradeNames: ["flock.test.clock.testSuite", "autoInit"],
 
-    QUnit.test("Initialization, 30 fps", function () {
-        flock.test.clock.realtimeManual.tester({
-            expected: {
-                rate: 30
+        dynamicComponents: {
+            tester: {
+                type: "flock.test.clock.realtimeManual.tester"
             }
-        });
-    });
+        },
 
-    QUnit.test("tick() time update", function () {
-        var tester = flock.test.clock.realtimeManual.tester({
-            expected: {
-                rate: 30
+        tests: [
+            {
+                name: "Initialization, default options",
+                initOnly: true
+            },
+            {
+                name: "Initialization, 30 fps",
+                initOnly: true,
+                testerOptions: {
+                    expected: {
+                        rate: 30
+                    }
+                }
+            },
+            {
+                name: "tick() time update",
+                async: false,
+                testerOptions: {
+                    expected: {
+                        rate: 30
+                    }
+                }
             }
-        });
+        ]
+    })
 
-        tester.start();
-    });
+    var testSuite = flock.test.clock.realtimeClockTestSuite();
+    testSuite.run();
 
 }());
