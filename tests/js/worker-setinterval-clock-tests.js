@@ -2,9 +2,7 @@
 
     "use strict";
 
-    QUnit.module("requestAnimationFrame clock");
-
-    fluid.defaults("flock.test.clock.rafClockTestSuite", {
+    fluid.defaults("flock.test.clock.workerSetIntervalClockTestSuite", {
         gradeNames: ["flock.test.clock.testSuite", "autoInit"],
 
         dynamicComponents: {
@@ -13,7 +11,7 @@
                 options: {
                     components: {
                         clock: {
-                            type: "flock.clock.raf"
+                            type: "flock.clock.workerSetInterval"
                         }
                     }
                 }
@@ -33,12 +31,14 @@
                 }
             },
             {
-                name: "tick() time update"
+                name: "tick() time update, 30 fps",
+                expected: {
+                    rate: 30
+                }
             }
         ]
     });
 
-    var testSuite = flock.test.clock.rafClockTestSuite();
+    var testSuite = flock.test.clock.workerSetIntervalClockTestSuite();
     testSuite.run();
-
 }());

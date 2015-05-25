@@ -29,23 +29,19 @@
             {
                 name: "Initialization, 30 fps",
                 initOnly: true,
-                testerOptions: {
-                    expected: {
-                        rate: 30
-                    }
+                expected: {
+                    rate: 30
                 }
             },
             {
                 name: "tick() time update",
                 async: false,
-                testerOptions: {
-                    expected: {
-                        rate: 30
-                    }
+                expected: {
+                    rate: 30
                 }
             }
         ]
-    })
+    });
 
     var testSuite = flock.test.clock.realtimeClockTestSuite();
     testSuite.run();

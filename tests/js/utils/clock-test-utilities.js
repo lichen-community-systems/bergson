@@ -24,7 +24,6 @@
         }
     };
 
-
     fluid.defaults("flock.test.clock.tester.manual", {
         gradeNames: ["fluid.eventedComponent", "autoInit"],
 

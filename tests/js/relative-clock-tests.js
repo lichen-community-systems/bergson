@@ -24,30 +24,24 @@
         tests: [
             {
                 name: "Initialization, default options",
-                testerOptions: {},
                 initOnly: true
             },
             {
                 name: "Initialization, 30 fps",
-                testerOptions: {
-                    expected: {
-                        rate: 30,
-                        tickDuration: 1/30
-                    }
-                },
-                initOnly: true
+                initOnly: true,
+                expected: {
+                    rate: 30,
+                    tickDuration: 1/30
+                }
             },
             {
                 name: "tick() time update",
                 async: false,
-                testerOptions: {
-                    expected: {
-                        rate: 30,
-                        tickDuration: 1/30
-                    }
+                expected: {
+                    rate: 30,
+                    tickDuration: 1/30
                 }
             }
-
         ]
     });
 

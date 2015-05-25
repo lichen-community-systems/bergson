@@ -99,7 +99,9 @@
             tester: {
                 createOnEvent: "onTest",
                 type: "flock.test.clock.tester",
-                options: "{arguments}.0"
+                options: {
+                    expected: "{arguments}.0"
+                }
             }
         },
 
@@ -112,7 +114,7 @@
         fluid.each(that.options.tests, function (test) {
             var testFnName = test.initOnly || test.async === false ? "test" : "asyncTest";
             QUnit[testFnName](test.name, function () {
-                that.events.onTest.fire(test.testerOptions);
+                that.events.onTest.fire(test.expected);
 
                 if (!test.initOnly) {
                     that.tester.start();

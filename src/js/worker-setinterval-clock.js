@@ -35,25 +35,25 @@
         invokers: {
             start: {
                 funcName: "flock.clock.workerSetInterval.post",
-                args: [{
-                    msg: "start",
-                    value: {
-                        rate: "{that}.options.rate"
+                args: [
+                    "{that}.worker",
+                    {
+                        msg: "start",
+                        value: {
+                            rate: "{that}.options.rate"
+                        }
                     }
-                }]
+                ]
             },
 
-            stop: {
-                funcName: "flock.clock.workerSetInterval.post",
-                args: [{
-                    msg: "stop"
-                }]
-            }
+            stop: "flock.clock.workerSetInterval.stop({that})"
         },
 
-        onCreate: [
-            "flock.clock.workerSetInterval.listen({that})"
-        ]
+        listeners: {
+            onCreate: [
+                "flock.clock.workerSetInterval.listen({that})"
+            ]
+        }
     });
 
     flock.clock.workerSetInterval.initWorker = function () {
@@ -61,15 +61,23 @@
     };
 
     flock.clock.workerSetInterval.listen = function (that) {
-        that.worker.addListener("message", function (e) {
+        that.worker.addEventListener("message", function (e) {
             if (e.data.msg === "tick") {
-                that.tick(e.data.value);
+                that.tick(performance.now());
             }
-        });
+        }, false);
     };
 
-    flock.clock.workerSetInterval.post = function (msg) {
-        postMessage(msg);
+    flock.clock.workerSetInterval.post = function (worker, msg) {
+        worker.postMessage(msg);
+    };
+
+    flock.clock.workerSetInterval.stop = function (that) {
+        flock.clock.workerSetInterval.post(that.worker, {
+            msg: "stop"
+        });
+
+        that.worker.terminate();
     };
 
     // Note: This function is intended to be invoked as
@@ -83,7 +91,8 @@
 
         flock.workerClock = function (options) {
             var that = {
-                options: options || {};
+                options: options || {},
+                intervalID: null
             };
 
             that.start = function () {
@@ -92,8 +101,7 @@
 
             that.tick = function () {
                 self.postMessage({
-                    msg: "tick",
-                    value: performance.now()
+                    msg: "tick"
                 });
             };
 
@@ -106,15 +114,17 @@
 
         self.addEventListener("message", function (e) {
             if (e.data.msg === "start") {
-                flock.clock = flock.workerClock(e.data.value);
+                flock.clock = flock.workerClock({
+                    rate: e.data.value
+                });
                 flock.clock.start();
             } else if (e.data.msg === "stop") {
                 if (flock.clock) {
                     flock.clock.stop();
                 }
 
-                self.close();
+                //self.close();
             }
-        });
+        }, false);
     };
 }());

@@ -2,7 +2,7 @@
 
     "use strict";
 
-    fluid.defaults("flock.clock.mainThreadSetInterval", {
+    fluid.defaults("flock.clock.setInterval", {
         gradeNames: ["flock.clock.realtime", "autoInit"],
 
         members: {
@@ -11,22 +11,22 @@
 
         invokers: {
             start: {
-                funcName: "flock.clock.mainThreadSetInterval.start",
+                funcName: "flock.clock.setInterval.start",
                 args: ["{that}"]
             },
 
             stop: {
-                funcName: "flock.clock.mainThreadSetInterval.stop",
+                funcName: "flock.clock.setInterval.stop",
                 args: ["{that}"]
             }
         }
     });
 
-    flock.clock.mainThreadSetInterval.start = function (that) {
+    flock.clock.setInterval.start = function (that) {
         that.intervalID = setInterval(that.tick, 1000 / that.options.rate);
     };
 
-    flock.clock.mainThreadSetInterval.stop = function (that) {
+    flock.clock.setInterval.stop = function (that) {
         clearInterval(that.intervalID);
     };
 }());
