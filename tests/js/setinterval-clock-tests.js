@@ -2,38 +2,63 @@
 
     "use strict";
 
+    fluid.defaults("flock.test.clock.tester.setInterval", {
+        gradeNames: [
+            "flock.test.clock.tester.external",
+            "flock.test.clock.tester.realtime",
+            "autoInit"
+        ],
+
+        components: {
+            clock: {
+                type: "flock.clock.setInterval"
+            }
+        }
+    });
+
     fluid.defaults("flock.test.clock.setIntervalClockTestSuite", {
         gradeNames: ["flock.test.clock.testSuite", "autoInit"],
-
-        dynamicComponents: {
-            tester: {
-                type: "flock.test.clock.realtimeExternal.tester",
-                options: {
-                    components: {
-                        clock: {
-                            type: "flock.clock.setInterval"
-                        }
-                    }
-                }
-            }
-        },
 
         tests: [
             {
                 name: "Initial state, default options",
-                initOnly: true
+                initOnly: true,
+                tester: {
+                    type: "flock.test.clock.tester.setInterval"
+                }
             },
             {
-                name: "Initial state, 30 fps",
+                name: "Initial state, 30 Hz",
                 initOnly: true,
-                expected: {
-                    rate: 30
+                tester: {
+                    type: "flock.test.clock.tester.setInterval",
+                    options: {
+                        expected: {
+                            rate: 30
+                        }
+                    }
                 }
             },
             {
                 name: "tick() time update",
-                expected: {
-                    rate: 30
+                tester: {
+                    type: "flock.test.clock.tester.setInterval",
+                    options: {
+                        expected: {
+                            rate: 30
+                        }
+                    }
+                }
+            },
+            {
+                name: "tick() at 240 Hz",
+                tester: {
+                    type: "flock.test.clock.tester.setInterval",
+                    options: {
+                        expected: {
+                            rate: 240
+                        }
+                    }
                 }
             }
         ]

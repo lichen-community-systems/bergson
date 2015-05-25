@@ -4,36 +4,67 @@
 
     QUnit.module("requestAnimationFrame clock");
 
+    fluid.defaults("flock.test.clock.tester.raf", {
+        gradeNames: [
+            "flock.test.clock.tester.external",
+            "flock.test.clock.tester.realtime",
+            "autoInit"
+        ],
+
+        components: {
+            clock: {
+                type: "flock.clock.raf"
+            }
+        }
+    });
+
+    fluid.defaults("flock.test.clock.tester.raf.refreshRate", {
+        gradeNames: ["flock.test.clock.tester.raf", "autoInit"],
+
+        components: {
+            testCase: {
+                type: "flock.test.clock.realtime.averageTickDurationTestCase"
+            }
+        }
+    });
+
     fluid.defaults("flock.test.clock.rafClockTestSuite", {
         gradeNames: ["flock.test.clock.testSuite", "autoInit"],
-
-        dynamicComponents: {
-            tester: {
-                type: "flock.test.clock.realtimeExternal.tester",
-                options: {
-                    components: {
-                        clock: {
-                            type: "flock.clock.raf"
-                        }
-                    }
-                }
-            }
-        },
 
         tests: [
             {
                 name: "Initial state, default options",
-                initOnly: true
+                initOnly: true,
+                tester: {
+                    type: "flock.test.clock.tester.raf"
+                }
             },
             {
                 name: "Initial state, 30 fps",
                 initOnly: true,
-                expected: {
-                    rate: 30
+                tester: {
+                    type: "flock.test.clock.tester.raf",
+                    options: {
+                        expected: {
+                            rate: 30
+                        }
+                    }
                 }
             },
             {
-                name: "tick() time update"
+                name: "tick() time update",
+                tester: {
+                    type: "flock.test.clock.tester.raf"
+                }
+            },
+            {
+                name: "tick runs at refresh rate",
+                tester: {
+                    type: "flock.test.clock.tester.raf.refreshRate",
+                    options: {
+                        numTicks: 240
+                    }
+                }
             }
         ]
     });

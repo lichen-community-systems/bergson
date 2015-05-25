@@ -15,31 +15,51 @@
     fluid.defaults("flock.test.clock.relativeClockTestSuite", {
         gradeNames: ["flock.test.clock.testSuite", "autoInit"],
 
-        dynamicComponents: {
-            tester: {
-                type: "flock.test.clock.relativeManual.tester"
-            }
-        },
-
         tests: [
             {
                 name: "Initialization, default options",
-                initOnly: true
-            },
-            {
-                name: "Initialization, 30 fps",
                 initOnly: true,
-                expected: {
-                    rate: 30,
-                    tickDuration: 1/30
+                tester: {
+                    type: "flock.test.clock.relativeManual.tester"
                 }
             },
             {
-                name: "tick() time update",
+                name: "Initialization, 30 Hz",
+                initOnly: true,
+                tester: {
+                    type: "flock.test.clock.relativeManual.tester",
+                    options: {
+                        expected: {
+                            rate: 30,
+                            tickDuration: 1/30
+                        }
+                    }
+                }
+            },
+            {
+                name: "tick() time update, 30 Hz",
                 async: false,
-                expected: {
-                    rate: 30,
-                    tickDuration: 1/30
+                tester: {
+                    type: "flock.test.clock.relativeManual.tester",
+                    options: {
+                        expected: {
+                            rate: 30,
+                            tickDuration: 1/30
+                        }
+                    }
+                }
+            },
+            {
+                name: "tick() at 240 Hz",
+                async: false,
+                tester: {
+                    type: "flock.test.clock.relativeManual.tester",
+                    options: {
+                        expected: {
+                            rate: 240,
+                            tickDuration: 1/240
+                        }
+                    }
                 }
             }
         ]

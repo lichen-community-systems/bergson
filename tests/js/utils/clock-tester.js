@@ -93,20 +93,6 @@
 
         invokers: {
             run: "flock.test.clock.testSuite.runTests({that})"
-        },
-
-        dynamicComponents: {
-            tester: {
-                createOnEvent: "onTest",
-                type: "flock.test.clock.tester",
-                options: {
-                    expected: "{arguments}.0"
-                }
-            }
-        },
-
-        events: {
-            onTest: null
         }
     });
 
@@ -114,10 +100,9 @@
         fluid.each(that.options.tests, function (test) {
             var testFnName = test.initOnly || test.async === false ? "test" : "asyncTest";
             QUnit[testFnName](test.name, function () {
-                that.events.onTest.fire(test.expected);
-
+                var tester = fluid.initComponent(test.tester.type, test.tester.options);
                 if (!test.initOnly) {
-                    that.tester.start();
+                    tester.start();
                 }
             });
         });

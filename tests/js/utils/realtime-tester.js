@@ -77,18 +77,6 @@
         }
     });
 
-    fluid.defaults("flock.test.clock.realtimeExternal.tester", {
-        gradeNames: [
-            "flock.test.clock.tester.external",
-            "flock.test.clock.tester.realtime",
-            "autoInit"
-        ],
-
-        expected: {
-            rate: 60
-        }
-    });
-
 
     fluid.defaults("flock.test.clock.realtime.averageTickDurationTestCase", {
         gradeNames: [
