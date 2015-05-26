@@ -34,4 +34,29 @@
             }
         }
     });
+
+    // Tester mixin grade for clocks that are driven externally and thus:
+    //   a) run asynchronously and need to signal QUnit to resume.
+    //   b) need to be explicitly stopped.
+    fluid.defaults("flock.test.clock.tester.external", {
+        gradeNames: ["fluid.eventedComponent", "autoInit"],
+
+        invokers: {
+            start: "{clock}.start()"
+        },
+
+        listeners: {
+            onStop: [
+                {
+                    priority: "first",
+                    func: "{clock}.stop"
+                },
+                {
+                    priority: "last",
+                    func: "QUnit.start"
+                }
+            ]
+        }
+    });
+
 }());

@@ -4,14 +4,6 @@
 
     QUnit.module("Realtime clock");
 
-    fluid.defaults("flock.test.clock.realtimeManual.tester", {
-        gradeNames: [
-            "flock.test.clock.tester.manual",
-            "flock.test.clock.tester.realtime",
-            "autoInit"
-        ]
-    });
-
     fluid.defaults("flock.test.clock.realtimeClockTestSuite", {
         gradeNames: ["flock.test.clock.testSuite", "autoInit"],
 
@@ -20,14 +12,14 @@
                 name: "Initialization, default options",
                 initOnly: true,
                 tester: {
-                    type: "flock.test.clock.realtimeManual.tester"
+                    type: "flock.test.clock.tester.realtimeManual"
                 }
             },
             {
                 name: "Initialization, 30 Hz",
                 initOnly: true,
                 tester: {
-                    type: "flock.test.clock.realtimeManual.tester",
+                    type: "flock.test.clock.tester.realtimeManual",
                     options: {
                         expected: {
                             rate: 30
@@ -39,7 +31,7 @@
                 name: "tick() time update, 30 Hz",
                 async: false,
                 tester: {
-                    type: "flock.test.clock.realtimeManual.tester",
+                    type: "flock.test.clock.tester.realtimeManual",
                     options: {
                         expected: {
                             rate: 30
@@ -51,7 +43,7 @@
                 name: "tick() at 240 Hz",
                 async: false,
                 tester: {
-                    type: "flock.test.clock.realtimeManual.tester",
+                    type: "flock.test.clock.tester.realtimeManual",
                     options: {
                         expected: {
                             rate: 240

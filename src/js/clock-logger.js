@@ -9,7 +9,7 @@
      * if the clock is dropping frames).
      */
     fluid.defaults("flock.clock.logger", {
-        gradeNames: ["flock.clock", "autoInit"],
+        gradeNames: ["fluid.eventedComponent", "autoInit"],
 
         numTicksToLog: 60 * 60 * 20, // Twenty minutes at 60 fps by default.
 
@@ -25,7 +25,7 @@
         },
 
         listeners: {
-            onTick: [
+            "{clock}.events.onTick": [
                 "{that}.log()"
             ]
         }

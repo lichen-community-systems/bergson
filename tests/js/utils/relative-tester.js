@@ -62,4 +62,12 @@
         }
     });
 
+    fluid.defaults("flock.test.clock.tester.relativeManual", {
+        gradeNames: [
+            "flock.test.clock.tester.relative",
+            "flock.test.clock.tester.manual",
+            "autoInit"
+        ]
+    });
+
 }());
