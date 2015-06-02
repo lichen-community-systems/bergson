@@ -15,7 +15,16 @@
 
     fluid.registerNamespace("flock");
 
-    // TODO: Unit tests.
+    /**
+     * Priority Queue
+     *
+     * Stores elements sorted by their order of priority.
+     * This implementation uses a binary heap algorithm in order to
+     * efficiently keep items sorted.
+     *
+     * @param {String} priorityProp the name of the property to use as the item's priority
+     * @return the new queue instance
+     */
     // TODO: Consider the performance consequence of the "priorityProp" scheme.
     flock.priorityQueue = function (priorityProp) {
         var that = {
@@ -23,6 +32,11 @@
             priorityProp: priorityProp || "priority"
         };
 
+        /**
+         * Adds a new item to the queue.
+         *
+         * @param the item to add
+         */
         that.push = function (item) {
             if (!item) {
                 return;
@@ -38,10 +52,21 @@
             that.bubbleUp(that.items.length - 1);
         };
 
+        /**
+         * Returns the highest-priority element from the queue.
+         * This method will not remove the item from the queue.
+         *
+         * @return the highest-priority element
+         */
         that.peek = function () {
             return that.items[0];
         };
 
+        /**
+         * Removes the highest-priority element from the queue and returns it.
+         *
+         * @return the highest-priority element in the queue
+         */
         that.pop = function () {
             // Store the first element so we can return it later.
             var result = that.items[0],
@@ -57,6 +82,11 @@
             return result;
         };
 
+        /**
+         * Removes the specified item from the queue.
+         *
+         * @param item the item to remove
+         */
         that.remove = function (item) {
             var len = that.items.length;
             // To remove a value, we must search through the array to find it.
@@ -78,10 +108,23 @@
             }
         };
 
+        /**
+         * Returns the number of items in the queue.
+         *
+         * @return the number of items
+         */
         that.size = function () {
             return that.items.length;
         };
 
+        /**
+         * Clears all items from the queue.
+         */
+        that.clear = function () {
+            that.items.length = 0;
+        };
+
+        // Unsupported, non-API method.
         that.bubbleUp = function (n) {
             // Fetch the element that has to be moved.
             var item = that.items[n];
@@ -105,6 +148,7 @@
             }
         };
 
+        // Unsupported, non-API method.
         that.sinkDown = function (n) {
             // Look up the target element and its score.
             var length = that.items.length,
@@ -148,10 +192,6 @@
                 that.items[swap] = item;
                 n = swap;
             }
-        };
-
-        that.clear = function () {
-            that.items.length = 0;
         };
 
         return that;

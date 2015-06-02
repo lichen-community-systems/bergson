@@ -121,4 +121,17 @@
             flock.test.priorityQueue.orderTestSpec.items.length,
             "The queue should be fully populated after each item has been peeked at.");
     });
+
+    QUnit.test("Push/remove", function () {
+        var q = flock.priorityQueue();
+        flock.test.priorityQueue.pushItems(q, flock.test.priorityQueue.orderTestSpec);
+        QUnit.equal(q.size(), 4, "There should be four items in the queue prior to removing one.");
+
+        var itemToRemove = flock.test.priorityQueue.orderTestSpec.items[3];
+        q.remove(itemToRemove);
+        QUnit.equal(q.items.indexOf(itemToRemove), -1,
+            "The item should have been removed.");
+        QUnit.equal(q.size(), 3,
+            "There should be only three items in the queue after remove the third-lowest priority one.");
+    });
 }());
