@@ -11,7 +11,8 @@
         rate: 1, // Ticks per second.
 
         members: {
-            time: 0
+            time: 0,
+            rate: "{that}.options.rate"
         },
 
         invokers: {
@@ -25,21 +26,22 @@
 
 
     /**
-     * Relative Clock
+     * Offline Clock
      *
-     * A Relative Clock tracks time relatively (i.e. without reference
-     * to "real" time).
+     * An Offline Clock tracks time relatively
+     * (i.e. without reference to a "real" source of time
+     * such as the system clock).
      *
      * This clock can be driven manually (perhaps by an offline frame or
      * audio sample renderer) by invoking its tick() method.
      */
-    fluid.defaults("flock.clock.relative", {
+    fluid.defaults("flock.clock.offline", {
         gradeNames: ["flock.clock", "autoInit"],
 
         members: {
             tickDuration: {
                 expander: {
-                    funcName: "flock.clock.relative.calcTickDuration",
+                    funcName: "flock.clock.offline.calcTickDuration",
                     args: "{that}.options.rate"
                 }
             }
@@ -47,19 +49,19 @@
 
         invokers: {
             tick: {
-                funcName: "flock.clock.relative.tick",
+                funcName: "flock.clock.offline.tick",
                 args: ["{that}"]
             }
         }
     });
 
-    flock.clock.relative.calcTickDuration = function (rate) {
+    flock.clock.offline.calcTickDuration = function (rate) {
         return 1.0 / rate;
     };
 
-    flock.clock.relative.tick = function (that) {
+    flock.clock.offline.tick = function (that) {
         that.time += that.tickDuration;
-        that.events.onTick.fire(that.time);
+        that.events.onTick.fire(that.time, that.rate);
     };
 
 
@@ -89,7 +91,7 @@
 
     flock.clock.realtime.tick = function (that) {
         that.time = performance.now();
-        that.events.onTick.fire(that.time);
+        that.events.onTick.fire(that.time, that.rate);
     };
 
 }());

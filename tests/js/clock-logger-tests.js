@@ -9,8 +9,8 @@
     });
 
 
-    fluid.defaults("flock.test.clock.tester.relativeClockLogger", {
-        gradeNames: ["flock.test.clock.tester.relativeManual", "autoInit"],
+    fluid.defaults("flock.test.clock.tester.offlineClockLogger", {
+        gradeNames: ["flock.test.clock.tester.offlineManual", "autoInit"],
 
         numTicks: 240,
 
@@ -29,13 +29,13 @@
 
         listeners: {
             onStop: {
-                funcName: "flock.test.clock.tester.relativeClockLogger.testLog",
+                funcName: "flock.test.clock.tester.offlineClockLogger.testLog",
                 args: ["{logger}", "{that}.expected.tickDuration"]
             }
         }
     });
 
-    flock.test.clock.tester.relativeClockLogger.testLog = function (logger, expectedTickDuration) {
+    flock.test.clock.tester.offlineClockLogger.testLog = function (logger, expectedTickDuration) {
         var allTicksOk = true;
         for (var i = 0; i < logger.numTicksToLog; i++) {
             if (logger.intervalLog[i] !== expectedTickDuration) {
@@ -55,7 +55,7 @@
                 name: "Log ticks running at 240 Hz",
                 async: false,
                 tester: {
-                    type: "flock.test.clock.tester.relativeClockLogger",
+                    type: "flock.test.clock.tester.offlineClockLogger",
                     options: {
                         expected: {
                             rate: 240,

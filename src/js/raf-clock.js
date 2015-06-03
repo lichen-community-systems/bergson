@@ -43,7 +43,7 @@
 
         var now = performance.now();
         that.time = now;
-        that.events.onTick.fire(now);
+        that.events.onTick.fire(now, that.rate);
     };
 
     flock.clock.raf.stop = function (that) {
