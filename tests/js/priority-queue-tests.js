@@ -81,7 +81,7 @@
     };
 
     QUnit.test("Adding items", function () {
-        var q = flock.priorityQueue("clockTime");
+        var q = flock.priorityQueue();
         flock.test.priorityQueue.testPushNothing(q, undefined);
         flock.test.priorityQueue.testPushNothing(q, null);
         flock.test.priorityQueue.testPushNothing(q, 0);
@@ -92,7 +92,7 @@
 
         q.push({
             cat: "meow",
-            clockTime: -1000
+            priority: -1000
         });
         equal(q.items.length, 1,
             "When a valid item is pushed, it should be added to the queue's list of items.");

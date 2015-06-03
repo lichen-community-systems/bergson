@@ -22,14 +22,11 @@
      * This implementation uses a binary heap algorithm in order to
      * efficiently keep items sorted.
      *
-     * @param {String} priorityProp the name of the property to use as the item's priority
      * @return the new queue instance
      */
-    // TODO: Consider the performance consequence of the "priorityProp" scheme.
-    flock.priorityQueue = function (priorityProp) {
+    flock.priorityQueue = function () {
         var that = {
-            items: [],
-            priorityProp: priorityProp || "priority"
+            items: []
         };
 
         /**
@@ -42,7 +39,7 @@
                 return;
             }
 
-            if (item[that.priorityProp] === undefined) {
+            if (item.priority === undefined) {
                 throw new Error("An item without a priority cannot be added to the queue.");
             }
 
@@ -136,7 +133,7 @@
                     parent = that.items[parentN];
                 // If the parent has a lesser score, things are in order and we
                 // are done.
-                if (parent[that.priorityProp] <= item[that.priorityProp]){
+                if (parent.priority <= item.priority){
                     break;
                 }
 
@@ -167,7 +164,7 @@
                     child1 = that.items[child1N];
 
                     // If the score is less than our element's, we need to swap.
-                    if (child1[that.priorityProp] < item[that.priorityProp]){
+                    if (child1.priority < item.priority){
                         swap = child1N;
                     }
                 }
@@ -177,7 +174,7 @@
                     var child2 = that.items[child2N],
                         right = swap === null ? item : child1;
 
-                    if (child2[that.priorityProp] < right[that.priorityProp]){
+                    if (child2.priority < right.priority){
                         swap = child2N;
                     }
                 }
