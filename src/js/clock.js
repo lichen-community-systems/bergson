@@ -32,8 +32,9 @@
      * (i.e. without reference to a "real" source of time
      * such as the system clock).
      *
-     * This clock can be driven manually (perhaps by an offline frame or
-     * audio sample renderer) by invoking its tick() method.
+     * This clock can be driven manually
+     * (perhaps by an offline frame or audio sample renderer)
+     * by invoking its tick() method.
      */
     fluid.defaults("flock.clock.offline", {
         gradeNames: ["flock.clock", "autoInit"],
