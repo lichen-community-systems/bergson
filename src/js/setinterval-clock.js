@@ -1,9 +1,15 @@
+/*
+* Bergson setInterval Clock
+* http://github.com/colinbdclark/bergson
+*
+* Copyright 2015, Colin Clark
+* Dual licensed under the MIT and GPL Version 2 licenses.
+*/
 (function () {
-
     "use strict";
 
-    fluid.defaults("flock.clock.setInterval", {
-        gradeNames: ["flock.clock.realtime", "autoInit"],
+    fluid.defaults("berg.clock.setInterval", {
+        gradeNames: ["berg.clock.realtime", "autoInit"],
 
         members: {
             intervalID: null
@@ -11,22 +17,22 @@
 
         invokers: {
             start: {
-                funcName: "flock.clock.setInterval.start",
+                funcName: "berg.clock.setInterval.start",
                 args: ["{that}"]
             },
 
             stop: {
-                funcName: "flock.clock.setInterval.stop",
+                funcName: "berg.clock.setInterval.stop",
                 args: ["{that}"]
             }
         }
     });
 
-    flock.clock.setInterval.start = function (that) {
+    berg.clock.setInterval.start = function (that) {
         that.intervalID = setInterval(that.tick, 1000 / that.options.rate);
     };
 
-    flock.clock.setInterval.stop = function (that) {
+    berg.clock.setInterval.stop = function (that) {
         clearInterval(that.intervalID);
     };
 }());

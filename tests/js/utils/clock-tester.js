@@ -2,7 +2,7 @@
 
     "use strict";
 
-    fluid.defaults("flock.test.clock.testCase", {
+    fluid.defaults("berg.test.clock.testCase", {
         gradeNames: ["fluid.eventedComponent"],
 
         invokers: {
@@ -11,7 +11,7 @@
         }
     });
 
-    fluid.defaults("flock.test.clock.tester", {
+    fluid.defaults("berg.test.clock.tester", {
         gradeNames: ["fluid.standardRelayComponent", "autoInit"],
 
         numTicks: 60,
@@ -34,7 +34,7 @@
             },
 
             clock: {
-                type: "flock.clock",
+                type: "berg.clock",
                 options: {
                     rate: "{tester}.options.expected.rate",
 
@@ -63,7 +63,7 @@
             onTick: [
                 {
                     priority: "first",
-                    funcName: "flock.test.clock.tester.tickGuard",
+                    funcName: "berg.test.clock.tester.tickGuard",
                     args: ["{that}"]
                 },
                 {
@@ -75,7 +75,7 @@
         }
     });
 
-    flock.test.clock.tester.tickGuard = function (that) {
+    berg.test.clock.tester.tickGuard = function (that) {
         that.model.tickCount++;
         that.applier.change("tickCount", that.model.tickCount);
 
@@ -86,17 +86,17 @@
     };
 
 
-    fluid.defaults("flock.test.clock.testSuite", {
+    fluid.defaults("berg.test.clock.testSuite", {
         gradeNames: ["fluid.standardRelayComponent", "autoInit"],
 
         tests: [],
 
         invokers: {
-            run: "flock.test.clock.testSuite.runTests({that})"
+            run: "berg.test.clock.testSuite.runTests({that})"
         }
     });
 
-    flock.test.clock.testSuite.runTests = function (that) {
+    berg.test.clock.testSuite.runTests = function (that) {
         fluid.each(that.options.tests, function (test) {
             var testFnName = test.initOnly || test.async === false ? "test" : "asyncTest";
             QUnit[testFnName](test.name, function () {

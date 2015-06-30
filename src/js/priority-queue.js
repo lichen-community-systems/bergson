@@ -1,4 +1,4 @@
-/* Flocking Scheduler Priority Queue
+/* Bergson Priority Queue
  *
  * Based on Marijn Haverbeke's Binary Heap,
  * published in the 1st edition of Eloquent JavaScript
@@ -8,12 +8,10 @@
  * Copyright 2013 Marijn Haverbeke
  * Copyright 2015 Colin Clark
  */
-
 (function() {
-
     "use strict";
 
-    fluid.registerNamespace("flock");
+    fluid.registerNamespace("berg");
 
     /**
      * Priority Queue
@@ -24,7 +22,7 @@
      *
      * @return the new queue instance
      */
-    flock.priorityQueue = function () {
+    berg.priorityQueue = function () {
         var that = {
             items: []
         };

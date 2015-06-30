@@ -1,11 +1,19 @@
-(function () {
+/*! Bergson 1.0, Copyright 2015 Colin Clark | flockingjs.org */
 
+/*
+* Bergson Clocks
+* http://github.com/colinbdclark/bergson
+*
+* Copyright 2015, Colin Clark
+* Dual licensed under the MIT and GPL Version 2 licenses.
+*/
+(function () {
     "use strict";
 
     /**
      * Clock is the base grade for all Clocks.
      */
-    fluid.defaults("flock.clock", {
+    fluid.defaults("berg.clock", {
         gradeNames: ["fluid.eventedComponent", "autoInit"],
 
         rate: 1, // Ticks per second.
@@ -36,13 +44,13 @@
      * (perhaps by an offline frame or audio sample renderer)
      * by invoking its tick() method.
      */
-    fluid.defaults("flock.clock.offline", {
-        gradeNames: ["flock.clock", "autoInit"],
+    fluid.defaults("berg.clock.offline", {
+        gradeNames: ["berg.clock", "autoInit"],
 
         members: {
             tickDuration: {
                 expander: {
-                    funcName: "flock.clock.offline.calcTickDuration",
+                    funcName: "berg.clock.offline.calcTickDuration",
                     args: "{that}.options.rate"
                 }
             }
@@ -50,17 +58,17 @@
 
         invokers: {
             tick: {
-                funcName: "flock.clock.offline.tick",
+                funcName: "berg.clock.offline.tick",
                 args: ["{that}"]
             }
         }
     });
 
-    flock.clock.offline.calcTickDuration = function (rate) {
+    berg.clock.offline.calcTickDuration = function (rate) {
         return 1.0 / rate;
     };
 
-    flock.clock.offline.tick = function (that) {
+    berg.clock.offline.tick = function (that) {
         that.time += that.tickDuration;
         that.events.onTick.fire(that.time, that.rate);
     };
@@ -70,8 +78,8 @@
      * A Realtime Clock tracks time based on actual system time
      * (i.e. performance.now)
      */
-    fluid.defaults("flock.clock.realtime", {
-        gradeNames: ["flock.clock", "autoInit"],
+    fluid.defaults("berg.clock.realtime", {
+        gradeNames: ["berg.clock", "autoInit"],
 
         members: {
             time: {
@@ -84,13 +92,13 @@
 
         invokers: {
             tick: {
-                funcName: "flock.clock.realtime.tick",
+                funcName: "berg.clock.realtime.tick",
                 args: ["{that}", "{arguments}.0"]
             }
         }
     });
 
-    flock.clock.realtime.tick = function (that) {
+    berg.clock.realtime.tick = function (that) {
         that.time = performance.now();
         that.events.onTick.fire(that.time, that.rate);
     };

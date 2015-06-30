@@ -1,27 +1,33 @@
+/*
+* Bergson requestAnimationFrame Clock Tests
+* http://github.com/colinbdclark/bergson
+*
+* Copyright 2015, Colin Clark
+* Dual licensed under the MIT and GPL Version 2 licenses.
+*/
 (function () {
-
     "use strict";
 
     QUnit.module("requestAnimationFrame clock");
 
-    fluid.defaults("flock.test.clock.tester.raf", {
+    fluid.defaults("berg.test.clock.tester.raf", {
         gradeNames: [
-            "flock.test.clock.tester.external",
-            "flock.test.clock.tester.realtime",
+            "berg.test.clock.tester.external",
+            "berg.test.clock.tester.realtime",
             "autoInit"
         ],
 
         components: {
             clock: {
-                type: "flock.clock.raf"
+                type: "berg.clock.raf"
             }
         }
     });
 
-    fluid.defaults("flock.test.clock.raf.refreshRateTestCase", {
+    fluid.defaults("berg.test.clock.raf.refreshRateTestCase", {
         gradeNames: [
             "fluid.standardRelayComponent",
-            "flock.test.clock.testCase.realtime",
+            "berg.test.clock.testCase.realtime",
             "autoInit"
         ],
 
@@ -32,20 +38,20 @@
 
         invokers: {
             testTick: {
-                funcName: "flock.test.clock.raf.logDuration",
+                funcName: "berg.test.clock.raf.logDuration",
                 args: ["{clock}", "{that}"]
             }
         },
 
         listeners: {
             "{tester}.events.onStop": {
-                funcName: "flock.test.clock.raf.testRefreshRate",
+                funcName: "berg.test.clock.raf.testRefreshRate",
                 args: ["{that}"]
             }
         }
     });
 
-    flock.test.clock.raf.logDuration = function (clock, that) {
+    berg.test.clock.raf.logDuration = function (clock, that) {
         if (that.lastTime === null) {
             that.lastTime = clock.time;
             return;
@@ -55,7 +61,7 @@
         that.lastTime = clock.time;
     };
 
-    flock.test.clock.raf.testRefreshRate = function (that) {
+    berg.test.clock.raf.testRefreshRate = function (that) {
         var sum = 0;
 
         for (var i = 0; i < that.durations.length; i++) {
@@ -73,33 +79,33 @@
     };
 
 
-    fluid.defaults("flock.test.clock.tester.raf.refreshRate", {
-        gradeNames: ["flock.test.clock.tester.raf", "autoInit"],
+    fluid.defaults("berg.test.clock.tester.raf.refreshRate", {
+        gradeNames: ["berg.test.clock.tester.raf", "autoInit"],
 
         components: {
             testCase: {
-                type: "flock.test.clock.raf.refreshRateTestCase"
+                type: "berg.test.clock.raf.refreshRateTestCase"
             }
         }
     });
 
 
-    fluid.defaults("flock.test.clock.rafClockTestSuite", {
-        gradeNames: ["flock.test.clock.testSuite", "autoInit"],
+    fluid.defaults("berg.test.clock.rafClockTestSuite", {
+        gradeNames: ["berg.test.clock.testSuite", "autoInit"],
 
         tests: [
             {
                 name: "Initial state, default options",
                 initOnly: true,
                 tester: {
-                    type: "flock.test.clock.tester.raf"
+                    type: "berg.test.clock.tester.raf"
                 }
             },
             {
                 name: "Initial state, 30 fps",
                 initOnly: true,
                 tester: {
-                    type: "flock.test.clock.tester.raf",
+                    type: "berg.test.clock.tester.raf",
                     options: {
                         expected: {
                             rate: 30
@@ -110,13 +116,13 @@
             {
                 name: "tick() time update",
                 tester: {
-                    type: "flock.test.clock.tester.raf"
+                    type: "berg.test.clock.tester.raf"
                 }
             },
             {
                 name: "tick runs at refresh rate",
                 tester: {
-                    type: "flock.test.clock.tester.raf.refreshRate",
+                    type: "berg.test.clock.tester.raf.refreshRate",
                     options: {
                         numTicks: 240
                     }
@@ -125,7 +131,7 @@
         ]
     });
 
-    var testSuite = flock.test.clock.rafClockTestSuite();
+    var testSuite = berg.test.clock.rafClockTestSuite();
     testSuite.run();
 
 }());

@@ -1,5 +1,11 @@
+/*
+* Bergson Clock Logger
+* http://github.com/colinbdclark/bergson
+*
+* Copyright 2015, Colin Clark
+* Dual licensed under the MIT and GPL Version 2 licenses.
+*/
 (function () {
-
     "use strict";
 
     /**
@@ -8,7 +14,7 @@
      * performance of a clock instance (e.g. to determine definitively
      * if the clock is dropping frames).
      */
-    fluid.defaults("flock.clock.logger", {
+    fluid.defaults("berg.clock.logger", {
         gradeNames: ["fluid.eventedComponent", "autoInit"],
 
         numTicksToLog: 60 * 60 * 20, // Twenty minutes at 60 fps by default.
@@ -17,11 +23,11 @@
             tickCounter: 0,
             lastTickTime: null,
             interval: 0,
-            intervalLog: "@expand:flock.clock.logger.initLog({that}.options.numTicksToLog)"
+            intervalLog: "@expand:berg.clock.logger.initLog({that}.options.numTicksToLog)"
         },
 
         invokers: {
-            log: "flock.clock.logger.log({that})"
+            log: "berg.clock.logger.log({that})"
         },
 
         listeners: {
@@ -31,13 +37,13 @@
         }
     });
 
-    flock.clock.logger.initLog = function (numTicksToLog) {
+    berg.clock.logger.initLog = function (numTicksToLog) {
         return new Float32Array(numTicksToLog);
     };
 
     // TODO: This would be much better expressed as a
     // set of separate model listeners.
-    flock.clock.logger.log = function (that) {
+    berg.clock.logger.log = function (that) {
         if (that.lastTickTime === null) {
             that.lastTickTime = that.time;
             return;

@@ -1,17 +1,23 @@
+/*
+* Bergson Scheduler
+* http://github.com/colinbdclark/bergson
+*
+* Copyright 2015, Colin Clark
+* Dual licensed under the MIT and GPL Version 2 licenses.
+*/
 (function () {
-
     "use strict";
 
-    fluid.defaults("flock.scheduler", {
+    fluid.defaults("berg.scheduler", {
         gradeNames: ["fluid.standardRelayComponent", "autoInit"],
 
         members: {
-            queue: "@expand:flock.priorityQueue()"
+            queue: "@expand:berg.priorityQueue()"
         },
 
         components: {
             clock: {
-                type: "flock.clock.offline" // Should be supplied by the user.
+                type: "berg.clock.offline" // Should be supplied by the user.
             }
         },
 
@@ -23,14 +29,14 @@
              *
              * @param {Number} time - the current clock time
              */
-            tick: "flock.scheduler.tick({arguments}.0, {arguments}.1, {that}.queue)",
+            tick: "berg.scheduler.tick({arguments}.0, {arguments}.1, {that}.queue)",
 
             /**
              * Schedules one or more score specifications.
              *
              * @param {Object||Array} scoreSpecs - the score specifications to schedule
              */
-            schedule: "flock.scheduler.schedule({arguments}.0, {that}.clock)",
+            schedule: "berg.scheduler.schedule({arguments}.0, {that}.clock)",
 
             /**
              * Schedules a callback to be fired once at the specified time.
@@ -38,7 +44,7 @@
              * @param {Number} time - the time from now, in seconds, to schedule the callback
              * @param {Function} callback - the callback to schedule
              */
-            once: "flock.scheduler.once({arguments}.0, {arguments}.1, {that})",
+            once: "berg.scheduler.once({arguments}.0, {arguments}.1, {that})",
 
             /**
              * Schedules a callback to be fired repeatedly at the specified interval.
@@ -46,7 +52,7 @@
              * @param {Number} interval - the interval to repeat at
              * @param {Function} callback - the callback to schedule
              */
-            repeat: "flock.scheduler.repeat({arguments}.0, {arguments}.1, {that})",
+            repeat: "berg.scheduler.repeat({arguments}.0, {arguments}.1, {that})",
 
             /**
              * Clears a scheduled event,
@@ -66,7 +72,7 @@
     });
 
     // Unsupported, non-API function.
-    flock.scheduler.expandRepeatingEventSpec = function (now, eventSpec) {
+    berg.scheduler.expandRepeatingEventSpec = function (now, eventSpec) {
         if (typeof eventSpec.time !== "number") {
             eventSpec.time = 0;
         }
@@ -76,11 +82,11 @@
     };
 
     // Unsupported, non-API function.
-    flock.scheduler.scheduleEvent = function (eventSpec, that) {
+    berg.scheduler.scheduleEvent = function (eventSpec, that) {
         var now = that.clock.time;
 
         if (eventSpec.type === "repeat") {
-            flock.scheduler.expandRepeatingEventSpec(now, eventSpec);
+            berg.scheduler.expandRepeatingEventSpec(now, eventSpec);
         }
 
         eventSpec.priority = now + eventSpec.time;
@@ -90,33 +96,33 @@
     };
 
     // Unsupported, non-API function.
-    flock.scheduler.scheduleEvents = function (eventSpecs, that) {
+    berg.scheduler.scheduleEvents = function (eventSpecs, that) {
         eventSpecs.forEach(function (eventSpec) {
-            flock.scheduler.scheduleEvent(eventSpec, that);
+            berg.scheduler.scheduleEvent(eventSpec, that);
         });
 
         return eventSpecs;
     };
 
-    flock.scheduler.schedule = function (eventSpec, that) {
+    berg.scheduler.schedule = function (eventSpec, that) {
         if (fluid.isArrayable(eventSpec)) {
-            flock.scheduler.scheduleEvents(eventSpec, that);
+            berg.scheduler.scheduleEvents(eventSpec, that);
         }
 
-        return flock.scheduler.scheduleEvent(eventSpec, that);
+        return berg.scheduler.scheduleEvent(eventSpec, that);
     };
 
-    flock.scheduler.once = function (time, callback, that) {
+    berg.scheduler.once = function (time, callback, that) {
         var eventSpec = {
             type: "once",
             time: time,
             callback: callback
         };
 
-        return flock.scheduler.scheduleEvent(eventSpec, that);
+        return berg.scheduler.scheduleEvent(eventSpec, that);
     };
 
-    flock.scheduler.repeat = function (interval, callback, that) {
+    berg.scheduler.repeat = function (interval, callback, that) {
         var eventSpec = {
             type: "repeat",
             freq: interval,
@@ -125,10 +131,10 @@
             callback: callback
         };
 
-        return flock.scheduler.scheduleEvent(eventSpec, that);
+        return berg.scheduler.scheduleEvent(eventSpec, that);
     };
 
-    flock.scheduler.tick = function (time, interval, queue) {
+    berg.scheduler.tick = function (time, interval, queue) {
         var next = queue.peek(),
             maxTime = time + interval;
 

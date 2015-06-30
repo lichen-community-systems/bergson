@@ -1,26 +1,32 @@
+/*
+* Bergson Clock Logger Tests
+* http://github.com/colinbdclark/bergson
+*
+* Copyright 2015, Colin Clark
+* Dual licensed under the MIT and GPL Version 2 licenses.
+*/
 (function () {
-
     "use strict";
 
     QUnit.module("Clock Logger");
 
-    fluid.defaults("flock.test.clock.testCase.clockLogger", {
-        gradeNames: ["flock.test.clock.testCase", "autoInit"]
+    fluid.defaults("berg.test.clock.testCase.clockLogger", {
+        gradeNames: ["berg.test.clock.testCase", "autoInit"]
     });
 
 
-    fluid.defaults("flock.test.clock.tester.offlineClockLogger", {
-        gradeNames: ["flock.test.clock.tester.offlineManual", "autoInit"],
+    fluid.defaults("berg.test.clock.tester.offlineClockLogger", {
+        gradeNames: ["berg.test.clock.tester.offlineManual", "autoInit"],
 
         numTicks: 240,
 
         components: {
             testCase: {
-                type: "flock.test.clock.testCase.clockLogger"
+                type: "berg.test.clock.testCase.clockLogger"
             },
 
             logger: {
-                type: "flock.clock.logger",
+                type: "berg.clock.logger",
                 options: {
                     numTicksToLog: 240
                 }
@@ -29,13 +35,13 @@
 
         listeners: {
             onStop: {
-                funcName: "flock.test.clock.tester.offlineClockLogger.testLog",
+                funcName: "berg.test.clock.tester.offlineClockLogger.testLog",
                 args: ["{logger}", "{that}.expected.tickDuration"]
             }
         }
     });
 
-    flock.test.clock.tester.offlineClockLogger.testLog = function (logger, expectedTickDuration) {
+    berg.test.clock.tester.offlineClockLogger.testLog = function (logger, expectedTickDuration) {
         var allTicksOk = true;
         for (var i = 0; i < logger.numTicksToLog; i++) {
             if (logger.intervalLog[i] !== expectedTickDuration) {
@@ -47,15 +53,15 @@
     };
 
 
-    fluid.defaults("flock.test.clock.clockLoggerTestSuite", {
-        gradeNames: ["flock.test.clock.testSuite", "autoInit"],
+    fluid.defaults("berg.test.clock.clockLoggerTestSuite", {
+        gradeNames: ["berg.test.clock.testSuite", "autoInit"],
 
         tests: [
             {
                 name: "Log ticks running at 240 Hz",
                 async: false,
                 tester: {
-                    type: "flock.test.clock.tester.offlineClockLogger",
+                    type: "berg.test.clock.tester.offlineClockLogger",
                     options: {
                         expected: {
                             rate: 240,
@@ -67,6 +73,6 @@
         ]
     });
 
-    var testSuite = flock.test.clock.clockLoggerTestSuite();
+    var testSuite = berg.test.clock.clockLoggerTestSuite();
     testSuite.run();
 }());

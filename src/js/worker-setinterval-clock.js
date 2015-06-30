@@ -1,9 +1,15 @@
+/*
+* Bergson Web Worker-based setInterval Clock
+* http://github.com/colinbdclark/bergson
+*
+* Copyright 2015, Colin Clark
+* Dual licensed under the MIT and GPL Version 2 licenses.
+*/
 (function () {
-
     "use strict";
 
     // TODO: Cut and pasted from the Flocking Scheduler.
-    flock.worker = function (code) {
+    berg.worker = function (code) {
         var type = typeof code,
             url,
             blob;
@@ -11,7 +17,7 @@
         if (type === "function") {
             code = "(" + code.toString() + ")();";
         } else if (type !== "string") {
-            throw new Error("An flock.worker must be initialized with a String or a Function.");
+            throw new Error("A berg.worker must be initialized with a String or a Function.");
         }
 
         if (window.Blob) {
@@ -25,16 +31,16 @@
         return new Worker(url);
     };
 
-    fluid.defaults("flock.clock.workerSetInterval", {
-        gradeNames: ["flock.clock.realtime", "autoInit"],
+    fluid.defaults("berg.clock.workerSetInterval", {
+        gradeNames: ["berg.clock.realtime", "autoInit"],
 
         members: {
-            worker: '@expand:flock.clock.workerSetInterval.initWorker()'
+            worker: '@expand:berg.clock.workerSetInterval.initWorker()'
         },
 
         invokers: {
             start: {
-                funcName: "flock.clock.workerSetInterval.post",
+                funcName: "berg.clock.workerSetInterval.post",
                 args: [
                     "{that}.worker",
                     {
@@ -46,21 +52,21 @@
                 ]
             },
 
-            stop: "flock.clock.workerSetInterval.stop({that})"
+            stop: "berg.clock.workerSetInterval.stop({that})"
         },
 
         listeners: {
             onCreate: [
-                "flock.clock.workerSetInterval.listen({that})"
+                "berg.clock.workerSetInterval.listen({that})"
             ]
         }
     });
 
-    flock.clock.workerSetInterval.initWorker = function () {
-        return flock.worker(flock.clock.workerSetInterval.workerImpl);
+    berg.clock.workerSetInterval.initWorker = function () {
+        return berg.worker(berg.clock.workerSetInterval.workerImpl);
     };
 
-    flock.clock.workerSetInterval.listen = function (that) {
+    berg.clock.workerSetInterval.listen = function (that) {
         that.worker.addEventListener("message", function (e) {
             if (e.data.msg === "tick") {
                 that.tick(performance.now());
@@ -68,12 +74,12 @@
         }, false);
     };
 
-    flock.clock.workerSetInterval.post = function (worker, msg) {
+    berg.clock.workerSetInterval.post = function (worker, msg) {
         worker.postMessage(msg);
     };
 
-    flock.clock.workerSetInterval.stop = function (that) {
-        flock.clock.workerSetInterval.post(that.worker, {
+    berg.clock.workerSetInterval.stop = function (that) {
+        berg.clock.workerSetInterval.post(that.worker, {
             msg: "stop"
         });
 
@@ -81,15 +87,15 @@
     };
 
     // Note: This function is intended to be invoked as
-    // an flock.worker only.
+    // an berg.worker only.
     // TODO: This is pretty well copied from the Flocking
     // Scheduler.
-    flock.clock.workerSetInterval.workerImpl = function () {
+    berg.clock.workerSetInterval.workerImpl = function () {
         "use strict"; // jshint ignore:line
 
-        var flock = {};
+        var berg = {};
 
-        flock.workerClock = function (options) {
+        berg.workerClock = function (options) {
             var that = {
                 options: options || {},
                 intervalID: null
@@ -114,16 +120,15 @@
 
         self.addEventListener("message", function (e) {
             if (e.data.msg === "start") {
-                flock.clock = flock.workerClock({
+                berg.clock = berg.workerClock({
                     rate: e.data.value
                 });
-                flock.clock.start();
+                berg.clock.start();
             } else if (e.data.msg === "stop") {
-                if (flock.clock) {
-                    flock.clock.stop();
+                if (berg.clock) {
+                    berg.clock.stop();
                 }
-
-                //self.close();
+                self.close();
             }
         }, false);
     };

@@ -2,23 +2,23 @@
 
     "use strict";
 
-    fluid.defaults("flock.test.clock.testCase.offline", {
-        gradeNames: ["flock.test.clock.testCase", "autoInit"],
+    fluid.defaults("berg.test.clock.testCase.offline", {
+        gradeNames: ["berg.test.clock.testCase", "autoInit"],
 
         invokers: {
             testInitState: {
-                funcName: "flock.test.clock.testCase.offline.testInitial",
+                funcName: "berg.test.clock.testCase.offline.testInitial",
                 args: ["{clock}", "{tester}"]
             },
 
             testTick: {
-                funcName: "flock.test.clock.testCase.offline.testTick",
+                funcName: "berg.test.clock.testCase.offline.testTick",
                 args: ["{clock}", "{tester}"]
             }
         }
     });
 
-    flock.test.clock.testCase.offline.testInitial = function (clock, that) {
+    berg.test.clock.testCase.offline.testInitial = function (clock, that) {
         QUnit.equal(clock.options.rate, that.options.expected.rate,
             "The clock should be initialized with a rate of " +
             that.options.expected.rate + ".");
@@ -30,7 +30,7 @@
             that.options.expected.tickDuration + " seconds.");
     };
 
-    flock.test.clock.testCase.offline.testTick = function (clock, that) {
+    berg.test.clock.testCase.offline.testTick = function (clock, that) {
         that.applier.change("expectedTime",
             that.model.expectedTime + that.options.expected.tickDuration);
 
@@ -40,8 +40,8 @@
     };
 
 
-    fluid.defaults("flock.test.clock.tester.offline", {
-        gradeNames: ["flock.test.clock.tester", "autoInit"],
+    fluid.defaults("berg.test.clock.tester.offline", {
+        gradeNames: ["berg.test.clock.tester", "autoInit"],
 
         model: {
             expectedTime: 0
@@ -53,19 +53,19 @@
 
         components: {
             testCase: {
-                type: "flock.test.clock.testCase.offline"
+                type: "berg.test.clock.testCase.offline"
             },
 
             clock: {
-                type: "flock.clock.offline"
+                type: "berg.clock.offline"
             }
         }
     });
 
-    fluid.defaults("flock.test.clock.tester.offlineManual", {
+    fluid.defaults("berg.test.clock.tester.offlineManual", {
         gradeNames: [
-            "flock.test.clock.tester.offline",
-            "flock.test.clock.tester.manual",
+            "berg.test.clock.tester.offline",
+            "berg.test.clock.tester.manual",
             "autoInit"
         ]
     });

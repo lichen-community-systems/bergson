@@ -1,18 +1,24 @@
+/*
+* Bergson Scheduler Tests
+* http://github.com/colinbdclark/bergson
+*
+* Copyright 2015, Colin Clark
+* Dual licensed under the MIT and GPL Version 2 licenses.
+*/
 (function () {
-
     "use strict";
 
-    fluid.registerNamespace("flock.test.scheduler");
+    fluid.registerNamespace("berg.test.scheduler");
 
     QUnit.test("Instantiation", function () {
-        var s = flock.scheduler();
-        QUnit.ok(fluid.hasGrade(s.clock.options, "flock.clock.offline"),
+        var s = berg.scheduler();
+        QUnit.ok(fluid.hasGrade(s.clock.options, "berg.clock.offline"),
             "The scheduler has been configured with a clock instance");
         QUnit.equal(s.queue.items.length, 0, "The scheduler's queue is empty upon initialization.");
     });
 
     QUnit.test("Schedule a callback once: setup", function () {
-        var s = flock.scheduler({
+        var s = berg.scheduler({
             components: {
                 clock: {
                     options: {

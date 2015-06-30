@@ -2,9 +2,9 @@
 
     "use strict";
 
-    fluid.registerNamespace("flock.test.clock");
+    fluid.registerNamespace("berg.test.clock");
 
-    flock.test.assertTimeEqual = function (actual, expected, tolerance, msg) {
+    berg.test.assertTimeEqual = function (actual, expected, tolerance, msg) {
         var larger = expected,
             smaller = actual;
 
@@ -18,18 +18,18 @@
         ok(diff <= tolerance, msg + " Difference was: " + diff + "ms.");
     };
 
-    flock.test.clock.manualTicker = function (numTicks, clock) {
+    berg.test.clock.manualTicker = function (numTicks, clock) {
         for (var i = 0; i < numTicks; i++) {
             clock.tick();
         }
     };
 
-    fluid.defaults("flock.test.clock.tester.manual", {
+    fluid.defaults("berg.test.clock.tester.manual", {
         gradeNames: ["fluid.eventedComponent", "autoInit"],
 
         invokers: {
             start: {
-                funcName: "flock.test.clock.manualTicker",
+                funcName: "berg.test.clock.manualTicker",
                 args: ["{that}.options.numTicks", "{clock}"]
             }
         }
@@ -38,7 +38,7 @@
     // Tester mixin grade for clocks that are driven externally and thus:
     //   a) run asynchronously and need to signal QUnit to resume.
     //   b) need to be explicitly stopped.
-    fluid.defaults("flock.test.clock.tester.external", {
+    fluid.defaults("berg.test.clock.tester.external", {
         gradeNames: ["fluid.eventedComponent", "autoInit"],
 
         invokers: {

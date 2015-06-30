@@ -1,13 +1,19 @@
+/*
+* Bergson requestAnimationFrame Clock
+* http://github.com/colinbdclark/bergson
+*
+* Copyright 2015, Colin Clark
+* Dual licensed under the MIT and GPL Version 2 licenses.
+*/
 (function () {
-
     "use strict";
 
     /**
      * The RAF Clock is a realtime clock driven by
      * window.requestAnimationFrame()
      */
-    fluid.defaults("flock.clock.raf", {
-        gradeNames: ["flock.clock.realtime", "autoInit"],
+    fluid.defaults("berg.clock.raf", {
+        gradeNames: ["berg.clock.realtime", "autoInit"],
 
         rate: 60, // This should be overridden by the user
                   // to match the refresh rate of their display.
@@ -18,35 +24,35 @@
 
         invokers: {
             start: {
-                funcName: "flock.clock.raf.requestNextTick",
+                funcName: "berg.clock.raf.requestNextTick",
                 args: ["{that}"]
             },
 
             tick: {
-                funcName: "flock.clock.raf.tick",
+                funcName: "berg.clock.raf.tick",
                 args: ["{that}"]
             },
 
             stop: {
-                funcName: "flock.clock.raf.stop",
+                funcName: "berg.clock.raf.stop",
                 args: ["{that}"]
             }
         }
     });
 
-    flock.clock.raf.requestNextTick = function (that) {
+    berg.clock.raf.requestNextTick = function (that) {
         that.requestID = requestAnimationFrame(that.tick);
     };
 
-    flock.clock.raf.tick = function (that) {
-        flock.clock.raf.requestNextTick(that);
+    berg.clock.raf.tick = function (that) {
+        berg.clock.raf.requestNextTick(that);
 
         var now = performance.now();
         that.time = now;
         that.events.onTick.fire(now, that.rate);
     };
 
-    flock.clock.raf.stop = function (that) {
+    berg.clock.raf.stop = function (that) {
         cancelAnimationFrame(that.requestID);
     };
 
