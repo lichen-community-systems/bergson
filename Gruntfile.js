@@ -57,6 +57,11 @@ module.exports = function(grunt) {
             all: {
                 src: [].concat(files.jQuery, files.infusion, files.bergson),
                 dest: "dist/<%= pkg.name %>-all.js"
+            },
+
+            only: {
+                src: files.bergson,
+                dest: "dist/<%= pkg.name %>-only.js"
             }
         },
 

@@ -17245,9 +17245,7 @@ var fluid_2_0 = fluid_2_0 || {};
     });
 
 })(jQuery, fluid_2_0);
-;/*! Bergson 1.0, Copyright 2015 Colin Clark | github.com/colinbdclark/bergson */
-
-/*
+;/*
  * Bergson Clocks
  * http://github.com/colinbdclark/bergson
  *
