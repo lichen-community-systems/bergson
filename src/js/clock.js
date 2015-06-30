@@ -1,12 +1,12 @@
-/*! Bergson 1.0, Copyright 2015 Colin Clark | flockingjs.org */
+/*! Bergson 1.0, Copyright 2015 Colin Clark | github.com/colinbdclark/bergson */
 
 /*
-* Bergson Clocks
-* http://github.com/colinbdclark/bergson
-*
-* Copyright 2015, Colin Clark
-* Dual licensed under the MIT and GPL Version 2 licenses.
-*/
+ * Bergson Clocks
+ * http://github.com/colinbdclark/bergson
+ *
+ * Copyright 2015, Colin Clark
+ * Dual licensed under the MIT and GPL Version 2 licenses.
+ */
 (function () {
     "use strict";
 

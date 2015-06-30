@@ -1,10 +1,10 @@
 /*
-* Bergson requestAnimationFrame Clock
-* http://github.com/colinbdclark/bergson
-*
-* Copyright 2015, Colin Clark
-* Dual licensed under the MIT and GPL Version 2 licenses.
-*/
+ * Bergson requestAnimationFrame Clock
+ * http://github.com/colinbdclark/bergson
+ *
+ * Copyright 2015, Colin Clark
+ * Dual licensed under the MIT and GPL Version 2 licenses.
+ */
 (function () {
     "use strict";
 

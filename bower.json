@@ -1,0 +1,13 @@
+{
+    "name": "bergson",
+    "version": "1.0.0",
+    "main": "dist/bergson-all.min.js",
+    "ignore": [
+        "build-support",
+        "tests",
+        "GPL-LICENSE.txt",
+        "Gruntfile.js",
+        "MIT-LICENSE.txt",
+        "package.json"
+    ]
+}
