@@ -11,7 +11,7 @@
 
         components: {
             clock: {
-                type: "flock.clock" // Should be supplied by the user.
+                type: "flock.clock.offline" // Should be supplied by the user.
             }
         },
 
@@ -65,6 +65,7 @@
         }
     });
 
+    // Unsupported, non-API function.
     flock.scheduler.expandRepeatingEventSpec = function (now, eventSpec) {
         if (typeof eventSpec.time !== "number") {
             eventSpec.time = 0;
@@ -133,7 +134,7 @@
 
         // Check to see if this event fits within the current tick
         // (or if it's from an earlier tick in the case of a delay).
-        while (next.priority <= maxTime) {
+        while (next && next.priority <= maxTime) {
             // Take it out of the queue and invoke its callback.
             queue.pop();
             next.callback(time);
