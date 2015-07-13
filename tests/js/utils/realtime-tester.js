@@ -40,7 +40,7 @@
     fluid.defaults("berg.test.clock.tester.realtime", {
         gradeNames: ["berg.test.clock.tester", "autoInit"],
 
-        maxJitter: 15,
+        maxJitter: 20,
 
         components: {
             testCase: {

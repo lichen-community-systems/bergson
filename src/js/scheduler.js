@@ -16,8 +16,8 @@
         },
 
         components: {
-            clock: {
-                type: "berg.clock.offline" // Should be supplied by the user.
+            clock: { // Should be supplied by the user.
+                type: "berg.clock.offline"
             }
         },
 
@@ -27,9 +27,18 @@
              * queue of scheduled callback and fire those that
              * are appropriate for the current clock time.
              *
-             * @param {Number} time - the current clock time
+             * This function is invoked automatically when the
+             * scheduler's clock fires its onTick event.
+             *
+             * Note: the basic Bergson scheduler operates a "late"
+             * scheduling algorithm for changes that are finer-grained
+             * than the resolution of its clock. So, for example, if the
+             * clock is running at a rate of 1 tick/second, an event scheduled
+             * at time 1.1 seconds will be invoked at the 2 second tick.
+             *
+             * @param {Number} time - the current clock time, in seconds
              */
-            tick: "berg.scheduler.tick({arguments}.0, {arguments}.1, {that}.queue)",
+            tick: "berg.scheduler.tick({arguments}.0, {that}.queue)",
 
             /**
              * Schedules one or more score event specifications.
@@ -68,6 +77,12 @@
              * Clears all scheduled events.
              */
             clearAll: "{that}.queue.clear()"
+        },
+
+        listeners: {
+            "{clock}.events.onTick": {
+                func: "{scheduler}.tick"
+            }
         }
     });
 
@@ -84,6 +99,11 @@
     // Unsupported, non-API function.
     berg.scheduler.scheduleEvent = function (eventSpec, that) {
         var now = that.clock.time;
+
+        // TODO: Should we warn on omitted type?
+        if (!eventSpec.type) {
+            eventSpec.type = "once";
+        }
 
         if (eventSpec.type === "repeat") {
             berg.scheduler.expandRepeatingEventSpec(now, eventSpec);
@@ -134,20 +154,20 @@
         return berg.scheduler.scheduleEvent(eventSpec, that);
     };
 
-    berg.scheduler.tick = function (time, interval, queue) {
-        var next = queue.peek(),
-            maxTime = time + interval;
+    berg.scheduler.tick = function (time, queue) {
+        var next = queue.peek();
 
-        // Check to see if this event fits within the current tick
-        // (or if it's from an earlier tick in the case of a delay).
+        // Check to see if this event should fire now
+        // (or should have fired earlier!)
+        //
         // TODO: Consider the best semantic for hopelessly late events;
         // should they play immediately no matter what
         // (as in the current implementation),
         // or perhaps be thrown away if they're older than a certain threshold?
-        while (next && next.priority <= maxTime) {
+        while (next && next.priority <= time) {
             // Take it out of the queue and invoke its callback.
             queue.pop();
-            next.callback(time);
+            next.callback(time, next);
 
             // If it's a repeating event, queue it back up.
             if (next.type === "repeat" && next.end > time) {

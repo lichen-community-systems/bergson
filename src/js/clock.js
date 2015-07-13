@@ -17,8 +17,28 @@
         rate: 1, // Ticks per second.
 
         members: {
+            /**
+             * The clock's current time, in seconds.
+             */
             time: 0,
-            rate: "{that}.options.rate"
+
+            /**
+             * The rate (in cycles per second) that the clock is
+             * running at.
+             * This value is not guaranteed to be precise all clocks.
+             */
+            rate: "{that}.options.rate",
+
+            /**
+             * The duration, in seconds, between ticks.
+             * This value is not guaranteed to be precise for all clocks.
+             */
+            tickDuration: {
+                expander: {
+                    funcName: "berg.clock.calcTickDuration",
+                    args: "{that}.options.rate"
+                }
+            }
         },
 
         invokers: {
@@ -30,6 +50,9 @@
         }
     });
 
+    berg.clock.calcTickDuration = function (rate) {
+        return 1.0 / rate;
+    };
 
     /**
      * Offline Clock
@@ -45,15 +68,6 @@
     fluid.defaults("berg.clock.offline", {
         gradeNames: ["berg.clock", "autoInit"],
 
-        members: {
-            tickDuration: {
-                expander: {
-                    funcName: "berg.clock.offline.calcTickDuration",
-                    args: "{that}.options.rate"
-                }
-            }
-        },
-
         invokers: {
             tick: {
                 funcName: "berg.clock.offline.tick",
@@ -61,10 +75,6 @@
             }
         }
     });
-
-    berg.clock.offline.calcTickDuration = function (rate) {
-        return 1.0 / rate;
-    };
 
     berg.clock.offline.tick = function (that) {
         that.time += that.tickDuration;

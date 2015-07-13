@@ -88,8 +88,6 @@
 
     // Note: This function is intended to be invoked as
     // an berg.worker only.
-    // TODO: This is pretty well copied from the Flocking
-    // Scheduler.
     berg.clock.workerSetInterval.workerImpl = function () {
         "use strict"; // jshint ignore:line
 

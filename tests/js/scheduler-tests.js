@@ -12,33 +12,46 @@
 
     QUnit.test("Instantiation", function () {
         var s = berg.scheduler();
-        QUnit.ok(fluid.hasGrade(s.clock.options, "berg.clock.offline"),
-            "The scheduler has been configured with a clock instance");
-        QUnit.equal(s.queue.items.length, 0, "The scheduler's queue is empty upon initialization.");
+        berg.test.scheduler.testInitial(s);
     });
 
-    QUnit.test("Schedule a callback once: setup", function () {
-        var s = berg.scheduler({
-            components: {
-                clock: {
-                    options: {
-                        rate: 1/10
-                    }
-                }
-            }
-        });
+    QUnit.module("once");
 
-        // Tick the clock once so we've got an offset clock time to check against.
-        s.clock.tick();
+    berg.test.scheduler.onceTestSequencer({
+        name: "scheduled precisely on the tick interval",
 
-        var callback = function () {};
-        s.once(20, callback);
-        QUnit.equal(s.queue.items.length, 1,
-            "The queue should contain one item");
-        QUnit.equal(s.queue.peek().callback, callback,
-            "The specified callback should have been wrapped in an event specification object.");
-        QUnit.equal(s.queue.peek().priority, 30,
-            "The specified event time should have been normalized with the current clock time.");
+        expectedCallbackTime: 30,
+
+        scoreEventSpec: {
+            type: "once",
+            time: 20,     // As specified in the call to once()
+            priority: 30, // Normalized to clock's "now" position
+            callback: "{that}.events.onScheduledEvent.fire"
+        }
     });
 
+    berg.test.scheduler.onceTestSequencer({
+        name: "scheduled midway between the clock's tick interval",
+
+        expectedCallbackTime: 30,
+        scoreEventSpec: {
+            type: "once",
+            time: 15,     // As specified in the call to once()
+            priority: 25, // Normalized to clock's "now" position
+            callback: "{that}.events.onScheduledEvent.fire"
+        }
+    });
+
+    berg.test.scheduler.onceTestSequencer({
+        name: "scheduled in the past",
+
+        expectedCallbackTime: 20,
+
+        scoreEventSpec: {
+            type: "once",
+            time: 0,      // As specified in the call to once()
+            priority: 10, // Scheduler will normalize us to its current time.
+            callback: "{that}.events.onScheduledEvent.fire"
+        }
+    });
 }());
