@@ -32,9 +32,9 @@
             tick: "berg.scheduler.tick({arguments}.0, {arguments}.1, {that}.queue)",
 
             /**
-             * Schedules one or more score specifications.
+             * Schedules one or more score event specifications.
              *
-             * @param {Object||Array} scoreSpecs - the score specifications to schedule
+             * @param {Object||Array} scoreSpecs - the score event specifications to schedule
              */
             schedule: "berg.scheduler.schedule({arguments}.0, {that}.clock)",
 
@@ -59,7 +59,7 @@
              * causing it not to be evaluated by this scheduler
              * if it hasn't already fired or is repeating.
              *
-             * @param {Object} eventSpec - the event spec
+             * @param {Object} eventSpec - the event specification to clear
              */
             clear: "{that}.queue.remove({arguments}.0)",
 
@@ -77,8 +77,8 @@
             eventSpec.time = 0;
         }
 
-        eventSpec.endTime = typeof eventSpec.endTime !== "number" ?
-            Infinity : eventSpec.endTime + now;
+        eventSpec.end = typeof eventSpec.end !== "number" ?
+            Infinity : eventSpec.end + now;
     };
 
     // Unsupported, non-API function.
@@ -106,7 +106,7 @@
 
     berg.scheduler.schedule = function (eventSpec, that) {
         if (fluid.isArrayable(eventSpec)) {
-            berg.scheduler.scheduleEvents(eventSpec, that);
+            return berg.scheduler.scheduleEvents(eventSpec, that);
         }
 
         return berg.scheduler.scheduleEvent(eventSpec, that);
@@ -127,7 +127,7 @@
             type: "repeat",
             freq: interval,
             time: 0,
-            endTime: Infinity,
+            end: Infinity,
             callback: callback
         };
 
@@ -140,13 +140,17 @@
 
         // Check to see if this event fits within the current tick
         // (or if it's from an earlier tick in the case of a delay).
+        // TODO: Consider the best semantic for hopelessly late events;
+        // should they play immediately no matter what
+        // (as in the current implementation),
+        // or perhaps be thrown away if they're older than a certain threshold?
         while (next && next.priority <= maxTime) {
             // Take it out of the queue and invoke its callback.
             queue.pop();
             next.callback(time);
 
             // If it's a repeating event, queue it back up.
-            if (next.type === "repeat" && next.endTime > time) {
+            if (next.type === "repeat" && next.end > time) {
                 next.priority = time + next.freq;
                 queue.push(next);
             }

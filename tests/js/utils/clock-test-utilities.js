@@ -15,7 +15,9 @@
 
         var diff = larger - smaller;
 
-        ok(diff <= tolerance, msg + " Difference was: " + diff + "ms.");
+        ok(diff <= tolerance, msg +
+            " Tolerance is " + tolerance +
+            "; difference was: " + diff + "ms.");
     };
 
     berg.test.clock.manualTicker = function (numTicks, clock) {

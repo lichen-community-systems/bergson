@@ -5,8 +5,6 @@
     fluid.defaults("berg.test.clock.testCase.realtime", {
         gradeNames: ["berg.test.clock.testCase", "autoInit"],
 
-        maxJitter: 5,
-
         invokers: {
             testInitState: {
                 funcName: "berg.test.clock.testCase.realtime.testInitial",
@@ -41,6 +39,8 @@
 
     fluid.defaults("berg.test.clock.tester.realtime", {
         gradeNames: ["berg.test.clock.tester", "autoInit"],
+
+        maxJitter: 15,
 
         components: {
             testCase: {

@@ -17,6 +17,8 @@
             "autoInit"
         ],
 
+        maxJitter: 20, // Anything calling back to the main thread
+                       // is going to be jittery.
         components: {
             clock: {
                 type: "berg.clock.raf"

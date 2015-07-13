@@ -15,6 +15,8 @@
             "autoInit"
         ],
 
+        maxJitter: 15, // setInterval is jittery at the best of times.
+
         components: {
             clock: {
                 type: "berg.clock.setInterval"

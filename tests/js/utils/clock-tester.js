@@ -16,6 +16,8 @@
 
         numTicks: 60,
 
+        maxJitter: 0,
+
         expected: {
             rate: 1
         },
@@ -30,7 +32,10 @@
 
         components: {
             testCase: {
-                type: "fluid.emptySubcomponent"
+                type: "fluid.emptySubcomponent",
+                options: {
+                    maxJitter: "{tester}.options.maxJitter"
+                }
             },
 
             clock: {
