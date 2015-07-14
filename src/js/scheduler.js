@@ -109,10 +109,28 @@
             berg.scheduler.expandRepeatingEventSpec(now, eventSpec);
         }
 
+        berg.scheduler.validateEventSpec(eventSpec);
         eventSpec.priority = now + eventSpec.time;
         that.queue.push(eventSpec);
 
         return eventSpec;
+    };
+
+    berg.scheduler.validateEventSpec = function (eventSpec) {
+        if (typeof eventSpec.callback !== "function") {
+            throw new Error("No callback was specified for scheduled event: " +
+                fluid.prettyPrintJSON(eventSpec));
+        }
+
+        if (eventSpec.type === "repeat" && typeof eventSpec.interval !== "number") {
+            throw new Error("No interval was specified for scheduled event: " +
+                fluid.prettyPrintJSON(eventSpec));
+        }
+
+        if (typeof eventSpec.time !== "number") {
+            throw new Error("No time was specified for scheduled event: " +
+                fluid.prettyPrintJSON(eventSpec));
+        }
     };
 
     // Unsupported, non-API function.

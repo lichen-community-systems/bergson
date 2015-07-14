@@ -9,19 +9,36 @@
         QUnit.equal(s.queue.items.length, 0, "The scheduler's queue is empty upon initialization.");
     };
 
-    berg.test.scheduler.testQueue = function (s, expectedNumItems, expectedNext) {
-        QUnit.equal(s.queue.items.length, expectedNumItems,
-            "The queue should contain " + expectedNumItems + " items");
+    berg.test.scheduler.testQueue = function (s, scoreEventSpecs, expectedSequence, currentEventIdx) {
+        // TODO: Fix this!
+        var expectedInQueue = Object.keys(scoreEventSpecs).length - currentEventIdx;
 
-        if (expectedNext) {
+        QUnit.equal(s.queue.items.length, expectedInQueue,
+            "The queue should contain " + expectedInQueue + " items");
+
+        if (currentEventIdx < expectedSequence.length) {
+
+            var nextInSequence = expectedSequence[currentEventIdx],
+                expectedNext = scoreEventSpecs[nextInSequence.name];
+
             QUnit.deepEqual(s.queue.peek(), expectedNext,
                 "The next item in the queue should match the expected item.");
         }
     };
 
-    berg.test.scheduler.testCallback = function (clock, callbackArgs, expectedNow, expectedEventSpec) {
-        QUnit.equal(clock.time, expectedNow,
-            "The event should have been called back at the expected time.");
+    berg.test.scheduler.scheduleAll = function (scheduler, specs, onScheduledEvent) {
+        // TODO: Add the ability for tests to define order relative to clock ticks.
+        fluid.each(specs, function (spec) {
+            scheduler.once(spec.time, onScheduledEvent)
+        });
+    };
+
+    berg.test.scheduler.testCallback = function (clock, callbackArgs, scoreEventsSpecs, expectedSequence, currentEventIdx) {
+        var sequenceSpec = expectedSequence[currentEventIdx],
+            expectedEventSpec = scoreEventsSpecs[sequenceSpec.name];
+
+        QUnit.equal(clock.time, sequenceSpec.time,
+            "The callback should have been called back at the expected time.");
         QUnit.equal(callbackArgs[0], clock.time,
             "The callback should have been passed the current time as its first argument.");
         QUnit.deepEqual(callbackArgs[1], expectedEventSpec,
@@ -29,9 +46,13 @@
     };
 
     fluid.defaults("berg.test.scheduler.testSequencer", {
-        gradeNames: ["fluid.eventedComponent", "autoInit"],
+        gradeNames: ["fluid.standardRelayComponent", "autoInit"],
 
         name: "No test name was defined!",
+
+        model: {
+            currentEventIdx: 0
+        },
 
         components: {
             scheduler: {
@@ -54,7 +75,8 @@
                 {
                     priority: "first",
                     funcName: "QUnit.asyncTest",
-                    args: ["{that}.options.name", "{that}.run"]
+                    args: ["{that}.options.name", "{that}.run"],
+                    nameSpace: "runTests"
                 }
             ]
         }
@@ -73,7 +95,21 @@
             }
         },
 
-        scoreEventSpec: {},
+        scoreEventSpecs: {},
+        expectedSequence: [],
+
+        invokers: {
+            testQueue: {
+                funcName: "berg.test.scheduler.testQueue",
+                dynamic: true,
+                args: [
+                    "{scheduler}",
+                    "{that}.options.scoreEventSpecs",
+                    "{that}.options.expectedSequence",
+                    "{that}.model.currentEventIdx"
+                ]
+            }
+        },
 
         listeners: {
             onRun: [
@@ -86,20 +122,22 @@
 
                 // Schedule an event.
                 {
-                    func: "{scheduler}.once",
+                    funcName: "berg.test.scheduler.scheduleAll",
                     args: [
-                        "{that}.options.scoreEventSpec.time", "{that}.events.onScheduledEvent.fire"
+                        "{scheduler}",
+                        "{that}.options.scoreEventSpecs",
+                        "{that}.events.onScheduledEvent.fire"
                     ]
                 },
 
-                // Check the queue's state.
                 {
-                    funcName: "berg.test.scheduler.testQueue",
-                    args: ["{scheduler}", 1, "{that}.options.scoreEventSpec"]
+                    func: "{that}.testQueue"
                 },
 
                 "{scheduler}.clock.tick()",
                 "{scheduler}.clock.tick()",
+                "{scheduler}.clock.tick()",
+                "{scheduler}.clock.tick()"
             ],
 
             onScheduledEvent: [
@@ -108,13 +146,39 @@
                     args: [
                         "{scheduler}.clock",
                         "{arguments}",
-                        "{that}.options.expectedCallbackTime",
-                        "{that}.options.scoreEventSpec"
+                        "{that}.options.scoreEventSpecs",
+                        "{that}.options.expectedSequence",
+                        "{that}.model.currentEventIdx"
                     ]
                 },
-                "berg.test.scheduler.testQueue({scheduler}, 0)",
-                "QUnit.start()"
+                {
+                    funcName: "berg.test.scheduler.onceTestSequencer.updateModel",
+                    args: ["{that}.applier", "{that}.model"],
+                    namespace: "updateModel"
+                },
+                {
+                    func: "{that}.testQueue"
+                },
+                {
+                    funcName: "berg.test.scheduler.startWhenExpected",
+                    args: [
+                        "{that}.model.currentEventIdx",
+                        "{that}.options.expectedSequence"
+                    ]
+                }
             ]
         }
     });
+
+    berg.test.scheduler.onceTestSequencer.updateModel = function (applier, model) {
+        var newVal = model.currentEventIdx + 1;
+        applier.change("currentEventIdx", newVal);
+    };
+
+    berg.test.scheduler.startWhenExpected = function (currentEventIdx, expectedSequence) {
+        if (currentEventIdx === expectedSequence.length) {
+            QUnit.start();
+        }
+    };
+
 }());
