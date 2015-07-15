@@ -169,8 +169,8 @@
                     eventSpecName + "' was found. Registration sequence was: " +
                     fluid.prettyPrintJSON(registrationSequence));
             }
-            s.once(eventSpec.time, onScheduledEvent);
             eventSpec.callback = onScheduledEvent;
+            s.once(eventSpec.time, onScheduledEvent);
         });
     };
 

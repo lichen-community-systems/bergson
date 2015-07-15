@@ -87,34 +87,6 @@
         {
             type: "berg.test.scheduler.onceTestSequencer",
             options: {
-                name: "scheduled in the past",
-
-                numTicks: 5,
-
-                scoreEventSpecs: {
-                    only: {
-                        type: "once",
-                        time: 0,
-                        priority: 10
-                    }
-                },
-
-                registrationSequence: {
-                    1: ["only"]
-                },
-
-                expectedSequence: [
-                    {
-                        name: "only",
-                        time: 20,
-                        queueSize: 0
-                    }
-                ]
-            }
-        },
-        {
-            type: "berg.test.scheduler.onceTestSequencer",
-            options: {
                 name: "multiple scheduled; only one should fire",
 
                 numTicks: 5,
@@ -192,6 +164,62 @@
                     {
                         name: "scheduledLastRunsSecond",
                         time: 50,
+                        queueSize: 0
+                    }
+                ]
+            }
+        },
+        {
+            type: "berg.test.scheduler.onceTestSequencer",
+            options: {
+                name: "scheduled immediately",
+
+                numTicks: 2,
+
+                scoreEventSpecs: {
+                    immediately: {
+                        type: "once",
+                        time: 0,
+                        priority: 0
+                    }
+                },
+
+                registrationSequence: {
+                    0: ["immediately"]
+                },
+
+                expectedSequence: [
+                    {
+                        name: "immediately",
+                        time: 0,
+                        queueSize: 0
+                    }
+                ]
+            }
+        },
+        {
+            type: "berg.test.scheduler.onceTestSequencer",
+            options: {
+                name: "scheduled immediately, after ticking for a bit",
+
+                numTicks: 5,
+
+                scoreEventSpecs: {
+                    immediately: {
+                        type: "once",
+                        time: 0,
+                        priority: 20
+                    }
+                },
+
+                registrationSequence: {
+                    2: ["immediately"]
+                },
+
+                expectedSequence: [
+                    {
+                        name: "immediately",
+                        time: 20,
                         queueSize: 0
                     }
                 ]

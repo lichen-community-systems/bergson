@@ -97,25 +97,17 @@
     };
 
     // Unsupported, non-API function.
-    berg.scheduler.scheduleEvent = function (eventSpec, that) {
-        var now = that.clock.time;
+    berg.scheduler.evaluateScoreEvent = function (scoreEvent, time, queue) {
+        scoreEvent.callback(time, scoreEvent);
 
-        // TODO: Should we warn on omitted type?
-        if (!eventSpec.type) {
-            eventSpec.type = "once";
+        // If it's a repeating event, queue it back up.
+        if (scoreEvent.type === "repeat" && scoreEvent.end > time) {
+            scoreEvent.priority = time + scoreEvent.freq;
+            queue.push(scoreEvent);
         }
-
-        if (eventSpec.type === "repeat") {
-            berg.scheduler.expandRepeatingEventSpec(now, eventSpec);
-        }
-
-        berg.scheduler.validateEventSpec(eventSpec);
-        eventSpec.priority = now + eventSpec.time;
-        that.queue.push(eventSpec);
-
-        return eventSpec;
     };
 
+    // Unsupported, non-API function.
     berg.scheduler.validateEventSpec = function (eventSpec) {
         if (typeof eventSpec.callback !== "function") {
             throw new Error("No callback was specified for scheduled event: " +
@@ -131,6 +123,31 @@
             throw new Error("No time was specified for scheduled event: " +
                 fluid.prettyPrintJSON(eventSpec));
         }
+    };
+
+    // Unsupported, non-API function.
+    berg.scheduler.scheduleEvent = function (eventSpec, that) {
+        var now = that.clock.time;
+
+        // TODO: Should we warn on omitted type?
+        if (!eventSpec.type) {
+            eventSpec.type = "once";
+        }
+
+        if (eventSpec.type === "repeat") {
+            berg.scheduler.expandRepeatingEventSpec(now, eventSpec);
+        }
+
+        berg.scheduler.validateEventSpec(eventSpec);
+        eventSpec.priority = now + eventSpec.time;
+
+        if (eventSpec.priority <= now) {
+            berg.scheduler.evaluateScoreEvent(eventSpec, now, that.queue);
+        } else {
+            that.queue.push(eventSpec);
+        }
+
+        return eventSpec;
     };
 
     // Unsupported, non-API function.
@@ -185,14 +202,7 @@
         while (next && next.priority <= time) {
             // Take it out of the queue and invoke its callback.
             queue.pop();
-            next.callback(time, next);
-
-            // If it's a repeating event, queue it back up.
-            if (next.type === "repeat" && next.end > time) {
-                next.priority = time + next.freq;
-                queue.push(next);
-            }
-
+            berg.scheduler.evaluateScoreEvent(next, time, queue);
             next = queue.peek();
         }
     };
