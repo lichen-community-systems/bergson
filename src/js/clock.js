@@ -42,7 +42,9 @@
         },
 
         invokers: {
-            tick: "fluid.identity()"
+            start: "fluid.identity()",
+            tick: "fluid.identity()",
+            stop: "fluid.identity()"
         },
 
         events: {

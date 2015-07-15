@@ -66,9 +66,8 @@
                 scoreEventSpecs: {
                     only: {
                         type: "once",
-                        time: 15,     // As specified in the call to once()
-                        priority: 25, // Normalized to clock's "now" position
-                        callback: "{that}.events.onScheduledEvent.fire"
+                        time: 15,
+                        priority: 25
                     }
                 },
 
@@ -95,9 +94,8 @@
                 scoreEventSpecs: {
                     only: {
                         type: "once",
-                        time: 0,      // As specified in the call to once()
-                        priority: 10, // Scheduler will normalize us to its current time.
-                        callback: "{that}.events.onScheduledEvent.fire"
+                        time: 0,
+                        priority: 10
                     }
                 },
 
@@ -124,16 +122,14 @@
                 scoreEventSpecs: {
                     first: {
                         type: "once",
-                        time: 20,     // As specified in the call to once()
-                        priority: 30, // Normalized to clock's "now" position
-                        callback: "{that}.events.onScheduledEvent.fire"
+                        time: 20,
+                        priority: 30
                     },
 
                     later: {
                         type: "once",
                         time: 400,
-                        priority: 410,
-                        callback: "{that}.events.onScheduledEvent.fire"
+                        priority: 410
                     }
                 },
 
@@ -160,39 +156,37 @@
                 scoreEventSpecs: {
                     first: {
                         type: "once",
-                        time: 10,     // As specified in the call to once()
-                        priority: 20, // Normalized to clock's "now" position
-                        callback: "{that}.events.onScheduledEvent.fire"
+                        time: 10,
+                        priority: 10
                     },
 
                     scheduledSecondRunsLast: {
                         type: "once",
                         time: 20,
-                        priority: 30,
-                        callback: "{that}.events.onScheduledEvent.fire"
+                        priority: 20
                     },
 
                     scheduledLastRunsSecond: {
                         type: "once",
                         time: 31,
-                        priority: 41,
-                        callback: "{that}.events.onScheduledEvent.fire"
+                        priority: 41
                     }
                 },
 
                 registrationSequence: {
-                    1: ["first", "scheduledSecondRunsLast", "scheduledLastRunsSecond"]
+                    0: ["first", "scheduledSecondRunsLast"],
+                    1: ["scheduledLastRunsSecond"]
                 },
 
                 expectedSequence: [
                     {
                         name: "first",
-                        time: 20,
-                        queueSize: 2
+                        time: 10,
+                        queueSize: 1
                     },
                     {
                         name: "scheduledSecondRunsLast",
-                        time: 30,
+                        time: 20,
                         queueSize: 1
                     },
                     {

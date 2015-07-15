@@ -16,13 +16,6 @@
             "The queue should contain " + expectedQueueSize + " items");
     };
 
-    berg.test.scheduler.scheduleAll = function (scheduler, specs, onScheduledEvent) {
-        // TODO: Add the ability for tests to define order relative to clock ticks.
-        fluid.each(specs, function (spec) {
-            scheduler.once(spec.time, onScheduledEvent);
-        });
-    };
-
     berg.test.scheduler.testCallback = function (clock, callbackArgs, scoreEventsSpecs, expectedSequence, currentEventIdx) {
         var sequenceSpec = expectedSequence[currentEventIdx],
             expectedEventSpec = scoreEventsSpecs[sequenceSpec.name];
@@ -39,11 +32,16 @@
         gradeNames: ["fluid.standardRelayComponent", "autoInit"],
 
         name: "No test name was defined!",
+        scoreEventSpecs: {},
+        registrationSequence: {},
+        expectedSequence: [],
 
         model: {
             currentEventIdx: 0,
             tick: 0
         },
+
+        schedulerOptions: {},
 
         components: {
             scheduler: {
@@ -53,43 +51,8 @@
         },
 
         invokers: {
-            run: "{that}.events.onRun.fire"
-        },
+            run: "{that}.events.onRun.fire",
 
-        events: {
-            onRun: null,
-            onScheduledEvent: null
-        },
-
-        listeners: {
-            onCreate: [
-                {
-                    priority: "first",
-                    funcName: "QUnit.asyncTest",
-                    args: ["{that}.options.name", "{that}.run"],
-                    nameSpace: "runTests"
-                }
-            ]
-        }
-    });
-
-    fluid.defaults("berg.test.scheduler.onceTestSequencer", {
-        gradeNames: ["berg.test.scheduler.testSequencer", "autoInit"],
-
-        schedulerOptions: {
-            components: {
-                clock: {
-                    options: {
-                        rate: 1/10
-                    }
-                }
-            }
-        },
-
-        scoreEventSpecs: {},
-        expectedSequence: [],
-
-        invokers: {
             testQueue: {
                 funcName: "berg.test.scheduler.testQueue",
                 dynamic: true,
@@ -101,26 +64,34 @@
             }
         },
 
+        events: {
+            onRun: null,
+            onScheduledEvent: null,
+            onTick: null
+        },
+
         listeners: {
+            onCreate: [
+                {
+                    priority: "first",
+                    funcName: "QUnit.asyncTest",
+                    args: ["{that}.options.name", "{that}.run"],
+                    nameSpace: "runTests"
+                }
+            ],
+
+            onRun: [
+                "{scheduler}.clock.start()",
+                "{that}.schedule()",
+                "berg.test.scheduler.driveClockSync({scheduler}.clock, {that}.options.numTicks)"
+            ],
+
             "{scheduler}.clock.events.onTick": [
                 {
                     funcName: "berg.test.scheduler.incrementTick",
                     args: ["{that}.applier", "{that}.model"]
                 },
-                {
-                    funcName: "berg.test.scheduler.schedule",
-                    args: [
-                        "{scheduler}",
-                        "{that}.model.tick",
-                        "{that}.options.registrationSequence",
-                        "{that}.options.scoreEventSpecs",
-                        "{that}.events.onScheduledEvent.fire"
-                    ]
-                }
-            ],
-
-            onRun: [
-                "berg.test.scheduler.driveClockSync({scheduler}.clock, {that}.options.numTicks)"
+                "{that}.schedule()"
             ],
 
             onScheduledEvent: [
@@ -146,10 +117,39 @@
                     funcName: "berg.test.scheduler.startAfterSequenceEnds",
                     args: [
                         "{that}.model.currentEventIdx",
-                        "{that}.options.expectedSequence"
+                        "{that}.options.expectedSequence",
+                        "{scheduler}.clock"
                     ]
                 }
             ]
+        }
+    });
+
+    fluid.defaults("berg.test.scheduler.onceTestSequencer", {
+        gradeNames: ["berg.test.scheduler.testSequencer", "autoInit"],
+
+        schedulerOptions: {
+            components: {
+                clock: {
+                    options: {
+                        rate: 1/10
+                    }
+                }
+            }
+        },
+
+        invokers: {
+            schedule: {
+                funcName: "berg.test.scheduler.schedule",
+                dynamic: true,
+                args: [
+                    "{scheduler}",
+                    "{that}.model.tick",
+                    "{that}.options.registrationSequence",
+                    "{that}.options.scoreEventSpecs",
+                    "{that}.events.onScheduledEvent.fire"
+                ]
+            }
         }
     });
 
@@ -178,8 +178,9 @@
         applier.change("currentEventIdx", model.currentEventIdx + 1);
     };
 
-    berg.test.scheduler.startAfterSequenceEnds = function (currentEventIdx, expectedSequence) {
+    berg.test.scheduler.startAfterSequenceEnds = function (currentEventIdx, expectedSequence, clock) {
         if (currentEventIdx === expectedSequence.length) {
+            clock.stop();
             QUnit.start();
         }
     };
