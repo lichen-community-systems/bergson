@@ -17,6 +17,9 @@
     };
 
     berg.test.scheduler.testCallback = function (clock, callbackArgs, scoreEventsSpecs, expectedSequence, currentEventIdx) {
+        ok(currentEventIdx < expectedSequence.length,
+            "The number of event callbacks is within range of expected.");
+
         var sequenceSpec = expectedSequence[currentEventIdx],
             expectedEventSpec = scoreEventsSpecs[sequenceSpec.name];
 
@@ -206,12 +209,16 @@
         }
     };
 
-    fluid.defaults("berg.test.scheduler.onceTestSequencer", {
+    fluid.defaults("berg.test.scheduler.offlineTestSequencer", {
         gradeNames: [
             "berg.test.scheduler.testSequencer",
             "berg.test.scheduler.testSequencer.offline",
             "autoInit"
-        ],
+        ]
+    });
+
+    fluid.defaults("berg.test.scheduler.onceTestSequencer", {
+        gradeNames: ["berg.test.scheduler.offlineTestSequencer", "autoInit"],
 
         schedulerOptions: {
             components: {
@@ -240,11 +247,7 @@
     };
 
     fluid.defaults("berg.test.scheduler.repeatTestSequencer", {
-        gradeNames: [
-            "berg.test.scheduler.testSequencer",
-            "berg.test.scheduler.testSequencer.offline",
-            "autoInit"
-        ],
+        gradeNames: ["berg.test.scheduler.offlineTestSequencer", "autoInit"],
 
         invokers: {
             scheduleEvent: {
@@ -259,7 +262,7 @@
     });
 
     berg.test.scheduler.repeatTestSequencer.scheduleEvent = function (s, eventSpec, onScheduledEvent) {
-        s.repeat(eventSpec.freq, onScheduledEvent);
+        s.repeat(eventSpec.freq, onScheduledEvent, eventSpec.time, eventSpec.end);
     };
 
 }());

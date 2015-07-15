@@ -89,7 +89,7 @@
              *
              * @param {Object||Array} scoreSpecs - the score event specifications to schedule
              */
-            schedule: "berg.scheduler.schedule({arguments}.0, {that}.clock)",
+            schedule: "berg.scheduler.schedule({arguments}.0, {that})",
 
             /**
              * Schedules a callback to be fired once at the specified time.
@@ -104,8 +104,19 @@
              *
              * @param {Number} freq - the frequency (per second) to repeat at
              * @param {Function} callback - the callback to schedule
+             * @param {Number} time - the time (in seconds) to start repeating at
+             * @param {Number} end - the time (in seconds) to stop repeating at; this value is inclusive
              */
-            repeat: "berg.scheduler.repeat({arguments}.0, {arguments}.1, {that})",
+            repeat: {
+                funcName: "berg.scheduler.repeat",
+                args: [
+                    "{arguments}.0",
+                    "{arguments}.1",
+                    "{arguments}.2",
+                    "{arguments}.3",
+                    "{that}"
+                ]
+            },
 
             /**
              * Clears a scheduled event,
@@ -221,12 +232,12 @@
         return berg.scheduler.scheduleEvent(eventSpec, that);
     };
 
-    berg.scheduler.repeat = function (freq, callback, that) {
+    berg.scheduler.repeat = function (freq, callback, time, end, that) {
         var eventSpec = {
             type: "repeat",
             freq: freq,
-            time: 0,
-            end: Infinity,
+            time: time,
+            end: end,
             callback: callback
         };
 

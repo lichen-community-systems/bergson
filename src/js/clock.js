@@ -14,6 +14,8 @@
     fluid.defaults("berg.clock", {
         gradeNames: ["fluid.eventedComponent", "autoInit"],
 
+        // TODO: Consider renaming this to "freq" for consistency
+        // with the scheduler and Flocking.
         rate: 1, // Ticks per second.
 
         members: {
