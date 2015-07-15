@@ -9,27 +9,17 @@
         QUnit.equal(s.queue.items.length, 0, "The scheduler's queue is empty upon initialization.");
     };
 
-    berg.test.scheduler.testQueue = function (s, scoreEventSpecs, expectedSequence, currentEventIdx) {
-        // TODO: Fix this!
-        var expectedInQueue = Object.keys(scoreEventSpecs).length - currentEventIdx;
+    berg.test.scheduler.testQueue = function (s, expectedSequence, currentEventIdx) {
+        var expectedQueueSize = expectedSequence[currentEventIdx - 1].queueSize;
 
-        QUnit.equal(s.queue.items.length, expectedInQueue,
-            "The queue should contain " + expectedInQueue + " items");
-
-        if (currentEventIdx < expectedSequence.length) {
-
-            var nextInSequence = expectedSequence[currentEventIdx],
-                expectedNext = scoreEventSpecs[nextInSequence.name];
-
-            QUnit.deepEqual(s.queue.peek(), expectedNext,
-                "The next item in the queue should match the expected item.");
-        }
+        QUnit.equal(s.queue.items.length, expectedQueueSize,
+            "The queue should contain " + expectedQueueSize + " items");
     };
 
     berg.test.scheduler.scheduleAll = function (scheduler, specs, onScheduledEvent) {
         // TODO: Add the ability for tests to define order relative to clock ticks.
         fluid.each(specs, function (spec) {
-            scheduler.once(spec.time, onScheduledEvent)
+            scheduler.once(spec.time, onScheduledEvent);
         });
     };
 
@@ -51,7 +41,8 @@
         name: "No test name was defined!",
 
         model: {
-            currentEventIdx: 0
+            currentEventIdx: 0,
+            tick: 0
         },
 
         components: {
@@ -104,7 +95,6 @@
                 dynamic: true,
                 args: [
                     "{scheduler}",
-                    "{that}.options.scoreEventSpecs",
                     "{that}.options.expectedSequence",
                     "{that}.model.currentEventIdx"
                 ]
@@ -112,32 +102,25 @@
         },
 
         listeners: {
-            onRun: [
-                 // Tick the clock once
-                 // so we've got an offset clock time to check against.
+            "{scheduler}.clock.events.onTick": [
                 {
-                    func: "{scheduler}.clock.tick",
-                    namespace: "firstTick"
+                    funcName: "berg.test.scheduler.incrementTick",
+                    args: ["{that}.applier", "{that}.model"]
                 },
-
-                // Schedule an event.
                 {
-                    funcName: "berg.test.scheduler.scheduleAll",
+                    funcName: "berg.test.scheduler.schedule",
                     args: [
                         "{scheduler}",
+                        "{that}.model.tick",
+                        "{that}.options.registrationSequence",
                         "{that}.options.scoreEventSpecs",
                         "{that}.events.onScheduledEvent.fire"
                     ]
-                },
+                }
+            ],
 
-                {
-                    func: "{that}.testQueue"
-                },
-
-                "{scheduler}.clock.tick()",
-                "{scheduler}.clock.tick()",
-                "{scheduler}.clock.tick()",
-                "{scheduler}.clock.tick()"
+            onRun: [
+                "berg.test.scheduler.driveClockSync({scheduler}.clock, {that}.options.numTicks)"
             ],
 
             onScheduledEvent: [
@@ -160,7 +143,7 @@
                     func: "{that}.testQueue"
                 },
                 {
-                    funcName: "berg.test.scheduler.startWhenExpected",
+                    funcName: "berg.test.scheduler.startAfterSequenceEnds",
                     args: [
                         "{that}.model.currentEventIdx",
                         "{that}.options.expectedSequence"
@@ -170,14 +153,40 @@
         }
     });
 
-    berg.test.scheduler.onceTestSequencer.updateModel = function (applier, model) {
-        var newVal = model.currentEventIdx + 1;
-        applier.change("currentEventIdx", newVal);
+    berg.test.scheduler.incrementTick = function (applier, model) {
+        applier.change("tick", model.tick + 1);
     };
 
-    berg.test.scheduler.startWhenExpected = function (currentEventIdx, expectedSequence) {
+    berg.test.scheduler.schedule = function (s, tick, registrationSequence, scoreEventSpecs, onScheduledEvent) {
+        if (!registrationSequence[tick]) {
+            return;
+        }
+
+        fluid.each(registrationSequence[tick], function (eventSpecName) {
+            var eventSpec = scoreEventSpecs[eventSpecName];
+            if (!eventSpec) {
+                ok(false, "The registrationSequence was misconfigured. No scoreEventSpec named '" +
+                    eventSpecName + "' was found. Registration sequence was: " +
+                    fluid.prettyPrintJSON(registrationSequence));
+            }
+            s.once(eventSpec.time, onScheduledEvent);
+            eventSpec.callback = onScheduledEvent;
+        });
+    };
+
+    berg.test.scheduler.onceTestSequencer.updateModel = function (applier, model) {
+        applier.change("currentEventIdx", model.currentEventIdx + 1);
+    };
+
+    berg.test.scheduler.startAfterSequenceEnds = function (currentEventIdx, expectedSequence) {
         if (currentEventIdx === expectedSequence.length) {
             QUnit.start();
+        }
+    };
+
+    berg.test.scheduler.driveClockSync = function (clock, numTicks) {
+        for (var i = 0; i < numTicks; i++) {
+            clock.tick();
         }
     };
 

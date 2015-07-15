@@ -32,19 +32,26 @@
             options: {
                 name: "scheduled precisely on the tick interval",
 
+                numTicks: 5,
+
                 scoreEventSpecs: {
                     only: {
                         type: "once",
                         time: 20,     // As specified in the call to once()
-                        priority: 30, // Normalized to clock's "now" position
-                        callback: "{that}.events.onScheduledEvent.fire"
+                        priority: 30 // Normalized to clock's "now" position
                     }
+                },
+
+                // Tick count to register at : [specification names]
+                registrationSequence: {
+                    1: ["only"]
                 },
 
                 expectedSequence: [
                     {
                         name: "only",
-                        time: 30
+                        time: 30,
+                        queueSize: 0
                     }
                 ]
             }
@@ -53,6 +60,8 @@
             type: "berg.test.scheduler.onceTestSequencer",
             options: {
                 name: "scheduled midway between the clock's tick interval",
+
+                numTicks: 5,
 
                 scoreEventSpecs: {
                     only: {
@@ -63,10 +72,15 @@
                     }
                 },
 
+                registrationSequence: {
+                    1: ["only"]
+                },
+
                 expectedSequence: [
                     {
                         name: "only",
-                        time: 30
+                        time: 30,
+                        queueSize: 0
                     }
                 ]
             }
@@ -75,6 +89,8 @@
             type: "berg.test.scheduler.onceTestSequencer",
             options: {
                 name: "scheduled in the past",
+
+                numTicks: 5,
 
                 scoreEventSpecs: {
                     only: {
@@ -85,10 +101,15 @@
                     }
                 },
 
+                registrationSequence: {
+                    1: ["only"]
+                },
+
                 expectedSequence: [
                     {
                         name: "only",
-                        time: 20
+                        time: 20,
+                        queueSize: 0
                     }
                 ]
             }
@@ -97,6 +118,8 @@
             type: "berg.test.scheduler.onceTestSequencer",
             options: {
                 name: "multiple scheduled; only one should fire",
+
+                numTicks: 5,
 
                 scoreEventSpecs: {
                     first: {
@@ -114,10 +137,15 @@
                     }
                 },
 
+                registrationSequence: {
+                    1: ["first", "later"]
+                },
+
                 expectedSequence: [
                     {
                         name: "first",
-                        time: 30
+                        time: 30,
+                        queueSize: 1
                     }
                 ]
             }
@@ -126,6 +154,8 @@
             type: "berg.test.scheduler.onceTestSequencer",
             options: {
                 name: "multiple scheduled non-consecutively; all should fire",
+
+                numTicks: 5,
 
                 scoreEventSpecs: {
                     first: {
@@ -150,18 +180,25 @@
                     }
                 },
 
+                registrationSequence: {
+                    1: ["first", "scheduledSecondRunsLast", "scheduledLastRunsSecond"]
+                },
+
                 expectedSequence: [
                     {
                         name: "first",
-                        time: 20
+                        time: 20,
+                        queueSize: 2
                     },
                     {
                         name: "scheduledSecondRunsLast",
-                        time: 30
+                        time: 30,
+                        queueSize: 1
                     },
                     {
                         name: "scheduledLastRunsSecond",
-                        time: 50
+                        time: 50,
+                        queueSize: 0
                     }
                 ]
             }
