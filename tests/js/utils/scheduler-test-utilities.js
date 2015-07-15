@@ -53,6 +53,17 @@
         invokers: {
             run: "{that}.events.onRun.fire",
 
+            startClock: {
+                func: "{scheduler}.clock.start"
+            },
+
+            evaluateRegistrationSequence: {
+                funcName: "berg.test.scheduler.testSequencer.evaluateRegistrationSequence",
+                args: ["{that}"]
+            },
+
+            scheduleEvent: "{scheduler}.schedule({arguments}.0)",
+
             testQueue: {
                 funcName: "berg.test.scheduler.testQueue",
                 dynamic: true,
@@ -81,17 +92,16 @@
             ],
 
             onRun: [
-                "{scheduler}.clock.start()",
-                "{that}.schedule()",
-                "berg.test.scheduler.driveClockSync({scheduler}.clock, {that}.options.numTicks)"
+                "{that}.evaluateRegistrationSequence()",
+                "{that}.startClock()"
             ],
 
             "{scheduler}.clock.events.onTick": [
                 {
-                    funcName: "berg.test.scheduler.incrementTick",
+                    funcName: "berg.test.scheduler.testSequencer.incrementTick",
                     args: ["{that}.applier", "{that}.model"]
                 },
-                "{that}.schedule()"
+                "{that}.evaluateRegistrationSequence()"
             ],
 
             onScheduledEvent: [
@@ -106,7 +116,7 @@
                     ]
                 },
                 {
-                    funcName: "berg.test.scheduler.onceTestSequencer.updateModel",
+                    funcName: "berg.test.scheduler.testSequencer.updateModel",
                     args: ["{that}.applier", "{that}.model"],
                     namespace: "updateModel"
                 },
@@ -114,7 +124,7 @@
                     func: "{that}.testQueue"
                 },
                 {
-                    funcName: "berg.test.scheduler.startAfterSequenceEnds",
+                    funcName: "berg.test.scheduler.testSequencer.startAfterSequenceEnds",
                     args: [
                         "{that}.model.currentEventIdx",
                         "{that}.options.expectedSequence",
@@ -125,8 +135,66 @@
         }
     });
 
+    berg.test.scheduler.testSequencer.startClock = function (clock) {
+        clock.start();
+    };
+
+    berg.test.scheduler.testSequencer.incrementTick = function (applier, model) {
+        applier.change("tick", model.tick + 1);
+    };
+
+    berg.test.scheduler.testSequencer.updateModel = function (applier, model) {
+        applier.change("currentEventIdx", model.currentEventIdx + 1);
+    };
+
+    berg.test.scheduler.testSequencer.evaluateRegistrationSequence = function (that) {
+        if (!that.options.registrationSequence[that.model.tick]) {
+            return;
+        }
+
+        fluid.each(that.options.registrationSequence[that.model.tick], function (eventSpecName) {
+            var eventSpec = that.options.scoreEventSpecs[eventSpecName];
+            if (!eventSpec) {
+                ok(false, "The registrationSequence was misconfigured. No scoreEventSpec named '" +
+                    eventSpecName + "' was found. Registration sequence was: " +
+                    fluid.prettyPrintJSON(registrationSequence));
+            }
+            eventSpec.callback = that.events.onScheduledEvent.fire;
+            that.scheduleEvent(eventSpec);
+        });
+    };
+
+    berg.test.scheduler.testSequencer.startAfterSequenceEnds = function (currentEventIdx, expectedSequence, clock) {
+        if (currentEventIdx === expectedSequence.length) {
+            clock.stop();
+            QUnit.start();
+        }
+    };
+
+
+    fluid.defaults("berg.test.scheduler.testSequencer.offline", {
+        gradeNames: ["fluid.standardRelayComponent", "autoInit"],
+
+        invokers: {
+            startClock: {
+                funcName: "berg.test.scheduler.testSequencer.offline.driveClockSync",
+                args: ["{scheduler}.clock", "{that}.options.numTicks"]
+            }
+        }
+    });
+
+    berg.test.scheduler.testSequencer.offline.driveClockSync = function (clock, numTicks) {
+        for (var i = 0; i < numTicks; i++) {
+            clock.tick();
+        }
+    };
+
     fluid.defaults("berg.test.scheduler.onceTestSequencer", {
-        gradeNames: ["berg.test.scheduler.testSequencer", "autoInit"],
+        gradeNames: [
+            "berg.test.scheduler.testSequencer",
+            "berg.test.scheduler.testSequencer.offline",
+            "autoInit"
+        ],
 
         schedulerOptions: {
             components: {
@@ -139,56 +207,18 @@
         },
 
         invokers: {
-            schedule: {
-                funcName: "berg.test.scheduler.schedule",
-                dynamic: true,
+            scheduleEvent: {
+                funcName: "berg.test.scheduler.onceTestSequencer.scheduleEvent",
                 args: [
                     "{scheduler}",
-                    "{that}.model.tick",
-                    "{that}.options.registrationSequence",
-                    "{that}.options.scoreEventSpecs",
+                    "{arguments}.0",
                     "{that}.events.onScheduledEvent.fire"
                 ]
             }
         }
     });
 
-    berg.test.scheduler.incrementTick = function (applier, model) {
-        applier.change("tick", model.tick + 1);
+    berg.test.scheduler.onceTestSequencer.scheduleEvent = function (s, eventSpec, onScheduledEvent) {
+        s.once(eventSpec.time, onScheduledEvent);
     };
-
-    berg.test.scheduler.schedule = function (s, tick, registrationSequence, scoreEventSpecs, onScheduledEvent) {
-        if (!registrationSequence[tick]) {
-            return;
-        }
-
-        fluid.each(registrationSequence[tick], function (eventSpecName) {
-            var eventSpec = scoreEventSpecs[eventSpecName];
-            if (!eventSpec) {
-                ok(false, "The registrationSequence was misconfigured. No scoreEventSpec named '" +
-                    eventSpecName + "' was found. Registration sequence was: " +
-                    fluid.prettyPrintJSON(registrationSequence));
-            }
-            eventSpec.callback = onScheduledEvent;
-            s.once(eventSpec.time, onScheduledEvent);
-        });
-    };
-
-    berg.test.scheduler.onceTestSequencer.updateModel = function (applier, model) {
-        applier.change("currentEventIdx", model.currentEventIdx + 1);
-    };
-
-    berg.test.scheduler.startAfterSequenceEnds = function (currentEventIdx, expectedSequence, clock) {
-        if (currentEventIdx === expectedSequence.length) {
-            clock.stop();
-            QUnit.start();
-        }
-    };
-
-    berg.test.scheduler.driveClockSync = function (clock, numTicks) {
-        for (var i = 0; i < numTicks; i++) {
-            clock.tick();
-        }
-    };
-
 }());
