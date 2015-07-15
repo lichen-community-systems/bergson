@@ -8,6 +8,56 @@
 (function () {
     "use strict";
 
+    /**
+     * Scheduler
+     *
+     * Responsible for scheduling "score event specifications"
+     * at defined moments in time.
+     *
+     * Schedulers are typically driven by a Clock instance.
+     *
+     * Bergson provides two primary scheduling primitives:
+     *  1. "once", which will schedule a one-time event
+     *  2. "repeat", which schedules a repeating event
+     *
+     * Score Event Specifications:
+     *
+     * One-time events:
+     *    {
+     *        type: "once",
+     *
+     *        // a future time in seconds when the callback should be invoked
+     *        time: 2,
+     *
+     *        // a function to invoke at the specified time
+     *        callback: function (time, this) {}
+     *    }
+     *
+     * Repeating events:
+     *    {
+     *        type: "repeat",
+     *
+     *        // The interval, in seconds, at which to repeat
+     *        freq: 5,
+     *
+     *        // A future time in seconds at which to start repeating. Defaults to 0.
+     *        time: 2,
+     *
+     *        // A future time in seconds at which to stop. Defaults to Infinity
+     *        //(i.e. never stop)
+     *        end: 20,
+     *
+     *        // A function to invoke repeatedly.
+     *        callback: callback
+     *    }
+     *
+     * Note: the Bergson scheduler operates a "late"
+     * scheduling algorithm for changes that are finer-grained
+     * than the resolution of its clock. So, for example, if the
+     * clock is running at a rate of 1 tick/second, an event scheduled
+     * at time 1.1 seconds will be invoked at the 2 second tick.
+     *
+     */
     fluid.defaults("berg.scheduler", {
         gradeNames: ["fluid.standardRelayComponent", "autoInit"],
 
@@ -29,12 +79,6 @@
              *
              * This function is invoked automatically when the
              * scheduler's clock fires its onTick event.
-             *
-             * Note: the basic Bergson scheduler operates a "late"
-             * scheduling algorithm for changes that are finer-grained
-             * than the resolution of its clock. So, for example, if the
-             * clock is running at a rate of 1 tick/second, an event scheduled
-             * at time 1.1 seconds will be invoked at the 2 second tick.
              *
              * @param {Number} time - the current clock time, in seconds
              */
@@ -97,17 +141,6 @@
     };
 
     // Unsupported, non-API function.
-    berg.scheduler.evaluateScoreEvent = function (scoreEvent, time, queue) {
-        scoreEvent.callback(time, scoreEvent);
-
-        // If it's a repeating event, queue it back up.
-        if (scoreEvent.type === "repeat" && scoreEvent.end > time) {
-            scoreEvent.priority = time + scoreEvent.freq;
-            queue.push(scoreEvent);
-        }
-    };
-
-    // Unsupported, non-API function.
     berg.scheduler.validateEventSpec = function (eventSpec) {
         if (typeof eventSpec.callback !== "function") {
             throw new Error("No callback was specified for scheduled event: " +
@@ -122,6 +155,17 @@
         if (typeof eventSpec.time !== "number") {
             throw new Error("No time was specified for scheduled event: " +
                 fluid.prettyPrintJSON(eventSpec));
+        }
+    };
+
+    // Unsupported, non-API function.
+    berg.scheduler.evaluateScoreEvent = function (scoreEvent, time, queue) {
+        scoreEvent.callback(time, scoreEvent);
+
+        // If it's a repeating event, queue it back up.
+        if (scoreEvent.type === "repeat" && scoreEvent.end > time) {
+            scoreEvent.priority = time + scoreEvent.freq;
+            queue.push(scoreEvent);
         }
     };
 
@@ -194,11 +238,6 @@
 
         // Check to see if this event should fire now
         // (or should have fired earlier!)
-        //
-        // TODO: Consider the best semantic for hopelessly late events;
-        // should they play immediately no matter what
-        // (as in the current implementation),
-        // or perhaps be thrown away if they're older than a certain threshold?
         while (next && next.priority <= time) {
             // Take it out of the queue and invoke its callback.
             queue.pop();
