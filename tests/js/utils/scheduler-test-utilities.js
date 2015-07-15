@@ -24,8 +24,9 @@
             "The callback should have been called back at the expected time.");
         QUnit.equal(callbackArgs[0], clock.time,
             "The callback should have been passed the current time as its first argument.");
-        QUnit.deepEqual(callbackArgs[1], expectedEventSpec,
-            "The callback's second argument should be the current event spec.");
+        jqUnit.assertLeftHand(
+            "The callback's second argument should be the current event spec.",
+            expectedEventSpec, callbackArgs[1]);
     };
 
     fluid.defaults("berg.test.scheduler.testSequencer", {
@@ -41,7 +42,15 @@
             tick: 0
         },
 
-        schedulerOptions: {},
+        schedulerOptions: {
+            components: {
+                clock: {
+                    options: {
+                        rate: 1/10
+                    }
+                }
+            }
+        },
 
         components: {
             scheduler: {
@@ -62,7 +71,10 @@
                 args: ["{that}"]
             },
 
-            scheduleEvent: "{scheduler}.schedule({arguments}.0)",
+            scheduleEvent: {
+                funcName: "berg.test.scheduler.testSequencer.scheduleEvent",
+                args: ["{scheduler}", "{arguments}.0"]
+            },
 
             testQueue: {
                 funcName: "berg.test.scheduler.testQueue",
@@ -139,6 +151,11 @@
         clock.start();
     };
 
+    berg.test.scheduler.testSequencer.scheduleEvent = function (s, eventSpec) {
+        eventSpec = fluid.copy(eventSpec);
+        s.schedule(eventSpec);
+    };
+
     berg.test.scheduler.testSequencer.incrementTick = function (applier, model) {
         applier.change("tick", model.tick + 1);
     };
@@ -157,7 +174,7 @@
             if (!eventSpec) {
                 ok(false, "The registrationSequence was misconfigured. No scoreEventSpec named '" +
                     eventSpecName + "' was found. Registration sequence was: " +
-                    fluid.prettyPrintJSON(registrationSequence));
+                    fluid.prettyPrintJSON(that.options.registrationSequence));
             }
             eventSpec.callback = that.events.onScheduledEvent.fire;
             that.scheduleEvent(eventSpec);
@@ -221,4 +238,28 @@
     berg.test.scheduler.onceTestSequencer.scheduleEvent = function (s, eventSpec, onScheduledEvent) {
         s.once(eventSpec.time, onScheduledEvent);
     };
+
+    fluid.defaults("berg.test.scheduler.repeatTestSequencer", {
+        gradeNames: [
+            "berg.test.scheduler.testSequencer",
+            "berg.test.scheduler.testSequencer.offline",
+            "autoInit"
+        ],
+
+        invokers: {
+            scheduleEvent: {
+                funcName: "berg.test.scheduler.repeatTestSequencer.scheduleEvent",
+                args: [
+                    "{scheduler}",
+                    "{arguments}.0",
+                    "{that}.events.onScheduledEvent.fire"
+                ]
+            }
+        }
+    });
+
+    berg.test.scheduler.repeatTestSequencer.scheduleEvent = function (s, eventSpec, onScheduledEvent) {
+        s.repeat(eventSpec.freq, onScheduledEvent);
+    };
+
 }());

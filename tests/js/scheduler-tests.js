@@ -172,7 +172,7 @@
         {
             type: "berg.test.scheduler.onceTestSequencer",
             options: {
-                name: "scheduled immediately",
+                name: "scheduled immediately event before clock starts ticking",
 
                 numTicks: 2,
 
@@ -228,4 +228,100 @@
     ];
 
     berg.test.scheduler.runTests(berg.test.scheduler.onceTestSpecs);
+
+
+    QUnit.module("repeat");
+
+    berg.test.scheduler.repeatTestSpecs = [
+        {
+            type: "berg.test.scheduler.repeatTestSequencer",
+            options: {
+                name: "scheduled immediately, repeats infinitely every other tick",
+
+                numTicks: 10,
+
+                scoreEventSpecs: {
+                    immediately: {
+                        type: "repeat",
+                        time: 0,
+                        freq: 1/20,
+                        interval: 20,
+                        end: Infinity
+                    }
+                },
+
+                registrationSequence: {
+                    1: ["immediately"]
+                },
+
+                expectedSequence: [
+                    {
+                        name: "immediately",
+                        time: 10,
+                        queueSize: 0
+                    },
+                    {
+                        name: "immediately",
+                        time: 30,
+                        queueSize: 0
+                    },
+                    {
+                        name: "immediately",
+                        time: 50,
+                        queueSize: 0
+                    },
+                    {
+                        name: "immediately",
+                        time: 70,
+                        queueSize: 0
+                    },
+                    {
+                        name: "immediately",
+                        time: 90,
+                        queueSize: 0
+                    }
+                ]
+            }
+        },
+
+        // TODO: Scheduler API is broken!
+        // {
+        //     type: "berg.test.scheduler.repeatTestSequencer",
+        //     options: {
+        //         name: "repeats for two ticks",
+        //
+        //         numTicks: 5,
+        //
+        //         scoreEventSpecs: {
+        //             repeatsTwice: {
+        //                 type: "repeat",
+        //                 time: 0,
+        //                 freq: 1/10,
+        //                 interval: 10,
+        //                 end: 20
+        //             }
+        //         },
+        //
+        //         registrationSequence: {
+        //             0: ["repeatsTwice"]
+        //         },
+        //
+        //         expectedSequence: [
+        //             {
+        //                 name: "repeatsTwice",
+        //                 time: 0,
+        //                 queueSize: 0
+        //             },
+        //             {
+        //                 name: "repeatsTwice",
+        //                 time: 10,
+        //                 queueSize: 0
+        //             }
+        //         ]
+        //     }
+        // }
+    ];
+
+    berg.test.scheduler.runTests(berg.test.scheduler.repeatTestSpecs);
+
 }());

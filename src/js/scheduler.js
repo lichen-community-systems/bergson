@@ -37,7 +37,7 @@
      *    {
      *        type: "repeat",
      *
-     *        // The interval, in seconds, at which to repeat
+     *        // The frequency, in Hz, at which to repeat
      *        freq: 5,
      *
      *        // A future time in seconds at which to start repeating. Defaults to 0.
@@ -100,9 +100,9 @@
             once: "berg.scheduler.once({arguments}.0, {arguments}.1, {that})",
 
             /**
-             * Schedules a callback to be fired repeatedly at the specified interval.
+             * Schedules a callback to be fired repeatedly at the specified frequency.
              *
-             * @param {Number} interval - the interval to repeat at
+             * @param {Number} freq - the frequency (per second) to repeat at
              * @param {Function} callback - the callback to schedule
              */
             repeat: "berg.scheduler.repeat({arguments}.0, {arguments}.1, {that})",
@@ -135,7 +135,7 @@
         if (typeof eventSpec.time !== "number") {
             eventSpec.time = 0;
         }
-
+        eventSpec.interval = 1.0 / eventSpec.freq;
         eventSpec.end = typeof eventSpec.end !== "number" ?
             Infinity : eventSpec.end + now;
     };
@@ -147,8 +147,8 @@
                 fluid.prettyPrintJSON(eventSpec));
         }
 
-        if (eventSpec.type === "repeat" && typeof eventSpec.interval !== "number") {
-            throw new Error("No interval was specified for scheduled event: " +
+        if (eventSpec.type === "repeat" && typeof eventSpec.freq !== "number") {
+            throw new Error("No freq was specified for scheduled event: " +
                 fluid.prettyPrintJSON(eventSpec));
         }
 
@@ -164,7 +164,7 @@
 
         // If it's a repeating event, queue it back up.
         if (scoreEvent.type === "repeat" && scoreEvent.end > time) {
-            scoreEvent.priority = time + scoreEvent.freq;
+            scoreEvent.priority = time + scoreEvent.interval;
             queue.push(scoreEvent);
         }
     };
@@ -221,10 +221,10 @@
         return berg.scheduler.scheduleEvent(eventSpec, that);
     };
 
-    berg.scheduler.repeat = function (interval, callback, that) {
+    berg.scheduler.repeat = function (freq, callback, that) {
         var eventSpec = {
             type: "repeat",
-            freq: interval,
+            freq: freq,
             time: 0,
             end: Infinity,
             callback: callback
