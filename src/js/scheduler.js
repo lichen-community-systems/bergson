@@ -57,12 +57,18 @@
      * clock is running at a rate of 1 tick/second, an event scheduled
      * at time 1.1 seconds will be invoked at the 2 second tick.
      *
+     * The order of events scheduled for the same clock time is indeterminate.
+     *
      */
     fluid.defaults("berg.scheduler", {
         gradeNames: ["fluid.standardRelayComponent", "autoInit"],
 
         members: {
             queue: "@expand:berg.priorityQueue()"
+        },
+
+        model: {
+            timeScale: 1.0
         },
 
         components: {
@@ -80,9 +86,9 @@
              * This function is invoked automatically when the
              * scheduler's clock fires its onTick event.
              *
-             * @param {Number} time - the current clock time, in seconds
+             * @param {Number} now - the current clock time, in seconds
              */
-            tick: "berg.scheduler.tick({arguments}.0, {that}.queue)",
+            tick: "berg.scheduler.tick({arguments}.0, {that}.model.timeScale, {that}.queue)",
 
             /**
              * Schedules one or more score event specifications.
@@ -131,7 +137,21 @@
             /**
              * Clears all scheduled events.
              */
-            clearAll: "{that}.queue.clear()"
+            clearAll: "{that}.queue.clear()",
+
+            /**
+             * Scales the scheduled time of all currently and future events.
+             *
+             * @param {Number} value - the timeScale value (default is 1.0)
+             */
+            setTimeScale: {
+                changePath: "timeScale",
+                value: "{arguments}.0"
+            }
+        },
+
+        modelListeners: {
+            "timeScale": "berg.scheduler.scaleEventTimes({that}.queue, {change}.value)"
         },
 
         listeners: {
@@ -140,6 +160,19 @@
             }
         }
     });
+
+    // Unsupported, non-API function.
+    berg.scheduler.calcPriority = function (baseTime, timeOffset, timeScale) {
+        return baseTime + (timeOffset * timeScale);
+    };
+
+    // Unsupported, non-API function.
+    berg.scheduler.scaleEventTimes = function (queue, timeScale) {
+        for (var i = 0; i < queue.items.length; i++) {
+            var item = queue.items[i];
+            item.priority = berg.scheduler.calcPriority(item.scheduledAt, item.time, timeScale);
+        }
+    };
 
     // Unsupported, non-API function.
     berg.scheduler.expandRepeatingEventSpec = function (now, eventSpec) {
@@ -170,19 +203,20 @@
     };
 
     // Unsupported, non-API function.
-    berg.scheduler.evaluateScoreEvent = function (scoreEvent, time, queue) {
-        scoreEvent.callback(time, scoreEvent);
+    berg.scheduler.evaluateScoreEvent = function (scoreEvent, now, timeScale, queue) {
+        scoreEvent.callback(now, scoreEvent);
 
         // If it's a repeating event, queue it back up.
-        if (scoreEvent.type === "repeat" && scoreEvent.end > time) {
-            scoreEvent.priority = time + scoreEvent.interval;
+        if (scoreEvent.type === "repeat" && scoreEvent.end > now) {
+            scoreEvent.priority = berg.scheduler.calcPriority(now, scoreEvent.interval, timeScale);
             queue.push(scoreEvent);
         }
     };
 
     // Unsupported, non-API function.
     berg.scheduler.scheduleEvent = function (eventSpec, that) {
-        var now = that.clock.time;
+        var now = that.clock.time,
+            timeScale = that.model.timeScale;
 
         // TODO: Should we warn on omitted type?
         if (!eventSpec.type) {
@@ -193,11 +227,15 @@
             berg.scheduler.expandRepeatingEventSpec(now, eventSpec);
         }
 
+        if (typeof eventSpec.scheduledAt !== "number") {
+            eventSpec.scheduledAt = now;
+        }
+
         berg.scheduler.validateEventSpec(eventSpec);
-        eventSpec.priority = now + eventSpec.time;
+        eventSpec.priority = berg.scheduler.calcPriority(now, eventSpec.time, timeScale);
 
         if (eventSpec.priority <= now) {
-            berg.scheduler.evaluateScoreEvent(eventSpec, now, that.queue);
+            berg.scheduler.evaluateScoreEvent(eventSpec, now, timeScale, that.queue);
         } else {
             that.queue.push(eventSpec);
         }
@@ -244,15 +282,15 @@
         return berg.scheduler.scheduleEvent(eventSpec, that);
     };
 
-    berg.scheduler.tick = function (time, queue) {
+    berg.scheduler.tick = function (now, timeScale, queue) {
         var next = queue.peek();
 
         // Check to see if this event should fire now
         // (or should have fired earlier!)
-        while (next && next.priority <= time) {
+        while (next && next.priority <= now) {
             // Take it out of the queue and invoke its callback.
             queue.pop();
-            berg.scheduler.evaluateScoreEvent(next, time, queue);
+            berg.scheduler.evaluateScoreEvent(next, now, timeScale, queue);
             next = queue.peek();
         }
     };

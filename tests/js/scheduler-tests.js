@@ -20,6 +20,10 @@
         });
     };
 
+    berg.test.scheduler.testModule = function (moduleName, moduleSpec) {
+        QUnit.module(moduleName);
+        berg.test.scheduler.runTests(moduleSpec.testSequencerType, moduleSpec.testSpecs);
+    };
 
     QUnit.test("Instantiation", function () {
         var s = berg.scheduler();
@@ -209,13 +213,15 @@
         }
     ];
 
-    QUnit.module("One-time events scheduled with once()");
-    berg.test.scheduler.runTests("berg.test.scheduler.onceTestSequencer",
-        berg.test.scheduler.onceTestSpecs);
+    berg.test.scheduler.testModule("One-time events scheduled with once()", {
+        testSequencerType: "berg.test.scheduler.onceTestSequencer",
+        testSpecs: berg.test.scheduler.onceTestSpecs
+    });
 
-    QUnit.module("One-time events scheduled with schedule()");
-    berg.test.scheduler.runTests("berg.test.scheduler.offlineTestSequencer",
-        berg.test.scheduler.onceTestSpecs);
+    berg.test.scheduler.testModule("One-time events scheduled with schedule()", {
+        testSequencerType: "berg.test.scheduler.offlineTestSequencer",
+        testSpecs: berg.test.scheduler.onceTestSpecs
+    });
 
 
     berg.test.scheduler.repeatTestSpecs = [
@@ -305,13 +311,16 @@
         }
     ];
 
-    QUnit.module("Repeating events scheduled with repeat()");
-    berg.test.scheduler.runTests("berg.test.scheduler.repeatTestSequencer",
-        berg.test.scheduler.repeatTestSpecs);
+    berg.test.scheduler.testModule("Repeating events scheduled with repeat()", {
+        testSequencerType: "berg.test.scheduler.repeatTestSequencer",
+        testSpecs: berg.test.scheduler.repeatTestSpecs
+    });
 
-    QUnit.module("Repeating events scheduled with schedule()");
-    berg.test.scheduler.runTests("berg.test.scheduler.offlineTestSequencer",
-        berg.test.scheduler.repeatTestSpecs);
+    berg.test.scheduler.testModule("Repeating events scheduled with schedule()", {
+        testSequencerType: "berg.test.scheduler.offlineTestSequencer",
+        testSpecs: berg.test.scheduler.repeatTestSpecs
+    });
+
 
     berg.test.scheduler.mixedTestSpecs = [
         {
@@ -439,8 +448,77 @@
         }
     ];
 
-    QUnit.module("Mixed events with schedule()");
-    berg.test.scheduler.runTests("berg.test.scheduler.offlineTestSequencer",
-        berg.test.scheduler.mixedTestSpecs);
+    berg.test.scheduler.testModule("Mixed events scheduled with schedule()", {
+        testSequencerType: "berg.test.scheduler.offlineTestSequencer",
+        testSpecs: berg.test.scheduler.mixedTestSpecs
+    });
 
+
+    berg.test.scheduler.timeScalingTestSpecs = [
+        {
+            name: "Half speed time scaling set from the beginning",
+            schedulerOptions: {
+                model: {
+                    timeScale: 2
+                },
+
+                components: {
+                    clock: {
+                        options: {
+                            rate: 1
+                        }
+                    }
+                }
+            },
+
+            numTicks: 13,
+            scoreEventSpecs: {
+                repeating: {
+                    type: "repeat",
+                    time: 2,
+                    freq: 1/2,
+                    interval: 2,
+                    end: Infinity
+                },
+
+                oneShot: {
+                    type: "once",
+                    time: 1,
+                }
+            },
+
+            registrationSequence: {
+                0: ["repeating", "oneShot"]
+            },
+
+            expectedSequence: [
+                {
+                    name: "oneShot",
+                    time: 2,
+                    queueSize: 1
+                },
+                {
+                    name: "repeating",
+                    time: 4,
+                    queueSize: 0
+                },
+                {
+                    name: "repeating",
+                    time: 8,
+                    queueSize: 0
+                },
+                {
+                    name: "repeating",
+                    time: 12,
+                    queueSize: 0
+                }
+            ]
+        }
+
+    ];
+
+    berg.test.scheduler.testModule("Time scaling", {
+        testSequencerType: "berg.test.scheduler.offlineTestSequencer",
+        testSpecs: berg.test.scheduler.timeScalingTestSpecs
+    });
 }());
