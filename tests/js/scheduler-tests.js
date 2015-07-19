@@ -313,5 +313,134 @@
     berg.test.scheduler.runTests("berg.test.scheduler.offlineTestSequencer",
         berg.test.scheduler.repeatTestSpecs);
 
-    // TODO: Mix repeating and once events using schedule().
+    berg.test.scheduler.mixedTestSpecs = [
+        {
+            name: "drum beat",
+            schedulerOptions: {
+                components: {
+                    clock: {
+                        options: {
+                            rate: 10
+                        }
+                    }
+                }
+            },
+
+            numTicks: 30,
+
+            // 60 bpm
+            // Quarter note is 1 second - snare and kick
+            // Eigth note, half a second - hihat
+            scoreEventSpecs: {
+                hihat: {
+                    id: "hihat",
+                    type: "repeat",
+                    time: 0,
+                    freq: 2,
+                    interval: 0.5,
+                    end: Infinity
+                },
+
+                kick: {
+                    id: "kick",
+                    type: "repeat",
+                    time: 0,
+                    freq: 1/2,
+                    interval: 2,
+                    end: Infinity
+                },
+
+                snare: {
+                    id: "snare",
+                    type: "repeat",
+                    time: 1,
+                    freq: 1/2,
+                    interval: 2,
+                    end: Infinity
+                },
+
+                splash: {
+                    id: "splash",
+                    type: "once",
+                    time: 2.25
+                }
+            },
+
+            registrationSequence: {
+                0: ["kick", "snare", "hihat", "splash"]
+            },
+
+            // Note: Given the nature of a binary heap priority queue,
+            // it's just completely impossible to assert the order of
+            // simultaneous events; this test is thus highly implementation-specific.
+            expectedSequence: [
+                {
+                    name: "kick",
+                    time: 0,
+                    queueSize: 0 // Evaluated immediately, before the others have been scheduled.
+                },
+                {
+                    name: "hihat",
+                    time: 0,
+                    queueSize: 2
+                },
+                {
+                    name: "hihat",
+                    time: 0.5,
+                    queueSize: 3
+                },
+                {
+                    name: "snare",
+                    time: 1,
+                    queueSize: 3
+                },
+                {
+                    name: "hihat",
+                    time: 1,
+                    queueSize: 3
+                },
+                {
+                    name: "hihat",
+                    time: 1.5,
+                    queueSize: 3
+                },
+                {
+                    name: "kick",
+                    time: 2,
+                    queueSize: 3
+                },
+                {
+                    name: "hihat",
+                    time: 2,
+                    queueSize: 3
+                },
+                {
+                    name: "splash",
+                    time: 2.3,
+                    queueSize: 3
+                },
+                {
+                    name: "hihat",
+                    time: 2.5,
+                    queueSize: 2
+                },
+                {
+                    name: "snare",
+                    time: 3,
+                    queueSize: 2
+                },
+                {
+                    name: "hihat",
+                    time: 3,
+                    queueSize: 2
+                }
+            ]
+
+        }
+    ];
+
+    QUnit.module("Mixed events with schedule()");
+    berg.test.scheduler.runTests("berg.test.scheduler.offlineTestSequencer",
+        berg.test.scheduler.mixedTestSpecs);
+
 }());

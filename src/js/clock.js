@@ -81,7 +81,8 @@
     });
 
     berg.clock.offline.tick = function (that) {
-        that.time += that.tickDuration;
+        var time = that.time + that.tickDuration;
+        that.time = parseFloat(time.toPrecision(15)); // TODO: Profoudly high per-tick cost.
         that.events.onTick.fire(that.time, that.rate);
     };
 

@@ -24,11 +24,11 @@
             expectedEventSpec = scoreEventsSpecs[sequenceSpec.name];
 
         QUnit.equal(clock.time, sequenceSpec.time,
-            "The callback should have been called back at the expected time.");
+            "Callback #" + currentEventIdx + " should have been called back at the expected time.");
         QUnit.equal(callbackArgs[0], clock.time,
-            "The callback should have been passed the current time as its first argument.");
+            "Callback #" + currentEventIdx + " should have been passed the current time as its first argument.");
         jqUnit.assertLeftHand(
-            "The callback's second argument should be the current event spec.",
+            "Callback #" + currentEventIdx + "'s second argument should be the current event spec.",
             expectedEventSpec, callbackArgs[1]);
     };
 

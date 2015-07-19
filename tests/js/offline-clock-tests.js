@@ -10,6 +10,12 @@
 
     QUnit.module("Offline clock");
 
+    fluid.registerNamespace("berg.test.clock");
+
+    berg.test.clock.roundTo15 = function (time) {
+        return parseFloat(time.toPrecision(15));
+    };
+
     fluid.defaults("berg.test.clock.offlineClockTestSuite", {
         gradeNames: ["berg.test.clock.testSuite", "autoInit"],
 
