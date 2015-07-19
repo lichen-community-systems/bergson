@@ -80,9 +80,14 @@
         }
     });
 
+    berg.clock.offline.round = function (time) {
+        // 15 decimal places.
+        return Math.round(time * 100000000000000) / 100000000000000;
+    };
+
     berg.clock.offline.tick = function (that) {
         var time = that.time + that.tickDuration;
-        that.time = parseFloat(time.toPrecision(15)); // TODO: Profoudly high per-tick cost.
+        that.time = berg.clock.offline.round(time);
         that.events.onTick.fire(that.time, that.rate);
     };
 

@@ -4,10 +4,6 @@
 
     fluid.registerNamespace("berg.test.clock");
 
-    berg.test.clock.roundTo15Digits = function (time) {
-        return parseFloat(time.toPrecision(15));
-    };
-
     fluid.defaults("berg.test.clock.testCase.offline", {
         gradeNames: ["berg.test.clock.testCase", "autoInit"],
 
@@ -38,7 +34,7 @@
 
     berg.test.clock.testCase.offline.testTick = function (clock, that) {
         var expectedTime = that.model.expectedTime + that.options.expected.tickDuration;
-        that.applier.change("expectedTime", berg.test.clock.roundTo15Digits(expectedTime));
+        that.applier.change("expectedTime", berg.clock.offline.round(expectedTime));
 
         QUnit.equal(clock.time, that.model.expectedTime,
             "The clock should have been incremented by 1/" +
