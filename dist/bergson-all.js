@@ -17261,15 +17261,39 @@ var fluid_2_0 = fluid_2_0 || {};
     fluid.defaults("berg.clock", {
         gradeNames: ["fluid.eventedComponent", "autoInit"],
 
+        // TODO: Consider renaming this to "freq" for consistency
+        // with the scheduler and Flocking.
         rate: 1, // Ticks per second.
 
         members: {
+            /**
+             * The clock's current time, in seconds.
+             */
             time: 0,
-            rate: "{that}.options.rate"
+
+            /**
+             * The rate (in cycles per second) that the clock is
+             * running at.
+             * This value is not guaranteed to be precise all clocks.
+             */
+            rate: "{that}.options.rate",
+
+            /**
+             * The duration, in seconds, between ticks.
+             * This value is not guaranteed to be precise for all clocks.
+             */
+            tickDuration: {
+                expander: {
+                    funcName: "berg.clock.calcTickDuration",
+                    args: "{that}.options.rate"
+                }
+            }
         },
 
         invokers: {
-            tick: "fluid.identity()"
+            start: "fluid.identity()",
+            tick: "fluid.identity()",
+            stop: "fluid.identity()"
         },
 
         events: {
@@ -17277,6 +17301,9 @@ var fluid_2_0 = fluid_2_0 || {};
         }
     });
 
+    berg.clock.calcTickDuration = function (rate) {
+        return 1.0 / rate;
+    };
 
     /**
      * Offline Clock
@@ -17292,15 +17319,6 @@ var fluid_2_0 = fluid_2_0 || {};
     fluid.defaults("berg.clock.offline", {
         gradeNames: ["berg.clock", "autoInit"],
 
-        members: {
-            tickDuration: {
-                expander: {
-                    funcName: "berg.clock.offline.calcTickDuration",
-                    args: "{that}.options.rate"
-                }
-            }
-        },
-
         invokers: {
             tick: {
                 funcName: "berg.clock.offline.tick",
@@ -17309,12 +17327,14 @@ var fluid_2_0 = fluid_2_0 || {};
         }
     });
 
-    berg.clock.offline.calcTickDuration = function (rate) {
-        return 1.0 / rate;
+    berg.clock.offline.round = function (time) {
+        // 15 decimal places.
+        return Math.round(time * 100000000000000) / 100000000000000;
     };
 
     berg.clock.offline.tick = function (that) {
-        that.time += that.tickDuration;
+        var time = that.time + that.tickDuration;
+        that.time = berg.clock.offline.round(time); // TODO: Accuracy and performance issues.
         that.events.onTick.fire(that.time, that.rate);
     };
 
@@ -17554,6 +17574,58 @@ var fluid_2_0 = fluid_2_0 || {};
 (function () {
     "use strict";
 
+    /**
+     * Scheduler
+     *
+     * Responsible for scheduling "score event specifications"
+     * at defined moments in time.
+     *
+     * Schedulers are typically driven by a Clock instance.
+     *
+     * Bergson provides two primary scheduling primitives:
+     *  1. "once", which will schedule a one-time event
+     *  2. "repeat", which schedules a repeating event
+     *
+     * Score Event Specifications:
+     *
+     * One-time events:
+     *    {
+     *        type: "once",
+     *
+     *        // a future time in seconds when the callback should be invoked
+     *        time: 2,
+     *
+     *        // a function to invoke at the specified time
+     *        callback: function (time, this) {}
+     *    }
+     *
+     * Repeating events:
+     *    {
+     *        type: "repeat",
+     *
+     *        // The frequency, in Hz, at which to repeat
+     *        freq: 5,
+     *
+     *        // A future time in seconds at which to start repeating. Defaults to 0.
+     *        time: 2,
+     *
+     *        // A future time in seconds at which to stop. Defaults to Infinity
+     *        //(i.e. never stop)
+     *        end: 20,
+     *
+     *        // A function to invoke repeatedly.
+     *        callback: callback
+     *    }
+     *
+     * Note: the Bergson scheduler operates a "late"
+     * scheduling algorithm for changes that are finer-grained
+     * than the resolution of its clock. So, for example, if the
+     * clock is running at a rate of 1 tick/second, an event scheduled
+     * at time 1.1 seconds will be invoked at the 2 second tick.
+     *
+     * The order of events scheduled for the same clock time is indeterminate.
+     *
+     */
     fluid.defaults("berg.scheduler", {
         gradeNames: ["fluid.standardRelayComponent", "autoInit"],
 
@@ -17561,9 +17633,13 @@ var fluid_2_0 = fluid_2_0 || {};
             queue: "@expand:berg.priorityQueue()"
         },
 
+        model: {
+            timeScale: 1.0
+        },
+
         components: {
-            clock: {
-                type: "berg.clock.offline" // Should be supplied by the user.
+            clock: { // Should be supplied by the user.
+                type: "berg.clock.offline"
             }
         },
 
@@ -17573,16 +17649,19 @@ var fluid_2_0 = fluid_2_0 || {};
              * queue of scheduled callback and fire those that
              * are appropriate for the current clock time.
              *
-             * @param {Number} time - the current clock time
+             * This function is invoked automatically when the
+             * scheduler's clock fires its onTick event.
+             *
+             * @param {Number} now - the current clock time, in seconds
              */
-            tick: "berg.scheduler.tick({arguments}.0, {arguments}.1, {that}.queue)",
+            tick: "berg.scheduler.tick({arguments}.0, {that}.model.timeScale, {that}.queue)",
 
             /**
-             * Schedules one or more score specifications.
+             * Schedules one or more score event specifications.
              *
-             * @param {Object||Array} scoreSpecs - the score specifications to schedule
+             * @param {Object||Array} scoreSpecs - the score event specifications to schedule
              */
-            schedule: "berg.scheduler.schedule({arguments}.0, {that}.clock)",
+            schedule: "berg.scheduler.schedule({arguments}.0, {that})",
 
             /**
              * Schedules a callback to be fired once at the specified time.
@@ -17593,19 +17672,30 @@ var fluid_2_0 = fluid_2_0 || {};
             once: "berg.scheduler.once({arguments}.0, {arguments}.1, {that})",
 
             /**
-             * Schedules a callback to be fired repeatedly at the specified interval.
+             * Schedules a callback to be fired repeatedly at the specified frequency.
              *
-             * @param {Number} interval - the interval to repeat at
+             * @param {Number} freq - the frequency (per second) to repeat at
              * @param {Function} callback - the callback to schedule
+             * @param {Number} time - the time (in seconds) to start repeating at
+             * @param {Number} end - the time (in seconds) to stop repeating at; this value is inclusive
              */
-            repeat: "berg.scheduler.repeat({arguments}.0, {arguments}.1, {that})",
+            repeat: {
+                funcName: "berg.scheduler.repeat",
+                args: [
+                    "{arguments}.0",
+                    "{arguments}.1",
+                    "{arguments}.2",
+                    "{arguments}.3",
+                    "{that}"
+                ]
+            },
 
             /**
              * Clears a scheduled event,
              * causing it not to be evaluated by this scheduler
              * if it hasn't already fired or is repeating.
              *
-             * @param {Object} eventSpec - the event spec
+             * @param {Object} eventSpec - the event specification to clear
              */
             clear: "{that}.queue.remove({arguments}.0)",
 
@@ -17613,30 +17703,112 @@ var fluid_2_0 = fluid_2_0 || {};
             /**
              * Clears all scheduled events.
              */
-            clearAll: "{that}.queue.clear()"
+            clearAll: "{that}.queue.clear()",
+
+            /**
+             * Scales the scheduled time of all currently and future events.
+             *
+             * @param {Number} value - the timeScale value (default is 1.0)
+             */
+            setTimeScale: {
+                changePath: "timeScale",
+                value: "{arguments}.0"
+            }
+        },
+
+        modelListeners: {
+            timeScale: {
+                funcName: "berg.scheduler.scaleEventTimes",
+                args: ["{that}.queue", "{change}.value"],
+                excludeSource: "init"
+            }
+        },
+
+        listeners: {
+            "{clock}.events.onTick": {
+                func: "{scheduler}.tick"
+            }
         }
     });
+
+    // Unsupported, non-API function.
+    berg.scheduler.calcPriority = function (baseTime, timeOffset, timeScale) {
+        return baseTime + (timeOffset * timeScale);
+    };
+
+    // Unsupported, non-API function.
+    berg.scheduler.scaleEventTimes = function (queue, timeScale) {
+        for (var i = 0; i < queue.items.length; i++) {
+            var item = queue.items[i];
+            item.priority = berg.scheduler.calcPriority(item.scheduledAt, item.time, timeScale);
+        }
+    };
 
     // Unsupported, non-API function.
     berg.scheduler.expandRepeatingEventSpec = function (now, eventSpec) {
         if (typeof eventSpec.time !== "number") {
             eventSpec.time = 0;
         }
+        eventSpec.interval = 1.0 / eventSpec.freq;
+        eventSpec.end = typeof eventSpec.end !== "number" ?
+            Infinity : eventSpec.end + now;
+    };
 
-        eventSpec.endTime = typeof eventSpec.endTime !== "number" ?
-            Infinity : eventSpec.endTime + now;
+    // Unsupported, non-API function.
+    berg.scheduler.validateEventSpec = function (eventSpec) {
+        if (typeof eventSpec.callback !== "function") {
+            throw new Error("No callback was specified for scheduled event: " +
+                fluid.prettyPrintJSON(eventSpec));
+        }
+
+        if (eventSpec.type === "repeat" && typeof eventSpec.freq !== "number") {
+            throw new Error("No freq was specified for scheduled event: " +
+                fluid.prettyPrintJSON(eventSpec));
+        }
+
+        if (typeof eventSpec.time !== "number") {
+            throw new Error("No time was specified for scheduled event: " +
+                fluid.prettyPrintJSON(eventSpec));
+        }
+    };
+
+    // Unsupported, non-API function.
+    berg.scheduler.evaluateScoreEvent = function (scoreEvent, now, timeScale, queue) {
+        scoreEvent.callback(now, scoreEvent);
+
+        // If it's a repeating event, queue it back up.
+        if (scoreEvent.type === "repeat" && scoreEvent.end > now) {
+            scoreEvent.priority = berg.scheduler.calcPriority(now, scoreEvent.interval, timeScale);
+            queue.push(scoreEvent);
+        }
     };
 
     // Unsupported, non-API function.
     berg.scheduler.scheduleEvent = function (eventSpec, that) {
-        var now = that.clock.time;
+        var now = that.clock.time,
+            timeScale = that.model.timeScale;
+
+        // TODO: Should we warn on omitted type?
+        if (!eventSpec.type) {
+            eventSpec.type = "once";
+        }
 
         if (eventSpec.type === "repeat") {
             berg.scheduler.expandRepeatingEventSpec(now, eventSpec);
         }
 
-        eventSpec.priority = now + eventSpec.time;
-        that.queue.push(eventSpec);
+        if (typeof eventSpec.scheduledAt !== "number") {
+            eventSpec.scheduledAt = now;
+        }
+
+        berg.scheduler.validateEventSpec(eventSpec);
+        eventSpec.priority = berg.scheduler.calcPriority(now, eventSpec.time, timeScale);
+
+        if (eventSpec.priority <= now) {
+            berg.scheduler.evaluateScoreEvent(eventSpec, now, timeScale, that.queue);
+        } else {
+            that.queue.push(eventSpec);
+        }
 
         return eventSpec;
     };
@@ -17652,7 +17824,7 @@ var fluid_2_0 = fluid_2_0 || {};
 
     berg.scheduler.schedule = function (eventSpec, that) {
         if (fluid.isArrayable(eventSpec)) {
-            berg.scheduler.scheduleEvents(eventSpec, that);
+            return berg.scheduler.scheduleEvents(eventSpec, that);
         }
 
         return berg.scheduler.scheduleEvent(eventSpec, that);
@@ -17668,35 +17840,27 @@ var fluid_2_0 = fluid_2_0 || {};
         return berg.scheduler.scheduleEvent(eventSpec, that);
     };
 
-    berg.scheduler.repeat = function (interval, callback, that) {
+    berg.scheduler.repeat = function (freq, callback, time, end, that) {
         var eventSpec = {
             type: "repeat",
-            freq: interval,
-            time: 0,
-            endTime: Infinity,
+            freq: freq,
+            time: time,
+            end: end,
             callback: callback
         };
 
         return berg.scheduler.scheduleEvent(eventSpec, that);
     };
 
-    berg.scheduler.tick = function (time, interval, queue) {
-        var next = queue.peek(),
-            maxTime = time + interval;
+    berg.scheduler.tick = function (now, timeScale, queue) {
+        var next = queue.peek();
 
-        // Check to see if this event fits within the current tick
-        // (or if it's from an earlier tick in the case of a delay).
-        while (next && next.priority <= maxTime) {
+        // Check to see if this event should fire now
+        // (or should have fired earlier!)
+        while (next && next.priority <= now) {
             // Take it out of the queue and invoke its callback.
             queue.pop();
-            next.callback(time);
-
-            // If it's a repeating event, queue it back up.
-            if (next.type === "repeat" && next.endTime > time) {
-                next.priority = time + next.freq;
-                queue.push(next);
-            }
-
+            berg.scheduler.evaluateScoreEvent(next, now, timeScale, queue);
             next = queue.peek();
         }
     };
@@ -17889,8 +18053,6 @@ var fluid_2_0 = fluid_2_0 || {};
 
     // Note: This function is intended to be invoked as
     // an berg.worker only.
-    // TODO: This is pretty well copied from the Flocking
-    // Scheduler.
     berg.clock.workerSetInterval.workerImpl = function () {
         "use strict"; // jshint ignore:line
 
