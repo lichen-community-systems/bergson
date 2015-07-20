@@ -111,7 +111,7 @@
         invokers: {
             tick: {
                 funcName: "berg.clock.realtime.tick",
-                args: ["{that}", "{arguments}.0"]
+                args: ["{that}"]
             }
         }
     });

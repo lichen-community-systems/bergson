@@ -8,7 +8,6 @@
 (function () {
     "use strict";
 
-    // TODO: Cut and pasted from the Flocking Scheduler.
     berg.worker = function (code) {
         var type = typeof code,
             url,
@@ -32,32 +31,45 @@
     };
 
     fluid.defaults("berg.clock.workerSetInterval", {
-        gradeNames: ["berg.clock.realtime", "autoInit"],
+        gradeNames: [
+            "berg.clock.realtime",
+            "berg.postMessageListener",
+            "berg.postMessageSender",
+            "autoInit"
+        ],
 
         members: {
-            worker: '@expand:berg.clock.workerSetInterval.initWorker()'
+            worker: "@expand:berg.clock.workerSetInterval.initWorker()",
+            messageTarget: "{that}.worker",
+            messageSource: "{that}.worker"
         },
 
         invokers: {
-            start: {
-                funcName: "berg.clock.workerSetInterval.post",
-                args: [
-                    "{that}.worker",
-                    {
-                        msg: "start",
-                        value: {
-                            rate: "{that}.options.rate"
-                        }
-                    }
-                ]
-            },
+            start: "{that}.events.onStart.fire",
+            stop: "{that}.events.onStop.fire"
+        },
 
-            stop: "berg.clock.workerSetInterval.stop({that})"
+        events: {
+            onStart: null,
+            onStop: null
         },
 
         listeners: {
-            onCreate: [
-                "berg.clock.workerSetInterval.listen({that})"
+            onStart: [
+                {
+                    func: "{that}.postMessage",
+                    args: ["start", {
+                        rate: "{that}.options.rate"
+                    }]
+                }
+            ],
+
+            onStop: [
+                "{that}.postMessage(stop)",
+                {
+                    this: "{that}.worker",
+                    method: "terminate"
+                }
             ]
         }
     });
@@ -66,25 +78,6 @@
         return berg.worker(berg.clock.workerSetInterval.workerImpl);
     };
 
-    berg.clock.workerSetInterval.listen = function (that) {
-        that.worker.addEventListener("message", function (e) {
-            if (e.data.msg === "tick") {
-                that.tick(performance.now());
-            }
-        }, false);
-    };
-
-    berg.clock.workerSetInterval.post = function (worker, msg) {
-        worker.postMessage(msg);
-    };
-
-    berg.clock.workerSetInterval.stop = function (that) {
-        berg.clock.workerSetInterval.post(that.worker, {
-            msg: "stop"
-        });
-
-        that.worker.terminate();
-    };
 
     // Note: This function is intended to be invoked as
     // an berg.worker only.
@@ -105,7 +98,7 @@
 
             that.tick = function () {
                 self.postMessage({
-                    msg: "tick"
+                    type: "tick"
                 });
             };
 
@@ -117,12 +110,12 @@
         };
 
         self.addEventListener("message", function (e) {
-            if (e.data.msg === "start") {
+            if (e.data.type === "start") {
                 berg.clock = berg.workerClock({
                     rate: e.data.value
                 });
                 berg.clock.start();
-            } else if (e.data.msg === "stop") {
+            } else if (e.data.type === "stop") {
                 if (berg.clock) {
                     berg.clock.stop();
                 }

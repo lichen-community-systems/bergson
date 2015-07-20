@@ -121,7 +121,10 @@
         listeners: {
             onDestroy: [
                 "{that}.postMessage(destroy)",
-                "{worker}.close()"
+                {
+                    this: "{that}.worker",
+                    method: "terminate"
+                }
             ]
         }
     });

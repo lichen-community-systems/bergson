@@ -7231,7 +7231,7 @@ outer:  for (var i = 0; i < exist.length; ++i) {
         invokers: {
             tick: {
                 funcName: "berg.clock.realtime.tick",
-                args: ["{that}", "{arguments}.0"]
+                args: ["{that}"]
             }
         }
     });
@@ -7434,6 +7434,89 @@ outer:  for (var i = 0; i < exist.length; ++i) {
         };
 
         return that;
+    };
+
+}());
+;/*
+ * Bergson postMessage Components
+ * http://github.com/colinbdclark/bergson
+ *
+ * Copyright 2015, Colin Clark
+ * Dual licensed under the MIT and GPL Version 2 licenses.
+ */
+(function () {
+    "use strict";
+
+    fluid.defaults("berg.postMessageSender", {
+        gradeNames: ["fluid.eventedComponent", "autoInit"],
+
+        members: {
+            messageTarget: self
+        },
+
+        invokers: {
+            postMessage: "berg.postMessageSender.postMessage({arguments}.0, {arguments}.1, {that}.messageTarget)"
+        }
+    });
+
+    berg.postMessageSender.postMessage = function (type, args, messageTarget) {
+        if (typeof type !== "string") {
+            throw new Error("Can't post a message without a message type.");
+        }
+
+        var message = {
+            type: type,
+            args: args
+        };
+
+        messageTarget.postMessage(message);
+    };
+
+
+    fluid.defaults("berg.postMessageListener", {
+        gradeNames: ["fluid.eventedComponent", "autoInit"],
+
+        members: {
+            messageSource: self
+        },
+
+        events: {
+            onError: null
+        },
+
+        listeners: {
+            onCreate: [
+                "berg.postMessageListener.bind({that})"
+            ],
+
+            onError: [
+                {
+                    namespace: "failOnError",
+                    funcName: "fluid.fail"
+                }
+            ]
+        }
+    });
+
+    berg.postMessageListener.bind = function (that) {
+        that.messageSource.addEventListener("message", function (e) {
+            var msg = e.data;
+
+            if (!msg.type) {
+                that.events.onError.fire("Received a remote message without a type. " +
+                    fluid.prettyPrintJSON(msg));
+            }
+
+            var invoker = that[msg.type];
+            if (!that.options.invokers[msg.type] || !invoker) {
+                that.events.onError.fire("Received a message of type " + msg.type +
+                    ", which did not resolve to a component invoker. Invokers: " +
+                    fluid.prettyPrintJSON(that.options.invokers));
+            }
+
+            var args = fluid.makeArray(msg.args);
+            invoker.apply(null, args);
+        }, false);
     };
 
 }());
@@ -7871,7 +7954,10 @@ outer:  for (var i = 0; i < exist.length; ++i) {
         listeners: {
             onDestroy: [
                 "{that}.postMessage(destroy)",
-                "{worker}.close()"
+                {
+                    this: "{that}.worker",
+                    method: "terminate"
+                }
             ]
         }
     });
@@ -8005,7 +8091,6 @@ outer:  for (var i = 0; i < exist.length; ++i) {
 (function () {
     "use strict";
 
-    // TODO: Cut and pasted from the Flocking Scheduler.
     berg.worker = function (code) {
         var type = typeof code,
             url,
@@ -8029,32 +8114,45 @@ outer:  for (var i = 0; i < exist.length; ++i) {
     };
 
     fluid.defaults("berg.clock.workerSetInterval", {
-        gradeNames: ["berg.clock.realtime", "autoInit"],
+        gradeNames: [
+            "berg.clock.realtime",
+            "berg.postMessageListener",
+            "berg.postMessageSender",
+            "autoInit"
+        ],
 
         members: {
-            worker: '@expand:berg.clock.workerSetInterval.initWorker()'
+            worker: "@expand:berg.clock.workerSetInterval.initWorker()",
+            messageTarget: "{that}.worker",
+            messageSource: "{that}.worker"
         },
 
         invokers: {
-            start: {
-                funcName: "berg.clock.workerSetInterval.post",
-                args: [
-                    "{that}.worker",
-                    {
-                        msg: "start",
-                        value: {
-                            rate: "{that}.options.rate"
-                        }
-                    }
-                ]
-            },
+            start: "{that}.events.onStart.fire",
+            stop: "{that}.events.onStop.fire"
+        },
 
-            stop: "berg.clock.workerSetInterval.stop({that})"
+        events: {
+            onStart: null,
+            onStop: null
         },
 
         listeners: {
-            onCreate: [
-                "berg.clock.workerSetInterval.listen({that})"
+            onStart: [
+                {
+                    func: "{that}.postMessage",
+                    args: ["start", {
+                        rate: "{that}.options.rate"
+                    }]
+                }
+            ],
+
+            onStop: [
+                "{that}.postMessage(stop)",
+                {
+                    this: "{that}.worker",
+                    method: "terminate"
+                }
             ]
         }
     });
@@ -8063,25 +8161,6 @@ outer:  for (var i = 0; i < exist.length; ++i) {
         return berg.worker(berg.clock.workerSetInterval.workerImpl);
     };
 
-    berg.clock.workerSetInterval.listen = function (that) {
-        that.worker.addEventListener("message", function (e) {
-            if (e.data.msg === "tick") {
-                that.tick(performance.now());
-            }
-        }, false);
-    };
-
-    berg.clock.workerSetInterval.post = function (worker, msg) {
-        worker.postMessage(msg);
-    };
-
-    berg.clock.workerSetInterval.stop = function (that) {
-        berg.clock.workerSetInterval.post(that.worker, {
-            msg: "stop"
-        });
-
-        that.worker.terminate();
-    };
 
     // Note: This function is intended to be invoked as
     // an berg.worker only.
@@ -8102,7 +8181,7 @@ outer:  for (var i = 0; i < exist.length; ++i) {
 
             that.tick = function () {
                 self.postMessage({
-                    msg: "tick"
+                    type: "tick"
                 });
             };
 
@@ -8114,12 +8193,12 @@ outer:  for (var i = 0; i < exist.length; ++i) {
         };
 
         self.addEventListener("message", function (e) {
-            if (e.data.msg === "start") {
+            if (e.data.type === "start") {
                 berg.clock = berg.workerClock({
                     rate: e.data.value
                 });
                 berg.clock.start();
-            } else if (e.data.msg === "stop") {
+            } else if (e.data.type === "stop") {
                 if (berg.clock) {
                     berg.clock.stop();
                 }

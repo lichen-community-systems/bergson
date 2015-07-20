@@ -15,6 +15,7 @@ module.exports = function(grunt) {
         bergson: [
             "src/js/clock.js",
             "src/js/priority-queue.js",
+            "src/js/postmessage-utils.js",
             "src/js/scheduler.js",
             "src/js/worker-scheduler.js",
             "src/js/raf-clock.js",
