@@ -16,6 +16,7 @@ module.exports = function(grunt) {
             "src/js/clock.js",
             "src/js/priority-queue.js",
             "src/js/scheduler.js",
+            "src/js/worker-scheduler.js",
             "src/js/raf-clock.js",
             "src/js/setinterval-clock.js",
             "src/js/worker-setinterval-clock.js",

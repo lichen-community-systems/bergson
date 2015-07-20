@@ -7527,7 +7527,7 @@ outer:  for (var i = 0; i < exist.length; ++i) {
              *
              * @param {Number} now - the current clock time, in seconds
              */
-            tick: "berg.scheduler.tick({arguments}.0, {that}.model.timeScale, {that}.queue)",
+            tick: "berg.scheduler.tick({arguments}.0, {that})",
 
             /**
              * Schedules one or more score event specifications.
@@ -7572,7 +7572,6 @@ outer:  for (var i = 0; i < exist.length; ++i) {
              */
             clear: "{that}.queue.remove({arguments}.0)",
 
-
             /**
              * Clears all scheduled events.
              */
@@ -7586,7 +7585,15 @@ outer:  for (var i = 0; i < exist.length; ++i) {
             setTimeScale: {
                 changePath: "timeScale",
                 value: "{arguments}.0"
-            }
+            },
+
+            // Unsupported, non-API function.
+            scheduleEvent: "berg.scheduler.scheduleEvent({arguments}.0, {that})",
+
+            // Unsupported, non-API function.
+            // args: scoreEvent, now
+            invokeCallback: "berg.scheduler.invokeCallback({arguments}.0, {arguments}.1)",
+
         },
 
         modelListeners: {
@@ -7645,14 +7652,18 @@ outer:  for (var i = 0; i < exist.length; ++i) {
         }
     };
 
-    // Unsupported, non-API function.
-    berg.scheduler.evaluateScoreEvent = function (scoreEvent, now, timeScale, queue) {
+    berg.scheduler.invokeCallback = function (now, scoreEvent) {
         scoreEvent.callback(now, scoreEvent);
+    };
+
+    // Unsupported, non-API function.
+    berg.scheduler.evaluateScoreEvent = function (now, scoreEvent, that) {
+        that.invokeCallback(now, scoreEvent);
 
         // If it's a repeating event, queue it back up.
         if (scoreEvent.type === "repeat" && scoreEvent.end > now) {
-            scoreEvent.priority = berg.scheduler.calcPriority(now, scoreEvent.interval, timeScale);
-            queue.push(scoreEvent);
+            scoreEvent.priority = berg.scheduler.calcPriority(now, scoreEvent.interval, that.model.timeScale);
+            that.queue.push(scoreEvent);
         }
     };
 
@@ -7678,7 +7689,7 @@ outer:  for (var i = 0; i < exist.length; ++i) {
         eventSpec.priority = berg.scheduler.calcPriority(now, eventSpec.time, timeScale);
 
         if (eventSpec.priority <= now) {
-            berg.scheduler.evaluateScoreEvent(eventSpec, now, timeScale, that.queue);
+            berg.scheduler.evaluateScoreEvent(now, eventSpec, that);
         } else {
             that.queue.push(eventSpec);
         }
@@ -7689,18 +7700,16 @@ outer:  for (var i = 0; i < exist.length; ++i) {
     // Unsupported, non-API function.
     berg.scheduler.scheduleEvents = function (eventSpecs, that) {
         eventSpecs.forEach(function (eventSpec) {
-            berg.scheduler.scheduleEvent(eventSpec, that);
+            that.scheduleEvent(eventSpec);
         });
 
         return eventSpecs;
     };
 
     berg.scheduler.schedule = function (eventSpec, that) {
-        if (fluid.isArrayable(eventSpec)) {
-            return berg.scheduler.scheduleEvents(eventSpec, that);
-        }
-
-        return berg.scheduler.scheduleEvent(eventSpec, that);
+        return fluid.isArrayable(eventSpec) ?
+            berg.scheduler.scheduleEvents(eventSpec, that) :
+            that.scheduleEvent(eventSpec);
     };
 
     berg.scheduler.once = function (time, callback, that) {
@@ -7710,7 +7719,7 @@ outer:  for (var i = 0; i < exist.length; ++i) {
             callback: callback
         };
 
-        return berg.scheduler.scheduleEvent(eventSpec, that);
+        return that.scheduleEvent(eventSpec);
     };
 
     berg.scheduler.repeat = function (freq, callback, time, end, that) {
@@ -7722,20 +7731,170 @@ outer:  for (var i = 0; i < exist.length; ++i) {
             callback: callback
         };
 
-        return berg.scheduler.scheduleEvent(eventSpec, that);
+        return that.scheduleEvent(eventSpec);
     };
 
-    berg.scheduler.tick = function (now, timeScale, queue) {
-        var next = queue.peek();
+    berg.scheduler.tick = function (now, that) {
+        var next = that.queue.peek();
 
         // Check to see if this event should fire now
         // (or should have fired earlier!)
         while (next && next.priority <= now) {
             // Take it out of the queue and invoke its callback.
-            queue.pop();
-            berg.scheduler.evaluateScoreEvent(next, now, timeScale, queue);
-            next = queue.peek();
+            that.queue.pop();
+            berg.scheduler.evaluateScoreEvent(now, next, that);
+            next = that.queue.peek();
         }
+    };
+
+}());
+;/*
+ * Bergson Worker-based Scheduler
+ * http://github.com/colinbdclark/bergson
+ *
+ * Copyright 2015, Colin Clark
+ * Dual licensed under the MIT and GPL Version 2 licenses.
+ */
+(function () {
+    "use strict";
+
+    fluid.defaults("berg.postMessageSender", {
+        gradeNames: ["fluid.eventedComponent", "autoInit"],
+
+        members: {
+            messageTarget: self
+        },
+
+        invokers: {
+            postMessage: "berg.postMessageSender.postMessage({arguments}, {that}.messageTarget)"
+        }
+    });
+
+    berg.postMessageSender.postMessage = function (args, messageTarget) {
+        var msgType = args[0];
+        if (typeof msgType !== "string") {
+            throw new Error("Can't post a message without a message type.");
+        }
+
+        var message = {
+            type: msgType,
+            args: args.slice(1)
+        };
+
+        messageTarget.postMessage(message);
+    };
+
+
+    fluid.defaults("berg.postMessageListener", {
+        gradeNames: ["fluid.eventedComponent", "autoInit"],
+
+        members: {
+            messageSource: self
+        },
+
+        events: {
+            onError: null
+        },
+
+        listeners: {
+            onCreate: [
+                "berg.postMessageListener.bind({that)"
+            ],
+
+            onError: [
+                {
+                    namespace: "failOnError",
+                    funcName: "fluid.fail"
+                }
+            ]
+        }
+    });
+
+    berg.postMessageListener.bind = function (messageSource, events) {
+        messageSource.addEventListener("message", function (e) {
+            var msg = e.data;
+
+            if (!msg.type) {
+                events.onError.fire("Received a remote message without a type. " +
+                    fluid.prettyPrintJSON(msg));
+            }
+
+            var invoker = that[msg.type];
+            if (!that.options.invokers[msgType] || !invoker) {
+                events.onError.fire("Received a message of type " + msg.type +
+                    ", which did not resolve to a component invoker. Invokers: " +
+                    fluid.prettyPrintJSON(that.options.invokers));
+            }
+
+            invoker.apply(null, msg.args);
+        }, false);
+    };
+
+
+    /**
+     * A Scheduler that runs in a Web Worker.
+     */
+    fluid.defaults("berg.scheduler.worker", {
+        gradeNames: ["berg.scheduler", "berg.postMessageSender", "autoInit"],
+
+        invokers: {
+            invokeCallback: "{that}.postMessage(invokeCallback, {arguments}.0, {arguments}.1)"
+        }
+    });
+
+    /**
+     * A Proxy Scheduler that delegates to a
+     * Web Worker-based Scheduler, communicating with it
+     * via postMessage().
+     *
+     * The Proxy Scheduler is responsible for maintaining a map
+     * of functions by id so that they can be invoked in the current thread.
+     */
+    fluid.defaults("berg.scheduler.proxy", {
+        gradeNames: ["berg.scheduler", "berg.postMessageListener", "berg.postMessageSender", "autoInit"],
+
+        members: {
+            callbackMap: {},
+            worker: "@expand:berg.scheduler.proxy.createWorker()",
+            messageTarget: "{that}.worker",
+            messageSource: "{that}.worker"
+        },
+
+        invokers: {
+            invokeCallback: "berg.scheduler.proxy.invokeCallback({arguments}.0, {arguments}.1, {that})",
+            scheduleEvent: "berg.scheduler.proxy.scheduleEvent({arguments}.0, {that})",
+            clear: "{that}.postMessage(clear, {arguments}.0)",
+            clearAll: "{that}.postMessage(clearAll)",
+            setTimeScale: "{that}.postMessage(setTimeScale, {arguments}.0)"
+        },
+
+        listeners: {
+            onDestroy: [
+                "{that}.postMessage(destroy)",
+                "{worker}.close()"
+            ]
+        }
+    });
+
+    berg.scheduler.proxy.invokeCallback = function (scoreEvent, now, that) {
+        var callback = that.callbackMap[scoreEvent.id];
+
+        if (typeof callback === "function") {
+            callback(now, scoreEvent);
+        } else {
+            that.events.onError.fire("A callback function was not found for score event: " +
+                fluid.prettyPrintJSON(scoreEvent));
+        }
+    };
+
+    berg.scheduler.proxy.scheduleEvent = function (eventSpec, that) {
+        if (!eventSpec.id) {
+            eventSpec.id = fluid.allocateGuid();
+            that.callbackMap[eventSpec.id] = eventSpec.callback;
+        }
+        delete eventSpec.callback;
+
+        that.postMessage("scheduleEvent", eventSpec);
     };
 
 }());
