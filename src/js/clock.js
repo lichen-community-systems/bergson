@@ -87,7 +87,7 @@
 
     berg.clock.offline.tick = function (that) {
         var time = that.time + that.tickDuration;
-        that.time = berg.clock.offline.round(time);
+        that.time = berg.clock.offline.round(time); // TODO: Accuracy and performance issues.
         that.events.onTick.fire(that.time, that.rate);
     };
 
