@@ -4,22 +4,12 @@ module.exports = function(grunt) {
     "use strict";
 
     var files = {
-        jQuery: [
-            "third-party/jquery/js/jquery.js"
-        ],
-
         infusion: [
+            "third-party/infusion/js/jquery.standalone.js",
             "third-party/infusion/js/Fluid.js",
-            "third-party/infusion/js/FluidDocument.js",
-            "third-party/infusion/js/FluidDOMUtilities.js",
+            "third-party/infusion/js/DataBinding.js",
             "third-party/infusion/js/FluidDebugging.js",
-            "third-party/infusion/js/FluidIoC.js",
-            "third-party/infusion/js/FluidPromises.js",
-            "third-party/infusion/js/FluidRequests.js",
-            "third-party/infusion/js/ModelTransformation.js",
-            "third-party/infusion/js/ModelTransformationTransforms.js",
-            "third-party/infusion/js/FluidView.js",
-            "third-party/infusion/js/FluidRequests.js"
+            "third-party/infusion/js/FluidIoC.js"
         ],
 
         bergson: [
@@ -55,7 +45,7 @@ module.exports = function(grunt) {
             },
 
             all: {
-                src: [].concat(files.jQuery, files.infusion, files.bergson),
+                src: [].concat(files.infusion, files.bergson),
                 dest: "dist/<%= pkg.name %>-all.js"
             },
 
@@ -91,6 +81,16 @@ module.exports = function(grunt) {
             }
         },
 
+        watch: {
+            scripts: {
+                files: ["src/**/*.js", "third-party/**/*.js", "Gruntfile.js"],
+                tasks: ["default"],
+                options: {
+                    spawn: false
+                }
+            }
+        },
+
         berg: {
             banners: {
                 short: "/*! Bergson <%= pkg.version %>, Copyright <%= grunt.template.today('yyyy') %> Colin Clark | github.com/colinbdclark/bergson */\n\n"
@@ -103,6 +103,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks("grunt-contrib-uglify");
     grunt.loadNpmTasks("grunt-contrib-clean");
     grunt.loadNpmTasks("grunt-contrib-jshint");
+    grunt.loadNpmTasks("grunt-contrib-watch");
 
     grunt.registerTask("default", ["clean", "jshint", "concat", "uglify"]);
 };
