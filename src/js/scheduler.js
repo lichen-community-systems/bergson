@@ -151,7 +151,11 @@
         },
 
         modelListeners: {
-            "timeScale": "berg.scheduler.scaleEventTimes({that}.queue, {change}.value)"
+            timeScale: {
+                funcName: "berg.scheduler.scaleEventTimes",
+                args: ["{that}.queue", "{change}.value"],
+                excludeSource: "init"
+            }
         },
 
         listeners: {

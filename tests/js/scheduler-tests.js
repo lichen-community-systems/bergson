@@ -10,6 +10,12 @@
 
     fluid.registerNamespace("berg.test.scheduler");
 
+    berg.test.scheduler.scheduleTimeScale = function (atTick, timeScale, testSequencer) {
+        if (testSequencer.model.tick === atTick) {
+            testSequencer.scheduler.applier.change("timeScale", timeScale);
+        }
+    };
+
     berg.test.scheduler.runTest = function (testSequencerType, testSpec) {
         var testSequencer = fluid.invokeGlobalFunction(testSequencerType, [testSpec]);
     };
@@ -513,8 +519,81 @@
                     queueSize: 0
                 }
             ]
-        }
+        },
+        {
+            name: "Changing timeScale in the middle of a schedule",
+            schedulerOptions: {
+                model: {
+                    timeScale: 1
+                },
 
+                components: {
+                    clock: {
+                        options: {
+                            rate: 2
+                        }
+                    }
+                }
+            },
+            listeners: {
+                "{scheduler}.clock.events.onTick": [
+                    {
+                        funcName: "berg.test.scheduler.scheduleTimeScale",
+                        args: [5, 0.5, "{that}"],
+                        priority: "first"
+                    }
+                ]
+            },
+
+            numTicks: 8,
+            scoreEventSpecs: {
+                repeating: {
+                    type: "repeat",
+                    time: 0,
+                    freq: 1/2,
+                    interval: 2,
+                    end: Infinity
+                },
+
+                oneShot: {
+                    type: "once",
+                    time: 3,
+                }
+            },
+
+            registrationSequence: {
+                0: ["repeating", "oneShot"]
+            },
+
+            expectedSequence: [
+                {
+                    name: "repeating",
+                    time: 0,
+                    queueSize: 0
+                },
+                {
+                    name: "repeating",
+                    time: 2,
+                    queueSize: 1
+                },
+                // Tempo change, so the oneShot fires now.
+                {
+                    name: "oneShot",
+                    time: 3,
+                    queueSize: 1
+                },
+                {
+                    name: "repeating",
+                    time: 3,
+                    queueSize: 0
+                },
+                {
+                    name: "repeating",
+                    time: 4,
+                    queueSize: 0
+                }
+            ]
+        }
     ];
 
     berg.test.scheduler.testModule("Time scaling", {
