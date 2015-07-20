@@ -88,7 +88,7 @@
              *
              * @param {Number} now - the current clock time, in seconds
              */
-            tick: "berg.scheduler.tick({arguments}.0, {that}.model.timeScale, {that}.queue)",
+            tick: "berg.scheduler.tick({arguments}.0, {that})",
 
             /**
              * Schedules one or more score event specifications.
@@ -133,7 +133,6 @@
              */
             clear: "{that}.queue.remove({arguments}.0)",
 
-
             /**
              * Clears all scheduled events.
              */
@@ -147,7 +146,15 @@
             setTimeScale: {
                 changePath: "timeScale",
                 value: "{arguments}.0"
-            }
+            },
+
+            // Unsupported, non-API function.
+            scheduleEvent: "berg.scheduler.scheduleEvent({arguments}.0, {that})",
+
+            // Unsupported, non-API function.
+            // args: scoreEvent, now
+            invokeCallback: "berg.scheduler.invokeCallback({arguments}.0, {arguments}.1)",
+
         },
 
         modelListeners: {
@@ -206,14 +213,18 @@
         }
     };
 
-    // Unsupported, non-API function.
-    berg.scheduler.evaluateScoreEvent = function (scoreEvent, now, timeScale, queue) {
+    berg.scheduler.invokeCallback = function (now, scoreEvent) {
         scoreEvent.callback(now, scoreEvent);
+    };
+
+    // Unsupported, non-API function.
+    berg.scheduler.evaluateScoreEvent = function (now, scoreEvent, that) {
+        that.invokeCallback(now, scoreEvent);
 
         // If it's a repeating event, queue it back up.
         if (scoreEvent.type === "repeat" && scoreEvent.end > now) {
-            scoreEvent.priority = berg.scheduler.calcPriority(now, scoreEvent.interval, timeScale);
-            queue.push(scoreEvent);
+            scoreEvent.priority = berg.scheduler.calcPriority(now, scoreEvent.interval, that.model.timeScale);
+            that.queue.push(scoreEvent);
         }
     };
 
@@ -239,7 +250,7 @@
         eventSpec.priority = berg.scheduler.calcPriority(now, eventSpec.time, timeScale);
 
         if (eventSpec.priority <= now) {
-            berg.scheduler.evaluateScoreEvent(eventSpec, now, timeScale, that.queue);
+            berg.scheduler.evaluateScoreEvent(now, eventSpec, that);
         } else {
             that.queue.push(eventSpec);
         }
@@ -250,18 +261,16 @@
     // Unsupported, non-API function.
     berg.scheduler.scheduleEvents = function (eventSpecs, that) {
         eventSpecs.forEach(function (eventSpec) {
-            berg.scheduler.scheduleEvent(eventSpec, that);
+            that.scheduleEvent(eventSpec);
         });
 
         return eventSpecs;
     };
 
     berg.scheduler.schedule = function (eventSpec, that) {
-        if (fluid.isArrayable(eventSpec)) {
-            return berg.scheduler.scheduleEvents(eventSpec, that);
-        }
-
-        return berg.scheduler.scheduleEvent(eventSpec, that);
+        return fluid.isArrayable(eventSpec) ?
+            berg.scheduler.scheduleEvents(eventSpec, that) :
+            that.scheduleEvent(eventSpec);
     };
 
     berg.scheduler.once = function (time, callback, that) {
@@ -271,7 +280,7 @@
             callback: callback
         };
 
-        return berg.scheduler.scheduleEvent(eventSpec, that);
+        return that.scheduleEvent(eventSpec);
     };
 
     berg.scheduler.repeat = function (freq, callback, time, end, that) {
@@ -283,19 +292,19 @@
             callback: callback
         };
 
-        return berg.scheduler.scheduleEvent(eventSpec, that);
+        return that.scheduleEvent(eventSpec);
     };
 
-    berg.scheduler.tick = function (now, timeScale, queue) {
-        var next = queue.peek();
+    berg.scheduler.tick = function (now, that) {
+        var next = that.queue.peek();
 
         // Check to see if this event should fire now
         // (or should have fired earlier!)
         while (next && next.priority <= now) {
             // Take it out of the queue and invoke its callback.
-            queue.pop();
-            berg.scheduler.evaluateScoreEvent(next, now, timeScale, queue);
-            next = queue.peek();
+            that.queue.pop();
+            berg.scheduler.evaluateScoreEvent(now, next, that);
+            next = that.queue.peek();
         }
     };
 
