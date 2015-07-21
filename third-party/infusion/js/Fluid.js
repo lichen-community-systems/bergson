@@ -24,7 +24,7 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
 */
 
 // Declare dependencies
-/* global console, opera, YAHOO*/
+/* global self, console, opera, YAHOO*/
 
 var fluid_2_0 = fluid_2_0 || {};
 var fluid = fluid || fluid_2_0;
@@ -42,7 +42,8 @@ var fluid = fluid || fluid_2_0;
         fluid: fluid
     };
 
-    fluid.global = fluid.global || window || {};
+    var globalContext = typeof window !== "undefined" ? window : typeof self !== "undefined" ? self : undefined;
+    fluid.global = fluid.global || globalContext || {};
 
     // A standard utility to schedule the invocation of a function after the current
     // stack returns. On browsers this defaults to setTimeout(func, 1) but in
@@ -684,8 +685,8 @@ var fluid = fluid || fluid_2_0;
         });
         return togo;
     };
-    
-    /** Converts an array consisting of a mixture of arrays and non-arrays into the concatenation of any inner arrays 
+
+    /** Converts an array consisting of a mixture of arrays and non-arrays into the concatenation of any inner arrays
      * with the non-array elements
      */
     fluid.flatten = function (array) {

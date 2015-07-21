@@ -7,9 +7,9 @@ module.exports = function(grunt) {
         infusion: [
             "third-party/infusion/js/jquery.standalone.js",
             "third-party/infusion/js/Fluid.js",
-            "third-party/infusion/js/DataBinding.js",
             "third-party/infusion/js/FluidDebugging.js",
-            "third-party/infusion/js/FluidIoC.js"
+            "third-party/infusion/js/FluidIoC.js",
+            "third-party/infusion/js/DataBinding.js"
         ],
 
         bergson: [
@@ -22,6 +22,10 @@ module.exports = function(grunt) {
             "src/js/setinterval-clock.js",
             "src/js/worker-setinterval-clock.js",
             "src/js/clock-logger.js"
+        ],
+
+        workerFooter: [
+            "src/js/worker-footer.js"
         ]
     };
 
@@ -54,6 +58,11 @@ module.exports = function(grunt) {
             only: {
                 src: files.bergson,
                 dest: "dist/<%= pkg.name %>-only.js"
+            },
+
+            worker: {
+                src: [].concat(files.infusion, files.bergson, files.workerFooter),
+                dest: "dist/<%= pkg.name %>-worker.js"
             }
         },
 

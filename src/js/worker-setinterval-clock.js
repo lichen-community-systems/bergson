@@ -5,6 +5,7 @@
  * Copyright 2015, Colin Clark
  * Dual licensed under the MIT and GPL Version 2 licenses.
  */
+/*global fluid, berg, self*/
 (function () {
     "use strict";
 
@@ -39,7 +40,7 @@
         ],
 
         members: {
-            worker: "@expand:berg.clock.workerSetInterval.initWorker()",
+            worker: "@expand:berg.clock.workerSetInterval.createWorker()",
             messageTarget: "{that}.worker",
             messageSource: "{that}.worker"
         },
@@ -74,7 +75,7 @@
         }
     });
 
-    berg.clock.workerSetInterval.initWorker = function () {
+    berg.clock.workerSetInterval.createWorker = function () {
         return berg.worker(berg.clock.workerSetInterval.workerImpl);
     };
 

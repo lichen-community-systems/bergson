@@ -5,6 +5,7 @@
  * Copyright 2015, Colin Clark
  * Dual licensed under the MIT and GPL Version 2 licenses.
  */
+/*global QUnit, fluid, berg*/
 (function () {
     "use strict";
 
@@ -35,7 +36,7 @@
             success = true;
         }
 
-        ok(success, "The queue should throw an Error if an invalid value is pushed into it.");
+        QUnit.ok(success, "The queue should throw an Error if an invalid value is pushed into it.");
     };
 
     berg.test.priorityQueue.orderTestSpec = {
@@ -100,7 +101,7 @@
             cat: "meow",
             priority: -1000
         });
-        equal(q.items.length, 1,
+        QUnit.equal(q.items.length, 1,
             "When a valid item is pushed, it should be added to the queue's list of items.");
     });
 

@@ -7,6 +7,7 @@
  * Copyright 2015, Colin Clark
  * Dual licensed under the MIT and GPL Version 2 licenses.
  */
+/*global fluid, berg, performance*/
 (function () {
     "use strict";
 
@@ -134,6 +135,7 @@
  * Copyright 2013 Marijn Haverbeke
  * Copyright 2015 Colin Clark
  */
+/*global fluid, berg*/
 (function() {
     "use strict";
 
@@ -212,13 +214,17 @@
             var len = that.items.length;
             // To remove a value, we must search through the array to find it.
             for (var i = 0; i < len; i++) {
-                if (that.items[i] != item) continue;
+                if (that.items[i] !== item) {
+                    continue;
+                }
                 // When it is found, the process seen in 'pop' is repeated
                 // to fill up the hole.
                 var end = that.items.pop();
                 // If the element we popped was the one we needed to remove,
                 // we're done.
-                if (i === len - 1) break;
+                if (i === len - 1) {
+                    break;
+                }
                 // Otherwise, we replace the removed element with the popped
                 // one, and allow it to float up or sink down as appropriate.
                 that.items[i] = end;
@@ -326,14 +332,22 @@
  * Copyright 2015, Colin Clark
  * Dual licensed under the MIT and GPL Version 2 licenses.
  */
+/*global fluid, berg, self*/
 (function () {
     "use strict";
+
+    // A function that returns "self",
+    // in order to prevent Infusion from chewing it.
+    // TODO: Will a mergePolicy address this?
+    berg.getGlobalSelf = function () {
+        return self;
+    };
 
     fluid.defaults("berg.postMessageSender", {
         gradeNames: ["fluid.eventedComponent", "autoInit"],
 
         members: {
-            messageTarget: self
+            messageTarget: "@expand:berg.getGlobalSelf()"
         },
 
         invokers: {
@@ -359,7 +373,7 @@
         gradeNames: ["fluid.eventedComponent", "autoInit"],
 
         members: {
-            messageSource: self
+            messageSource: "@expand:berg.getGlobalSelf()"
         },
 
         events: {
@@ -409,6 +423,7 @@
  * Copyright 2015, Colin Clark
  * Dual licensed under the MIT and GPL Version 2 licenses.
  */
+/*global fluid, berg*/
 (function () {
     "use strict";
 
@@ -483,6 +498,16 @@
 
         invokers: {
             /**
+             * Starts this scheduler's clock.
+             */
+            start: "{clock}.start()",
+
+            /**
+             * Stops this scheduler's clock.
+             */
+            stop: "{clock}.stop()",
+
+            /**
              * Causes the scheduler to evaluate its
              * queue of scheduled callback and fire those that
              * are appropriate for the current clock time.
@@ -553,12 +578,16 @@
             },
 
             // Unsupported, non-API function.
-            scheduleEvent: "berg.scheduler.scheduleEvent({arguments}.0, {that})",
+            scheduleEvent: {
+                funcName: "berg.scheduler.scheduleEvent",
+                args: ["{arguments}.0", "{that}"]
+            },
 
             // Unsupported, non-API function.
-            // args: scoreEvent, now
-            invokeCallback: "berg.scheduler.invokeCallback({arguments}.0, {arguments}.1)",
-
+            invokeCallback: {
+                funcName: "berg.scheduler.invokeCallback",
+                args: ["{arguments}.0", "{arguments}.1"]
+            }
         },
 
         modelListeners: {
@@ -572,7 +601,11 @@
         listeners: {
             "{clock}.events.onTick": {
                 func: "{scheduler}.tick"
-            }
+            },
+
+            onCreate: [
+                "{that}.start()"
+            ]
         }
     });
 
@@ -601,11 +634,7 @@
 
     // Unsupported, non-API function.
     berg.scheduler.validateEventSpec = function (eventSpec) {
-        if (typeof eventSpec.callback !== "function") {
-            throw new Error("No callback was specified for scheduled event: " +
-                fluid.prettyPrintJSON(eventSpec));
-        }
-
+        // TODO: Provide a means to perform implementation-specific validation.
         if (eventSpec.type === "repeat" && typeof eventSpec.freq !== "number") {
             throw new Error("No freq was specified for scheduled event: " +
                 fluid.prettyPrintJSON(eventSpec));
@@ -720,122 +749,100 @@
  * Copyright 2015, Colin Clark
  * Dual licensed under the MIT and GPL Version 2 licenses.
  */
+/*global fluid, berg*/
 (function () {
     "use strict";
 
-    fluid.defaults("berg.postMessageSender", {
-        gradeNames: ["fluid.eventedComponent", "autoInit"],
-
-        members: {
-            messageTarget: self
-        },
-
-        invokers: {
-            postMessage: "berg.postMessageSender.postMessage({arguments}, {that}.messageTarget)"
-        }
-    });
-
-    berg.postMessageSender.postMessage = function (args, messageTarget) {
-        var msgType = args[0];
-        if (typeof msgType !== "string") {
-            throw new Error("Can't post a message without a message type.");
-        }
-
-        var message = {
-            type: msgType,
-            args: args.slice(1)
-        };
-
-        messageTarget.postMessage(message);
-    };
-
-
-    fluid.defaults("berg.postMessageListener", {
-        gradeNames: ["fluid.eventedComponent", "autoInit"],
-
-        members: {
-            messageSource: self
-        },
-
-        events: {
-            onError: null
-        },
-
-        listeners: {
-            onCreate: [
-                "berg.postMessageListener.bind({that)"
-            ],
-
-            onError: [
-                {
-                    namespace: "failOnError",
-                    funcName: "fluid.fail"
-                }
-            ]
-        }
-    });
-
-    berg.postMessageListener.bind = function (messageSource, events) {
-        messageSource.addEventListener("message", function (e) {
-            var msg = e.data;
-
-            if (!msg.type) {
-                events.onError.fire("Received a remote message without a type. " +
-                    fluid.prettyPrintJSON(msg));
-            }
-
-            var invoker = that[msg.type];
-            if (!that.options.invokers[msgType] || !invoker) {
-                events.onError.fire("Received a message of type " + msg.type +
-                    ", which did not resolve to a component invoker. Invokers: " +
-                    fluid.prettyPrintJSON(that.options.invokers));
-            }
-
-            invoker.apply(null, msg.args);
-        }, false);
-    };
-
-
     /**
-     * A Scheduler that runs in a Web Worker.
+     * A Scheduler that runs in a Web Worker or other environment
+     * where it delegates callback invocation to an out-of-thread proxy
+     * using postMessage().
      */
-    fluid.defaults("berg.scheduler.worker", {
-        gradeNames: ["berg.scheduler", "berg.postMessageSender", "autoInit"],
+    fluid.defaults("berg.scheduler.postMessage", {
+        gradeNames: [
+            "berg.postMessageListener",
+            "berg.postMessageSender",
+            "berg.scheduler",
+            "autoInit"
+        ],
 
         invokers: {
-            invokeCallback: "{that}.postMessage(invokeCallback, {arguments}.0, {arguments}.1)"
+            invokeCallback: {
+                funcName: "berg.scheduler.postMessage.post",
+                args: ["invokeCallback", ["{arguments}.0", "{arguments}.1"], "{that}"]
+            }
         }
     });
 
+    // TODO: Apparent Infusion options merging bug.
+    // Try with compact invoker syntax or "func",
+    // and it will fail due to creating a merged invoker record
+    // containing both "funcName" and "func".
+    berg.scheduler.postMessage.post = function (type, args, that) {
+        that.postMessage(type, args);
+    };
+
     /**
-     * A Proxy Scheduler that delegates to a
-     * Web Worker-based Scheduler, communicating with it
-     * via postMessage().
+     * A Proxy Scheduler that communicates with  a
+     * Web Worker-based PostMessageScheduler via postMessage.
      *
      * The Proxy Scheduler is responsible for maintaining a map
      * of functions by id so that they can be invoked in the current thread.
      */
-    fluid.defaults("berg.scheduler.proxy", {
-        gradeNames: ["berg.scheduler", "berg.postMessageListener", "berg.postMessageSender", "autoInit"],
+    fluid.defaults("berg.scheduler.workerProxy", {
+        gradeNames: [
+            "berg.scheduler",
+            "berg.postMessageListener",
+            "berg.postMessageSender",
+            "autoInit"
+        ],
+
+        scriptPath: "../../dist/bergson-worker.js",
+
+        remoteSchedulerOptions: {
+            components: {
+                clock: {
+                    type: "berg.clock.setInterval",
+                    options: {
+                        rate: 1/100 // Tick every 10 ms by default.
+                    }
+                }
+            }
+        },
 
         members: {
             callbackMap: {},
-            worker: "@expand:berg.scheduler.proxy.createWorker()",
+            worker: "@expand:berg.scheduler.workerProxy.createWorker({that}.options.scriptPath)",
             messageTarget: "{that}.worker",
             messageSource: "{that}.worker"
         },
 
+        components: {
+            clock: {
+                type: "berg.clock" // The real clock is in the other universe.
+            }
+        },
+
         invokers: {
-            invokeCallback: "berg.scheduler.proxy.invokeCallback({arguments}.0, {arguments}.1, {that})",
-            scheduleEvent: "berg.scheduler.proxy.scheduleEvent({arguments}.0, {that})",
+            start: "{that}.postMessage(start)",
+            stop: "{that}.postMessage(stop)",
+            tick: "fluid.identity()",
+            invokeCallback: "berg.scheduler.workerProxy.invokeCallback({arguments}.0, {arguments}.1, {that})",
+            scheduleEvent: "berg.scheduler.workerProxy.scheduleEvent({arguments}.0, {that})",
             clear: "{that}.postMessage(clear, {arguments}.0)",
             clearAll: "{that}.postMessage(clearAll)",
             setTimeScale: "{that}.postMessage(setTimeScale, {arguments}.0)"
         },
 
         listeners: {
+            onCreate: [
+                {
+                    func: "{that}.postMessage",
+                    args: ["create", ["berg.scheduler.postMessage", "{that}.options.remoteSchedulerOptions"]]
+                }
+            ],
+
             onDestroy: [
-                "{that}.postMessage(destroy)",
                 {
                     this: "{that}.worker",
                     method: "terminate"
@@ -844,7 +851,11 @@
         }
     });
 
-    berg.scheduler.proxy.invokeCallback = function (scoreEvent, now, that) {
+    berg.scheduler.workerProxy.createWorker = function (scriptPath) {
+        return new Worker(scriptPath);
+    };
+
+    berg.scheduler.workerProxy.invokeCallback = function (now, scoreEvent, that) {
         var callback = that.callbackMap[scoreEvent.id];
 
         if (typeof callback === "function") {
@@ -855,11 +866,11 @@
         }
     };
 
-    berg.scheduler.proxy.scheduleEvent = function (eventSpec, that) {
+    berg.scheduler.workerProxy.scheduleEvent = function (eventSpec, that) {
         if (!eventSpec.id) {
             eventSpec.id = fluid.allocateGuid();
-            that.callbackMap[eventSpec.id] = eventSpec.callback;
         }
+        that.callbackMap[eventSpec.id] = eventSpec.callback;
         delete eventSpec.callback;
 
         that.postMessage("scheduleEvent", eventSpec);
@@ -873,6 +884,7 @@
  * Copyright 2015, Colin Clark
  * Dual licensed under the MIT and GPL Version 2 licenses.
  */
+/*global fluid, berg, requestAnimationFrame, cancelAnimationFrame, performance*/
 (function () {
     "use strict";
 
@@ -932,6 +944,7 @@
  * Copyright 2015, Colin Clark
  * Dual licensed under the MIT and GPL Version 2 licenses.
  */
+/*global fluid, berg*/
 (function () {
     "use strict";
 
@@ -970,6 +983,7 @@
  * Copyright 2015, Colin Clark
  * Dual licensed under the MIT and GPL Version 2 licenses.
  */
+/*global fluid, berg, self*/
 (function () {
     "use strict";
 
@@ -1004,7 +1018,7 @@
         ],
 
         members: {
-            worker: "@expand:berg.clock.workerSetInterval.initWorker()",
+            worker: "@expand:berg.clock.workerSetInterval.createWorker()",
             messageTarget: "{that}.worker",
             messageSource: "{that}.worker"
         },
@@ -1039,7 +1053,7 @@
         }
     });
 
-    berg.clock.workerSetInterval.initWorker = function () {
+    berg.clock.workerSetInterval.createWorker = function () {
         return berg.worker(berg.clock.workerSetInterval.workerImpl);
     };
 
@@ -1096,6 +1110,7 @@
  * Copyright 2015, Colin Clark
  * Dual licensed under the MIT and GPL Version 2 licenses.
  */
+ /*global fluid, berg*/
 (function () {
     "use strict";
 

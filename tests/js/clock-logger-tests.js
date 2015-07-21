@@ -5,6 +5,7 @@
  * Copyright 2015, Colin Clark
  * Dual licensed under the MIT and GPL Version 2 licenses.
  */
+/*global QUnit, fluid, berg*/
 (function () {
     "use strict";
 
@@ -49,7 +50,7 @@
             }
         }
 
-        ok(allTicksOk, "The logger should have logged the durations of each clock tick.");
+        QUnit.ok(allTicksOk, "The logger should have logged the durations of each clock tick.");
     };
 
 

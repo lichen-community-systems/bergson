@@ -17,7 +17,7 @@
  * Date: Thu May 12 15:04:36 2011 -0400
  */
 
-/* global jQuery:true */
+/* global jQuery:true, self */
 /* exported jQuery */
 
 var fluid_2_0 = fluid_2_0 || {};
@@ -30,10 +30,11 @@ var fluid = fluid || fluid_2_0;
     var toString = Object.prototype.toString;
     var hasOwn = Object.prototype.hasOwnProperty;
     var indexOf = Array.prototype.indexOf;
+    var globalContext = typeof window !== "undefined" ? window : self;
     // Map over jQuery in case of overwrite
-    var _jQuery = window.jQuery;
+    var _jQuery = globalContext.jQuery;
     // Map over the $ in case of overwrite
-    var _$ = window.$;
+    var _$ = globalContext.$;
     // Used for trimming whitespace
     var trimLeft = /^\s+/,
         trimRight = /\s+$/,
@@ -45,11 +46,11 @@ var fluid = fluid || fluid_2_0;
         jquery: "1.6.1-fluidStandalone",
 
         noConflict: function (deep) {
-            if (window.$ === jQuery) {
-                window.$ = _$;
+            if (globalContext.$ === jQuery) {
+                globalContext.$ = _$;
             }
-            if (deep && window.jQuery === jQuery) {
-                window.jQuery = _jQuery;
+            if (deep && globalContext.jQuery === jQuery) {
+                globalContext.jQuery = _jQuery;
             }
             return jQuery;
         },

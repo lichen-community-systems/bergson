@@ -5,6 +5,7 @@
  * Copyright 2015, Colin Clark
  * Dual licensed under the MIT and GPL Version 2 licenses.
  */
+/*global sheep, fluid, berg*/
 (function () {
     "use strict";
 

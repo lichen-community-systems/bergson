@@ -5,6 +5,7 @@
  * Copyright 2015, Colin Clark
  * Dual licensed under the MIT and GPL Version 2 licenses.
  */
+/*global fluid, berg, requestAnimationFrame, cancelAnimationFrame, performance*/
 (function () {
     "use strict";
 

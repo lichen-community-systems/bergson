@@ -8,6 +8,7 @@
  * Copyright 2013 Marijn Haverbeke
  * Copyright 2015 Colin Clark
  */
+/*global fluid, berg*/
 (function() {
     "use strict";
 
@@ -86,13 +87,17 @@
             var len = that.items.length;
             // To remove a value, we must search through the array to find it.
             for (var i = 0; i < len; i++) {
-                if (that.items[i] != item) continue;
+                if (that.items[i] !== item) {
+                    continue;
+                }
                 // When it is found, the process seen in 'pop' is repeated
                 // to fill up the hole.
                 var end = that.items.pop();
                 // If the element we popped was the one we needed to remove,
                 // we're done.
-                if (i === len - 1) break;
+                if (i === len - 1) {
+                    break;
+                }
                 // Otherwise, we replace the removed element with the popped
                 // one, and allow it to float up or sink down as appropriate.
                 that.items[i] = end;

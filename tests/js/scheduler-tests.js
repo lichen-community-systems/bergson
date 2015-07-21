@@ -5,6 +5,7 @@
  * Copyright 2015, Colin Clark
  * Dual licensed under the MIT and GPL Version 2 licenses.
  */
+/*global QUnit, fluid, berg*/
 (function () {
     "use strict";
 
@@ -17,7 +18,7 @@
     };
 
     berg.test.scheduler.runTest = function (testSequencerType, testSpec) {
-        var testSequencer = fluid.invokeGlobalFunction(testSequencerType, [testSpec]);
+        return fluid.invokeGlobalFunction(testSequencerType, [testSpec]);
     };
 
     berg.test.scheduler.runTests = function (testSequencerType, testSpecs) {

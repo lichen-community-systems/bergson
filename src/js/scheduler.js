@@ -5,6 +5,7 @@
  * Copyright 2015, Colin Clark
  * Dual licensed under the MIT and GPL Version 2 licenses.
  */
+/*global fluid, berg*/
 (function () {
     "use strict";
 
@@ -79,6 +80,16 @@
 
         invokers: {
             /**
+             * Starts this scheduler's clock.
+             */
+            start: "{clock}.start()",
+
+            /**
+             * Stops this scheduler's clock.
+             */
+            stop: "{clock}.stop()",
+
+            /**
              * Causes the scheduler to evaluate its
              * queue of scheduled callback and fire those that
              * are appropriate for the current clock time.
@@ -149,12 +160,16 @@
             },
 
             // Unsupported, non-API function.
-            scheduleEvent: "berg.scheduler.scheduleEvent({arguments}.0, {that})",
+            scheduleEvent: {
+                funcName: "berg.scheduler.scheduleEvent",
+                args: ["{arguments}.0", "{that}"]
+            },
 
             // Unsupported, non-API function.
-            // args: scoreEvent, now
-            invokeCallback: "berg.scheduler.invokeCallback({arguments}.0, {arguments}.1)",
-
+            invokeCallback: {
+                funcName: "berg.scheduler.invokeCallback",
+                args: ["{arguments}.0", "{arguments}.1"]
+            }
         },
 
         modelListeners: {
@@ -168,7 +183,11 @@
         listeners: {
             "{clock}.events.onTick": {
                 func: "{scheduler}.tick"
-            }
+            },
+
+            onCreate: [
+                "{that}.start()"
+            ]
         }
     });
 
@@ -197,11 +216,7 @@
 
     // Unsupported, non-API function.
     berg.scheduler.validateEventSpec = function (eventSpec) {
-        if (typeof eventSpec.callback !== "function") {
-            throw new Error("No callback was specified for scheduled event: " +
-                fluid.prettyPrintJSON(eventSpec));
-        }
-
+        // TODO: Provide a means to perform implementation-specific validation.
         if (eventSpec.type === "repeat" && typeof eventSpec.freq !== "number") {
             throw new Error("No freq was specified for scheduled event: " +
                 fluid.prettyPrintJSON(eventSpec));

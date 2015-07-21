@@ -1,3 +1,11 @@
+/*
+ * Bergson Clock Test Utilities
+ * http://github.com/colinbdclark/bergson
+ *
+ * Copyright 2015, Colin Clark
+ * Dual licensed under the MIT and GPL Version 2 licenses.
+ */
+ /*global QUnit, fluid, berg*/
 (function () {
 
     "use strict";
@@ -15,7 +23,7 @@
 
         var diff = larger - smaller;
 
-        ok(diff <= tolerance, msg +
+        QUnit.ok(diff <= tolerance, msg +
             " Tolerance is " + tolerance +
             "; difference was: " + diff + "ms.");
     };

@@ -1,3 +1,11 @@
+/*
+ * Bergson Scheduler Test Utilities
+ * http://github.com/colinbdclark/bergson
+ *
+ * Copyright 2015, Colin Clark
+ * Dual licensed under the MIT and GPL Version 2 licenses.
+ */
+ /*global QUnit, jqUnit, fluid, berg*/
 (function () {
     "use strict";
 
@@ -17,7 +25,7 @@
     };
 
     berg.test.scheduler.testCallback = function (clock, callbackArgs, scoreEventsSpecs, expectedSequence, currentEventIdx) {
-        ok(currentEventIdx < expectedSequence.length,
+        QUnit.ok(currentEventIdx < expectedSequence.length,
             "The number of event callbacks is within range of expected.");
 
         var sequenceSpec = expectedSequence[currentEventIdx],
@@ -175,7 +183,7 @@
         fluid.each(that.options.registrationSequence[that.model.tick], function (eventSpecName) {
             var eventSpec = that.options.scoreEventSpecs[eventSpecName];
             if (!eventSpec) {
-                ok(false, "The registrationSequence was misconfigured. No scoreEventSpec named '" +
+                QUnit.ok(false, "The registrationSequence was misconfigured. No scoreEventSpec named '" +
                     eventSpecName + "' was found. Registration sequence was: " +
                     fluid.prettyPrintJSON(that.options.registrationSequence));
             }

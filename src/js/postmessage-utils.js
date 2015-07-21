@@ -5,14 +5,22 @@
  * Copyright 2015, Colin Clark
  * Dual licensed under the MIT and GPL Version 2 licenses.
  */
+/*global fluid, berg, self*/
 (function () {
     "use strict";
+
+    // A function that returns "self",
+    // in order to prevent Infusion from chewing it.
+    // TODO: Will a mergePolicy address this?
+    berg.getGlobalSelf = function () {
+        return self;
+    };
 
     fluid.defaults("berg.postMessageSender", {
         gradeNames: ["fluid.eventedComponent", "autoInit"],
 
         members: {
-            messageTarget: self
+            messageTarget: "@expand:berg.getGlobalSelf()"
         },
 
         invokers: {
@@ -38,7 +46,7 @@
         gradeNames: ["fluid.eventedComponent", "autoInit"],
 
         members: {
-            messageSource: self
+            messageSource: "@expand:berg.getGlobalSelf()"
         },
 
         events: {
