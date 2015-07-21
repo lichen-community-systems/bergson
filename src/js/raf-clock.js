@@ -16,7 +16,7 @@
     fluid.defaults("berg.clock.raf", {
         gradeNames: ["berg.clock.realtime", "autoInit"],
 
-        rate: 60, // This should be overridden by the user
+        freq: 60, // This should be overridden by the user
                   // to match the refresh rate of their display.
 
         members: {
@@ -50,7 +50,7 @@
 
         var now = performance.now();
         that.time = now;
-        that.events.onTick.fire(now, that.rate);
+        that.events.onTick.fire(now, that.freq);
     };
 
     berg.clock.raf.stop = function (that) {

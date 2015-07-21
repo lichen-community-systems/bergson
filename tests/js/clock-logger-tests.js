@@ -65,7 +65,7 @@
                     type: "berg.test.clock.tester.offlineClockLogger",
                     options: {
                         expected: {
-                            rate: 240,
+                            freq: 240,
                             tickDuration: 1/240
                         }
                     }

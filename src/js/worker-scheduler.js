@@ -60,7 +60,7 @@
                 clock: {
                     type: "berg.clock.setInterval",
                     options: {
-                        rate: 1/100 // Tick every 10 ms by default.
+                        freq: 1/100 // Tick every 10 ms by default.
                     }
                 }
             }

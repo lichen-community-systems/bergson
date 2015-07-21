@@ -57,7 +57,7 @@
             components: {
                 clock: {
                     options: {
-                        rate: 1/10
+                        freq: 1/10
                     }
                 }
             }
@@ -232,7 +232,7 @@
             components: {
                 clock: {
                     options: {
-                        rate: 1/10
+                        freq: 1/10
                     }
                 }
             }

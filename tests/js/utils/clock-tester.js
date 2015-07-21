@@ -27,7 +27,7 @@
         maxJitter: 0,
 
         expected: {
-            rate: 1
+            freq: 1
         },
 
         model: {
@@ -49,7 +49,7 @@
             clock: {
                 type: "berg.clock",
                 options: {
-                    rate: "{tester}.options.expected.rate",
+                    freq: "{tester}.options.expected.freq",
 
                     events: {
                         onTick: "{tester}.events.onTick",

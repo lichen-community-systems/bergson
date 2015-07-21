@@ -29,9 +29,9 @@
     berg.test.clock.testCase.realtime.testInitial = function (clock, tester, maxJitter) {
         var now = performance.now();
 
-        QUnit.equal(clock.options.rate, tester.options.expected.rate,
-            "The clock should be initialized with a rate of " +
-            tester.options.expected.rate + ".");
+        QUnit.equal(clock.options.freq, tester.options.expected.freq,
+            "The clock should be initialized with a freq of " +
+            tester.options.expected.freq + ".");
         berg.test.assertTimeEqual(clock.time, now, maxJitter,
             "The clock should be initialized with the current time.");
     };

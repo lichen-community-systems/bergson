@@ -55,7 +55,7 @@
      * Note: the Bergson scheduler operates a "late"
      * scheduling algorithm for changes that are finer-grained
      * than the resolution of its clock. So, for example, if the
-     * clock is running at a rate of 1 tick/second, an event scheduled
+     * clock is running at a freq of 1 tick/second, an event scheduled
      * at time 1.1 seconds will be invoked at the 2 second tick.
      *
      * The order of events scheduled for the same clock time is indeterminate.

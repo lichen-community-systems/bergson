@@ -29,9 +29,9 @@
     });
 
     berg.test.clock.testCase.offline.testInitial = function (clock, that) {
-        QUnit.equal(clock.options.rate, that.options.expected.rate,
-            "The clock should be initialized with a rate of " +
-            that.options.expected.rate + ".");
+        QUnit.equal(clock.options.freq, that.options.expected.freq,
+            "The clock should be initialized with a freq of " +
+            that.options.expected.freq + ".");
         QUnit.equal(clock.time, 0,
             "The clock should be initialized with a time of 0.");
 
@@ -46,7 +46,7 @@
 
         QUnit.equal(clock.time, that.model.expectedTime,
             "The clock should have been incremented by 1/" +
-            that.options.expected.rate + " of a second.");
+            that.options.expected.freq + " of a second.");
     };
 
 

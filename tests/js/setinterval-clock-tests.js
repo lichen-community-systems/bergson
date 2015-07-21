@@ -43,7 +43,7 @@
                     type: "berg.test.clock.tester.setInterval",
                     options: {
                         expected: {
-                            rate: 30
+                            freq: 30
                         }
                     }
                 }
@@ -54,7 +54,7 @@
                     type: "berg.test.clock.tester.setInterval",
                     options: {
                         expected: {
-                            rate: 30
+                            freq: 30
                         }
                     }
                 }
@@ -65,7 +65,7 @@
                     type: "berg.test.clock.tester.setInterval",
                     options: {
                         expected: {
-                            rate: 240
+                            freq: 240
                         }
                     }
                 }

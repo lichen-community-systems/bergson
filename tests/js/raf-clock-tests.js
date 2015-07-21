@@ -111,7 +111,7 @@
                     type: "berg.test.clock.tester.raf",
                     options: {
                         expected: {
-                            rate: 30
+                            freq: 30
                         }
                     }
                 }

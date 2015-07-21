@@ -15,9 +15,7 @@
     fluid.defaults("berg.clock", {
         gradeNames: ["fluid.eventedComponent", "autoInit"],
 
-        // TODO: Consider renaming this to "freq" for consistency
-        // with the scheduler and Flocking.
-        rate: 1, // Ticks per second.
+        freq: 1, // Ticks per second.
 
         members: {
             /**
@@ -26,11 +24,11 @@
             time: 0,
 
             /**
-             * The rate (in cycles per second) that the clock is
+             * The frequency (in Hz) that the clock is
              * running at.
              * This value is not guaranteed to be precise all clocks.
              */
-            rate: "{that}.options.rate",
+            freq: "{that}.options.freq",
 
             /**
              * The duration, in seconds, between ticks.
@@ -39,7 +37,7 @@
             tickDuration: {
                 expander: {
                     funcName: "berg.clock.calcTickDuration",
-                    args: "{that}.options.rate"
+                    args: "{that}.options.freq"
                 }
             }
         },
@@ -55,8 +53,8 @@
         }
     });
 
-    berg.clock.calcTickDuration = function (rate) {
-        return 1.0 / rate;
+    berg.clock.calcTickDuration = function (freq) {
+        return 1.0 / freq;
     };
 
     /**
@@ -89,7 +87,7 @@
     berg.clock.offline.tick = function (that) {
         var time = that.time + that.tickDuration;
         that.time = berg.clock.offline.round(time); // TODO: Accuracy and performance issues.
-        that.events.onTick.fire(that.time, that.rate);
+        that.events.onTick.fire(that.time, that.freq);
     };
 
 
@@ -119,7 +117,7 @@
 
     berg.clock.realtime.tick = function (that) {
         that.time = performance.now();
-        that.events.onTick.fire(that.time, that.rate);
+        that.events.onTick.fire(that.time, that.freq);
     };
 
 }());

@@ -17,9 +17,7 @@
     fluid.defaults("berg.clock", {
         gradeNames: ["fluid.eventedComponent", "autoInit"],
 
-        // TODO: Consider renaming this to "freq" for consistency
-        // with the scheduler and Flocking.
-        rate: 1, // Ticks per second.
+        freq: 1, // Ticks per second.
 
         members: {
             /**
@@ -28,11 +26,11 @@
             time: 0,
 
             /**
-             * The rate (in cycles per second) that the clock is
+             * The frequency (in Hz) that the clock is
              * running at.
              * This value is not guaranteed to be precise all clocks.
              */
-            rate: "{that}.options.rate",
+            freq: "{that}.options.freq",
 
             /**
              * The duration, in seconds, between ticks.
@@ -41,7 +39,7 @@
             tickDuration: {
                 expander: {
                     funcName: "berg.clock.calcTickDuration",
-                    args: "{that}.options.rate"
+                    args: "{that}.options.freq"
                 }
             }
         },
@@ -57,8 +55,8 @@
         }
     });
 
-    berg.clock.calcTickDuration = function (rate) {
-        return 1.0 / rate;
+    berg.clock.calcTickDuration = function (freq) {
+        return 1.0 / freq;
     };
 
     /**
@@ -91,7 +89,7 @@
     berg.clock.offline.tick = function (that) {
         var time = that.time + that.tickDuration;
         that.time = berg.clock.offline.round(time); // TODO: Accuracy and performance issues.
-        that.events.onTick.fire(that.time, that.rate);
+        that.events.onTick.fire(that.time, that.freq);
     };
 
 
@@ -121,7 +119,7 @@
 
     berg.clock.realtime.tick = function (that) {
         that.time = performance.now();
-        that.events.onTick.fire(that.time, that.rate);
+        that.events.onTick.fire(that.time, that.freq);
     };
 
 }());
@@ -473,7 +471,7 @@
      * Note: the Bergson scheduler operates a "late"
      * scheduling algorithm for changes that are finer-grained
      * than the resolution of its clock. So, for example, if the
-     * clock is running at a rate of 1 tick/second, an event scheduled
+     * clock is running at a freq of 1 tick/second, an event scheduled
      * at time 1.1 seconds will be invoked at the 2 second tick.
      *
      * The order of events scheduled for the same clock time is indeterminate.
@@ -804,7 +802,7 @@
                 clock: {
                     type: "berg.clock.setInterval",
                     options: {
-                        rate: 1/100 // Tick every 10 ms by default.
+                        freq: 1/100 // Tick every 10 ms by default.
                     }
                 }
             }
@@ -895,7 +893,7 @@
     fluid.defaults("berg.clock.raf", {
         gradeNames: ["berg.clock.realtime", "autoInit"],
 
-        rate: 60, // This should be overridden by the user
+        freq: 60, // This should be overridden by the user
                   // to match the refresh rate of their display.
 
         members: {
@@ -929,7 +927,7 @@
 
         var now = performance.now();
         that.time = now;
-        that.events.onTick.fire(now, that.rate);
+        that.events.onTick.fire(now, that.freq);
     };
 
     berg.clock.raf.stop = function (that) {
@@ -969,7 +967,7 @@
     });
 
     berg.clock.setInterval.start = function (that) {
-        that.intervalID = setInterval(that.tick, 1000 / that.options.rate);
+        that.intervalID = setInterval(that.tick, 1000 / that.freq);
     };
 
     berg.clock.setInterval.stop = function (that) {
@@ -1038,7 +1036,7 @@
                 {
                     func: "{that}.postMessage",
                     args: ["start", {
-                        rate: "{that}.options.rate"
+                        freq: "{that}.freq"
                     }]
                 }
             ],
@@ -1072,7 +1070,7 @@
             };
 
             that.start = function () {
-                that.intervalID = setInterval(that.tick, 1000 / that.options.rate);
+                that.intervalID = setInterval(that.tick, 1000 / that.options.freq);
             };
 
             that.tick = function () {
@@ -1091,7 +1089,7 @@
         self.addEventListener("message", function (e) {
             if (e.data.type === "start") {
                 berg.clock = berg.workerClock({
-                    rate: e.data.value
+                    freq: e.data.value
                 });
                 berg.clock.start();
             } else if (e.data.type === "stop") {
@@ -1147,8 +1145,6 @@
         return new Float32Array(numTicksToLog);
     };
 
-    // TODO: This would be much better expressed as a
-    // set of separate model listeners.
     berg.clock.logger.log = function (that) {
         if (that.lastTickTime === null) {
             that.lastTickTime = that.time;

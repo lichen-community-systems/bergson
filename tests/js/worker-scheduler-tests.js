@@ -18,7 +18,7 @@
                     clock: {
                         type: "berg.clock.setInterval",
                         options: {
-                            rate: 1
+                            freq: 1
                         }
                     }
                 }

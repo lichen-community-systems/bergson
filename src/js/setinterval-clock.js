@@ -30,7 +30,7 @@
     });
 
     berg.clock.setInterval.start = function (that) {
-        that.intervalID = setInterval(that.tick, 1000 / that.options.rate);
+        that.intervalID = setInterval(that.tick, 1000 / that.freq);
     };
 
     berg.clock.setInterval.stop = function (that) {

@@ -23,7 +23,7 @@
         }
     });
 
-    fluid.defaults("berg.test.clock.tester.workerSetInterval.refreshRate", {
+    fluid.defaults("berg.test.clock.tester.workerSetInterval.refreshfreq", {
         gradeNames: ["berg.test.clock.tester.workerSetInterval", "autoInit"],
 
         components: {
@@ -51,7 +51,7 @@
                     type: "berg.test.clock.tester.workerSetInterval",
                     options: {
                         expected: {
-                            rate: 30
+                            freq: 30
                         }
                     }
                 }
@@ -62,7 +62,7 @@
                     type: "berg.test.clock.tester.workerSetInterval",
                     options: {
                         expected: {
-                            rate: 30
+                            freq: 30
                         }
                     }
                 }
@@ -73,7 +73,7 @@
                     type: "berg.test.clock.tester.workerSetInterval",
                     options: {
                         expected: {
-                            rate: 240
+                            freq: 240
                         }
                     }
                 }

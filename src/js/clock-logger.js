@@ -42,8 +42,6 @@
         return new Float32Array(numTicksToLog);
     };
 
-    // TODO: This would be much better expressed as a
-    // set of separate model listeners.
     berg.clock.logger.log = function (that) {
         if (that.lastTickTime === null) {
             that.lastTickTime = that.time;

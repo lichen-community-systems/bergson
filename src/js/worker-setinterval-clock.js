@@ -60,7 +60,7 @@
                 {
                     func: "{that}.postMessage",
                     args: ["start", {
-                        rate: "{that}.options.rate"
+                        freq: "{that}.freq"
                     }]
                 }
             ],
@@ -94,7 +94,7 @@
             };
 
             that.start = function () {
-                that.intervalID = setInterval(that.tick, 1000 / that.options.rate);
+                that.intervalID = setInterval(that.tick, 1000 / that.options.freq);
             };
 
             that.tick = function () {
@@ -113,7 +113,7 @@
         self.addEventListener("message", function (e) {
             if (e.data.type === "start") {
                 berg.clock = berg.workerClock({
-                    rate: e.data.value
+                    freq: e.data.value
                 });
                 berg.clock.start();
             } else if (e.data.type === "stop") {

@@ -35,7 +35,7 @@
                     type: "berg.test.clock.tester.offlineManual",
                     options: {
                         expected: {
-                            rate: 30,
+                            freq: 30,
                             tickDuration: 1/30
                         }
                     }
@@ -48,7 +48,7 @@
                     type: "berg.test.clock.tester.offlineManual",
                     options: {
                         expected: {
-                            rate: 30,
+                            freq: 30,
                             tickDuration: 1/30
                         }
                     }
@@ -61,7 +61,7 @@
                     type: "berg.test.clock.tester.offlineManual",
                     options: {
                         expected: {
-                            rate: 240,
+                            freq: 240,
                             tickDuration: 1/240
                         }
                     }
