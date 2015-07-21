@@ -74,27 +74,27 @@ A _score event specification_ is a JSON-type (i.e. plain old, non-prototypal) ob
         <th>Description</th>
     </tr>
     <tr>
-        <td>**type**</td>
+        <td>type</td>
         <td><code>"once"</code> or <code>"repeat"</code></td>
         <td>The type of event to schedule (either one-time or repeating).</td>
     </tr>
     <tr>
-        <td>**time**</td>
+        <td>time</td>
         <td>Number</td>
         <td>The future time in seconds when the scheduled event should occur.</td>
     </tr>
     <tr>
-        <td>**freq**</td>
+        <td>freq</td>
         <td>Number</td>
         <td>(Only for repeating events) The frequency at which the event should repeat.</td>
     </tr>
     <tr>
-        <td>**end**</td>
+        <td>end</td>
         <td>Number</td>
         <td>(Only for repeating events) The future time in seconds when the scheduled event should stop repeating.</td>
     </tr>
     <tr>
-        <td>**callback**</td>
+        <td>callback</td>
         <td>Function</td>
         <td>The function to invoke.</td>
     </tr>
@@ -111,7 +111,7 @@ For more information on interacting with models, see the [Infusion documentation
         <th>Types</th>
     </tr>
     <tr>
-        <td>**timeScale**</td>
+        <td>timeScale</td>
         <td>The scheduler's time scale factor. Defaults to 1.0.</td>
         <td>Number</td>
     </tr>
@@ -126,7 +126,7 @@ For more information on interacting with models, see the [Infusion documentation
         <th>Types</th>
     </tr>
     <tr>
-        <td>**queue**</td>
+        <td>queue</td>
         <td>The priority queue used to sort and queue score events.</td>
         <td><code>berg.priorityQueue</code></td>
     </tr>
@@ -142,37 +142,37 @@ For more information on interacting with models, see the [Infusion documentation
         <th>Returns</th>
     </tr>
     <tr>
-        <td>**start**</td>
+        <td>start</td>
         <td>Starts the scheduler and its clock.</td>
         <td>none</td>
         <td><code>undefined</code></td>
     </tr>
     <tr>
-        <td>**stop**</td>
+        <td>stop</td>
         <td>Stops the scheduler and its clock.</td>
         <td>none</td>
         <td><code>undefined</code></td>
     </tr>
     <tr>
-        <td>**schedule**
+        <td>schedule
         <td>Schedules an event</td>
         <td>A _score event specification_ object</td>
         <td>The scheduled score event specification.</td>
     </tr>
     <tr>
-        <td>**clear**</td>
+        <td>clear</td>
         <td>Removes a scheduled event from the scheduler queue.</td>
         <td>The _score event specification_ to clear.</td>
         <td><code>undefined</code></td>
     </tr>
     <tr>
-        <td>**clearAll**</td>
+        <td>clearAll</td>
         <td>Removes all scheduled events from the scheduler queue.</td>
         <td>none</td>
         <td><code>undefined</code></td>
     </tr>
     <tr>
-        <td>**setTimeScale**</td>
+        <td>setTimeScale</td>
         <td>Sets the time scale factor for the scheduler. This will cause all time values for current and future scheduled events to be scaled by the specified value.</td>
         <td><code>Number</code></td>
         <td><code>undefined</code></td>
@@ -190,17 +190,17 @@ For more information on interacting with models, see the [Infusion documentation
         <th>Types</th>
     </tr>
     <tr>
-        <td>**time**</td>
+        <td>time</td>
         <td>The current clock time, in seconds.</td>
         <td>Number</td>
     </tr>
     <tr>
-        <td>**freq**</td>
+        <td>freq</td>
         <td>The clock's frequency, in cyles per second.</td>
         <td>Number</td>
     </tr>
     <tr>
-        <td>**tickDuration**</td>
+        <td>tickDuration</td>
         <td>The duration between ticks, in seconds.</td>
         <td>Number</td>
     </tr>
@@ -216,19 +216,19 @@ For more information on interacting with models, see the [Infusion documentation
         <th>Returns</th>
     </tr>
     <tr>
-        <td>**start**</td>
+        <td>start</td>
         <td>Starts the clock.</td>
         <td>none</td>
         <td><code>undefined</code></td>
     </tr>
     <tr>
-        <td>**stop**</td>
+        <td>stop</td>
         <td>Stops clock.</td>
         <td>none</td>
         <td><code>undefined</code></td>
     </tr>
     <tr>
-        <td>**tick**</td>
+        <td>tick</td>
         <td>Advances the clock's time. (This will be invoked automatically for most clocks.)</td>
         <td>None</td>
         <td><code>undefined</code></td>
@@ -244,9 +244,9 @@ For more information on interacting with models, see the [Infusion documentation
         <th>Argument Types</th>
     </tr>
     <tr>
-        <td>**onTick**</td>
+        <td>onTick</td>
         <td>Fires each time the clock ticks.</td>
-        <td><code>Number</code> **time**: the current clock time in seconds</td>
+        <td><code>Number</code> time: the current clock time in seconds</td>
     </tr>
 </table>
 
