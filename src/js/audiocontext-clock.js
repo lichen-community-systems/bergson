@@ -70,6 +70,10 @@
     fluid.defaults("berg.clock.autoAudioContext", {
         gradeNames: ["berg.clock.audioContext", "autoInit"],
 
+        mergePolicy: {
+            "members.scriptNode": "noexpand"
+        },
+
         members: {
             scriptNode: {
                 expander: {

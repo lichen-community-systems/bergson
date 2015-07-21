@@ -959,6 +959,8 @@
     fluid.defaults("berg.clock.setInterval", {
         gradeNames: ["berg.clock.realtime", "autoInit"],
 
+        freq: 10,
+
         members: {
             intervalID: null
         },
@@ -1024,6 +1026,8 @@
             "berg.postMessageSender",
             "autoInit"
         ],
+
+        freq: 10,
 
         members: {
             worker: "@expand:berg.clock.workerSetInterval.createWorker()",
@@ -1240,6 +1244,10 @@
      */
     fluid.defaults("berg.clock.autoAudioContext", {
         gradeNames: ["berg.clock.audioContext", "autoInit"],
+
+        mergePolicy: {
+            "members.scriptNode": "noexpand"
+        },
 
         members: {
             scriptNode: {

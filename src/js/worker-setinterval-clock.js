@@ -39,6 +39,8 @@
             "autoInit"
         ],
 
+        freq: 10,
+
         members: {
             worker: "@expand:berg.clock.workerSetInterval.createWorker()",
             messageTarget: "{that}.worker",

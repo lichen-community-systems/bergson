@@ -12,6 +12,8 @@
     fluid.defaults("berg.clock.setInterval", {
         gradeNames: ["berg.clock.realtime", "autoInit"],
 
+        freq: 10,
+
         members: {
             intervalID: null
         },

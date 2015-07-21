@@ -8079,6 +8079,8 @@ var fluid_2_0 = fluid_2_0 || {};
     fluid.defaults("berg.clock.setInterval", {
         gradeNames: ["berg.clock.realtime", "autoInit"],
 
+        freq: 10,
+
         members: {
             intervalID: null
         },
@@ -8144,6 +8146,8 @@ var fluid_2_0 = fluid_2_0 || {};
             "berg.postMessageSender",
             "autoInit"
         ],
+
+        freq: 10,
 
         members: {
             worker: "@expand:berg.clock.workerSetInterval.createWorker()",
