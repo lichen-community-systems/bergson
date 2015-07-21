@@ -30,6 +30,7 @@
         var scheduler = berg.test.scheduler.workerProxy.createScheduler();
         QUnit.ok(scheduler, "The scheduler should have been instantiated.");
         QUnit.ok(scheduler.worker, "The scheduler's Web Worker instance should have been successfully created.");
+        scheduler.destroy();
     });
 
     QUnit.asyncTest("Once callback", function () {
@@ -48,6 +49,7 @@
                 QUnit.ok(typeof now === "number", "The current time should have been returned as a number");
                 jqUnit.assertLeftHand("The callback should have been invoked with the eventSpec.", expectedEventSpec, actualEventSpec);
                 QUnit.start();
+                scheduler.destroy();
             }
         });
     });

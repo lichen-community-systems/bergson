@@ -53,7 +53,7 @@
             "autoInit"
         ],
 
-        scriptPath: "../../dist/bergson-worker.js",
+        scriptPath: "../../dist/bergson-all-worker.js",
 
         remoteSchedulerOptions: {
             components: {

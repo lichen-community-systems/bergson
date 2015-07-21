@@ -62,7 +62,7 @@ module.exports = function(grunt) {
 
             worker: {
                 src: [].concat(files.infusion, files.bergson, files.workerFooter),
-                dest: "dist/<%= pkg.name %>-worker.js"
+                dest: "dist/<%= pkg.name %>-all-worker.js"
             }
         },
 

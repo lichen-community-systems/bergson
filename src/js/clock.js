@@ -99,12 +99,7 @@
         gradeNames: ["berg.clock", "autoInit"],
 
         members: {
-            time: {
-                expander: {
-                    "this": performance,
-                    method: "now"
-                }
-            }
+            time: "@expand:berg.clock.realtime.now()"
         },
 
         invokers: {
@@ -115,8 +110,23 @@
         }
     });
 
+    // TODO: Remove this in favour of a direct call
+    // to performance.now() once Safari supports it
+    // in Web Workers.
+    berg.clock.realtime.now = function () {
+        return performance.now();
+    };
+
+    // Terrible hack to workaround Safari's lack of
+    // support for performance.now().
+    if (typeof performance === "undefined") {
+        berg.clock.realtime.now = function () {
+            return Date.now() / 1000;
+        };
+    }
+
     berg.clock.realtime.tick = function (that) {
-        that.time = performance.now();
+        that.time = berg.clock.realtime.now();
         that.events.onTick.fire(that.time, that.freq);
     };
 
