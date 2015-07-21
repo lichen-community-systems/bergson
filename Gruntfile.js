@@ -20,8 +20,12 @@ module.exports = function(grunt) {
             "src/js/worker-scheduler.js",
             "src/js/raf-clock.js",
             "src/js/setinterval-clock.js",
-            "src/js/worker-setinterval-clock.js",
             "src/js/clock-logger.js"
+        ],
+
+        bergsonMainThreadOnly: [
+            "src/js/worker-setinterval-clock.js",
+            "src/js/audiocontext-clock.js"
         ],
 
         workerFooter: [
@@ -51,12 +55,12 @@ module.exports = function(grunt) {
             },
 
             all: {
-                src: [].concat(files.infusion, files.bergson),
+                src: [].concat(files.infusion, files.bergson, files.bergsonMainThreadOnly),
                 dest: "dist/<%= pkg.name %>-all.js"
             },
 
             only: {
-                src: files.bergson,
+                src: [].concat(files.bergson, files.bergsonMainThreadOnly),
                 dest: "dist/<%= pkg.name %>-only.js"
             },
 

@@ -52,21 +52,19 @@
                     freq: "{tester}.options.expected.freq",
 
                     events: {
-                        onTick: "{tester}.events.onTick",
-                        onCreate: "{tester}.events.onClockCreated"
+                        onTick: "{tester}.events.onTick"
                     }
                 }
             }
         },
 
         events: {
-            onClockCreated: null,
             onTick: "preventable",
             onStop: null
         },
 
         listeners: {
-            onClockCreated: [
+            onCreate: [
                 {
                     namespace: "initializationTest",
                     func: "{testCase}.testInitState"
