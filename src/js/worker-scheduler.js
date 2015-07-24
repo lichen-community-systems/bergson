@@ -67,7 +67,7 @@
         },
 
         members: {
-            callbackMap: {},
+            eventSpecMap: {},
             worker: "@expand:berg.scheduler.workerProxy.createWorker({that}.options.scriptPath)",
             messageTarget: "{that}.worker",
             messageSource: "{that}.worker"
@@ -111,25 +111,31 @@
         return new Worker(scriptPath);
     };
 
-    berg.scheduler.workerProxy.invokeCallback = function (now, scoreEvent, that) {
-        var callback = that.callbackMap[scoreEvent.id];
+    berg.scheduler.workerProxy.invokeCallback = function (now, scoreEventSpecFromWorker, that) {
+        var localEventSpec = that.eventSpecMap[scoreEventSpecFromWorker.id],
+            callback = localEventSpec.callback;
 
         if (typeof callback === "function") {
-            callback(now, scoreEvent);
+            callback(now, scoreEventSpecFromWorker);
         } else {
             that.events.onError.fire("A callback function was not found for score event: " +
-                fluid.prettyPrintJSON(scoreEvent));
+                fluid.prettyPrintJSON(localEventSpec));
         }
     };
 
-    berg.scheduler.workerProxy.scheduleEvent = function (eventSpec, that) {
-        if (!eventSpec.id) {
-            eventSpec.id = fluid.allocateGuid();
-        }
-        that.callbackMap[eventSpec.id] = eventSpec.callback;
-        delete eventSpec.callback;
+    berg.scheduler.workerProxy.makeTransferrableCopy = function (eventSpec) {
+        var toTransfer = fluid.copy(eventSpec);
+        delete toTransfer.callback; // Functions can't survive the journey to the other universe.
 
-        that.postMessage("scheduleEvent", eventSpec);
+        return toTransfer;
+    };
+
+    berg.scheduler.workerProxy.scheduleEvent = function (eventSpec, that) {
+        berg.scheduler.expandEventSpec(eventSpec);
+        that.eventSpecMap[eventSpec.id] = eventSpec;
+
+        var toTransfer = berg.scheduler.workerProxy.makeTransferrableCopy(eventSpec);
+        that.postMessage("scheduleEvent", toTransfer);
     };
 
 }());

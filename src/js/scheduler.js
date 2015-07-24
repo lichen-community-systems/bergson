@@ -243,16 +243,24 @@
         }
     };
 
-    // Unsupported, non-API function.
-    berg.scheduler.scheduleEvent = function (eventSpec, that) {
-        var now = that.clock.time,
-            timeScale = that.model.timeScale;
-
+    berg.scheduler.expandEventSpec = function (eventSpec) {
         // TODO: Should we warn on omitted type?
         if (!eventSpec.type) {
             eventSpec.type = "once";
         }
 
+        // Ensure all event specs have IDs (for debugging and complex scheduling cases).
+        if (!eventSpec.id) {
+            eventSpec.id = fluid.allocateGuid();
+        }
+    };
+
+    // Unsupported, non-API function.
+    berg.scheduler.scheduleEvent = function (eventSpec, that) {
+        var now = that.clock.time,
+            timeScale = that.model.timeScale;
+
+        berg.scheduler.expandEventSpec(eventSpec);
         if (eventSpec.type === "repeat") {
             berg.scheduler.expandRepeatingEventSpec(now, eventSpec);
         }

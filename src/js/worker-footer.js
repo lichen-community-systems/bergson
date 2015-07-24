@@ -13,7 +13,7 @@
                 self.activeComponent.destroy();
             }
 
-            self.activeComponent = fluid.initComponent(e.data.args[0], [e.data.args[1]]);
+            self.activeComponent = fluid.invokeGlobalFunction(e.data.args[0], [e.data.args[1]]);
             e.stopPropagation();
         }
     }, true);

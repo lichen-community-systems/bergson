@@ -50,6 +50,12 @@
 
         events: {
             onTick: null
+        },
+
+        listeners: {
+            onDestroy: [
+                "{that}.stop()"
+            ]
         }
     });
 
