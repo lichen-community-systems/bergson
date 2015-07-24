@@ -111,7 +111,7 @@
         fluid.each(that.options.tests, function (test) {
             var testFnName = test.initOnly || test.async === false ? "test" : "asyncTest";
             QUnit[testFnName](test.name, function () {
-                var tester = fluid.initComponent(test.tester.type, test.tester.options);
+                var tester = fluid.invokeGlobalFunction(test.tester.type, [test.tester.options]);
                 if (!test.initOnly) {
                     tester.start();
                 }
