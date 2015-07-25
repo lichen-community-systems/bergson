@@ -65,7 +65,7 @@
         gradeNames: ["fluid.standardRelayComponent", "autoInit"],
 
         // A very small lookahead value by default
-        // to deal with float point rounding errors,
+        // to deal with floating point rounding errors,
         // but can also be used to offset latency.
         lookahead: 0.00000000000001,
 
