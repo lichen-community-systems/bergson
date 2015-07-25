@@ -29,7 +29,7 @@
     });
 
     berg.test.clock.testCase.offline.testInitial = function (clock, that) {
-        QUnit.equal(clock.options.freq, that.options.expected.freq,
+        QUnit.equal(clock.freq, that.options.expected.freq,
             "The clock should be initialized with a freq of " +
             that.options.expected.freq + ".");
         QUnit.equal(clock.time, 0,
@@ -42,11 +42,13 @@
 
     berg.test.clock.testCase.offline.testTick = function (clock, that) {
         var expectedTime = that.model.expectedTime + that.options.expected.tickDuration;
-        that.applier.change("expectedTime", berg.clock.offline.round(expectedTime));
 
-        QUnit.equal(clock.time, that.model.expectedTime,
+        QUnit.equal(clock.time, expectedTime,
             "The clock should have been incremented by 1/" +
             that.options.expected.freq + " of a second.");
+
+        that.applier.change("expectedTime", expectedTime);
+
     };
 
 

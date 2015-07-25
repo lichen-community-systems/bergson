@@ -24,16 +24,16 @@
             "The queue should contain " + expectedQueueSize + " items");
     };
 
-    berg.test.scheduler.testCallback = function (clock, callbackArgs, scoreEventsSpecs, expectedSequence, currentEventIdx) {
+    berg.test.scheduler.testCallback = function (scheduler, callbackArgs, scoreEventsSpecs, expectedSequence, currentEventIdx) {
         QUnit.ok(currentEventIdx < expectedSequence.length,
             "The number of event callbacks is within range of expected.");
 
         var sequenceSpec = expectedSequence[currentEventIdx],
             expectedEventSpec = scoreEventsSpecs[sequenceSpec.name];
 
-        QUnit.equal(clock.time, sequenceSpec.time,
+        berg.test.assertTimeEqual(scheduler.clock.time, sequenceSpec.time, scheduler.options.lookahead,
             "Callback #" + currentEventIdx + " should have been called back at the expected time.");
-        QUnit.equal(callbackArgs[0], clock.time,
+        QUnit.equal(callbackArgs[0], scheduler.clock.time,
             "Callback #" + currentEventIdx + " should have been passed the current time as its first argument.");
         jqUnit.assertLeftHand(
             "Callback #" + currentEventIdx + "'s second argument should be the current event spec.",
@@ -131,7 +131,7 @@
                 {
                     funcName: "berg.test.scheduler.testCallback",
                     args: [
-                        "{scheduler}.clock",
+                        "{scheduler}",
                         "{arguments}",
                         "{that}.options.scoreEventSpecs",
                         "{that}.options.expectedSequence",

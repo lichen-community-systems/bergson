@@ -24,6 +24,8 @@
         var diff = larger - smaller;
 
         QUnit.ok(diff <= tolerance, msg +
+            " Expected time: " + expected +
+            ", actual time was: " + actual +
             " Tolerance is " + tolerance +
             "; difference was: " + diff + "ms.");
     };

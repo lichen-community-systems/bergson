@@ -64,6 +64,11 @@
     fluid.defaults("berg.scheduler", {
         gradeNames: ["fluid.standardRelayComponent", "autoInit"],
 
+        // A very small lookahead value by default
+        // to deal with float point rounding errors,
+        // but can also be used to offset latency.
+        lookahead: 0.00000000000001,
+
         members: {
             queue: "@expand:berg.priorityQueue()"
         },
@@ -323,7 +328,7 @@
 
         // Check to see if this event should fire now
         // (or should have fired earlier!)
-        while (next && next.priority <= now) {
+        while (next && next.priority <= now + that.options.lookahead) {
             // Take it out of the queue and invoke its callback.
             that.queue.pop();
             berg.scheduler.evaluateScoreEvent(now, next, that);

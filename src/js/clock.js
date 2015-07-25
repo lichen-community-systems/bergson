@@ -37,7 +37,7 @@
             tickDuration: {
                 expander: {
                     funcName: "berg.clock.calcTickDuration",
-                    args: "{that}.options.freq"
+                    args: "{that}.freq"
                 }
             }
         },
@@ -85,14 +85,8 @@
         }
     });
 
-    berg.clock.offline.round = function (time) {
-        // 15 decimal places.
-        return Math.round(time * 100000000000000) / 100000000000000;
-    };
-
     berg.clock.offline.tick = function (that) {
-        var time = that.time + that.tickDuration;
-        that.time = berg.clock.offline.round(time); // TODO: Accuracy and performance issues.
+        that.time = that.time + that.tickDuration;
         that.events.onTick.fire(that.time, that.freq);
     };
 

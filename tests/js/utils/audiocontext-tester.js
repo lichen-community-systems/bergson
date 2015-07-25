@@ -34,6 +34,10 @@
             tester.model.expectedFreq + ".");
         berg.test.assertTimeEqual(clock.time, tester.model.expectedTime, maxJitter,
             "The clock should be initialized with the current time.");
+
+        QUnit.equal(clock.tickDuration, tester.model.expectedTickDuration,
+            "The clock should have been initialized with a tick duration of " +
+            tester.model.expectedTickDuration + " seconds.");
     };
 
     berg.test.clock.testCase.audioContext.testTick = function (clock, time, maxJitter, tester) {
@@ -44,7 +48,7 @@
         QUnit.equal(time, clock.time,
             "The time passed to the onTick event should be the clock's time.");
 
-        tester.applier.change("expectedTime", berg.clock.offline.round(expectedTime));
+        tester.applier.change("expectedTime", expectedTime);
     };
 
     fluid.defaults("berg.test.clock.tester.audioContext", {
