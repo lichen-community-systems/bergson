@@ -64,13 +64,11 @@
     fluid.defaults("berg.scheduler", {
         gradeNames: ["fluid.standardRelayComponent", "autoInit"],
 
-        // A very small lookahead value by default
-        // to deal with floating point rounding errors,
-        // but can also be used to offset latency.
-        lookahead: 0.00000000000001,
-
         members: {
-            queue: "@expand:berg.priorityQueue()"
+            queue: "@expand:berg.priorityQueue()",
+
+            // By default, we schedule ahead by half a tick's duration.
+            lookahead: "@expand:berg.scheduler.calcLookahead({clock})"
         },
 
         model: {
@@ -195,6 +193,10 @@
             ]
         }
     });
+
+    berg.scheduler.calcLookahead = function (clock) {
+        return clock.tickDuration / 2;
+    };
 
     // Unsupported, non-API function.
     berg.scheduler.calcPriority = function (baseTime, timeOffset, timeScale) {
@@ -328,7 +330,7 @@
 
         // Check to see if this event should fire now
         // (or should have fired earlier!)
-        while (next && next.priority <= now + that.options.lookahead) {
+        while (next && next.priority <= now + that.lookahead) {
             // Take it out of the queue and invoke its callback.
             that.queue.pop();
             berg.scheduler.evaluateScoreEvent(now, next, that);

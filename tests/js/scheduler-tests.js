@@ -84,7 +84,7 @@
             expectedSequence: [
                 {
                     name: "only",
-                    time: 30,
+                    time: 20,
                     queueSize: 0
                 }
             ]
@@ -163,7 +163,7 @@
                 },
                 {
                     name: "scheduledLastRunsSecond",
-                    time: 50,
+                    time: 40,
                     queueSize: 0
                 }
             ]
@@ -432,7 +432,7 @@
                 },
                 {
                     name: "splash",
-                    time: 2.3,
+                    time: 2.2,
                     queueSize: 3
                 },
                 {

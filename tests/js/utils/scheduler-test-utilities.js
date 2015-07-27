@@ -31,7 +31,7 @@
         var sequenceSpec = expectedSequence[currentEventIdx],
             expectedEventSpec = scoreEventsSpecs[sequenceSpec.name];
 
-        berg.test.assertTimeEqual(scheduler.clock.time, sequenceSpec.time, scheduler.options.lookahead,
+        berg.test.assertTimeEqual(scheduler.clock.time, sequenceSpec.time, scheduler.lookahead,
             "Callback #" + currentEventIdx + " should have been called back at the expected time.");
         QUnit.equal(callbackArgs[0], scheduler.clock.time,
             "Callback #" + currentEventIdx + " should have been passed the current time as its first argument.");
