@@ -1,4 +1,4 @@
-/*! Bergson 0.9.0, Copyright 2015 Colin Clark | github.com/colinbdclark/bergson */
+/*! Bergson 0.9.1, Copyright 2015 Colin Clark | github.com/colinbdclark/bergson */
 
 /*
  * Bergson Clocks
