@@ -7599,7 +7599,7 @@ var fluid_2_0 = fluid_2_0 || {};
      *    }
      *
      * Note: the Bergson scheduler operates a simple "rounding"
-     * scheduling algorithm for changes that are finer-grained
+     * quantization scheme for changes that are finer-grained
      * than the resolution of its clock. So, for example, if the
      * clock is running at a freq of 1 tick/second, an event scheduled
      * at time 1.5 seconds or less will be invoked at the 1 second tick, while
