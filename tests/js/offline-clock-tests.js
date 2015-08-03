@@ -36,7 +36,7 @@
                     options: {
                         expected: {
                             freq: 30,
-                            tickDuration: 1/30
+                            tickDuration: 1 / 30
                         }
                     }
                 }
@@ -49,7 +49,7 @@
                     options: {
                         expected: {
                             freq: 30,
-                            tickDuration: 1/30
+                            tickDuration: 1 / 30
                         }
                     }
                 }
@@ -62,7 +62,7 @@
                     options: {
                         expected: {
                             freq: 240,
-                            tickDuration: 1/240
+                            tickDuration: 1 / 240
                         }
                     }
                 }

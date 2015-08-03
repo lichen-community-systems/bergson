@@ -9,7 +9,7 @@
  * Copyright 2015 Colin Clark
  */
 /*global fluid, berg*/
-(function() {
+(function () {
     "use strict";
 
     fluid.registerNamespace("berg");
@@ -136,7 +136,7 @@
                     parent = that.items[parentN];
                 // If the parent has a lesser score, things are in order and we
                 // are done.
-                if (parent.priority <= item.priority){
+                if (parent.priority <= item.priority) {
                     break;
                 }
 
@@ -167,7 +167,7 @@
                     child1 = that.items[child1N];
 
                     // If the score is less than our element's, we need to swap.
-                    if (child1.priority < item.priority){
+                    if (child1.priority < item.priority) {
                         swap = child1N;
                     }
                 }
@@ -177,7 +177,7 @@
                     var child2 = that.items[child2N],
                         right = swap === null ? item : child1;
 
-                    if (child2.priority < right.priority){
+                    if (child2.priority < right.priority) {
                         swap = child2N;
                     }
                 }

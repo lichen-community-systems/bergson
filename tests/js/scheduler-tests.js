@@ -241,7 +241,7 @@
                 immediately: {
                     type: "repeat",
                     time: 0,
-                    freq: 1/20,
+                    freq: 1 / 20,
                     interval: 20,
                     end: Infinity
                 }
@@ -288,7 +288,7 @@
                 repeatsThrice: {
                     type: "repeat",
                     time: 0,
-                    freq: 1/10,
+                    freq: 1 / 10,
                     interval: 10,
                     end: 20
                 }
@@ -361,7 +361,7 @@
                     id: "kick",
                     type: "repeat",
                     time: 0,
-                    freq: 1/2,
+                    freq: 1 / 2,
                     interval: 2,
                     end: Infinity
                 },
@@ -370,7 +370,7 @@
                     id: "snare",
                     type: "repeat",
                     time: 1,
-                    freq: 1/2,
+                    freq: 1 / 2,
                     interval: 2,
                     end: Infinity
                 },
@@ -483,7 +483,7 @@
                 repeating: {
                     type: "repeat",
                     time: 2,
-                    freq: 1/2,
+                    freq: 1 / 2,
                     interval: 2,
                     end: Infinity
                 },
@@ -551,7 +551,7 @@
                 repeating: {
                     type: "repeat",
                     time: 0,
-                    freq: 1/2,
+                    freq: 1 / 2,
                     interval: 2,
                     end: Infinity
                 },

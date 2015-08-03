@@ -1,4 +1,4 @@
-/*! Bergson 1.0.0, Copyright 2015 Colin Clark | github.com/colinbdclark/bergson */
+/*! Bergson 0.9.0, Copyright 2015 Colin Clark | github.com/colinbdclark/bergson */
 
 /*
  * Bergson Clocks
@@ -39,7 +39,7 @@
             tickDuration: {
                 expander: {
                     funcName: "berg.clock.calcTickDuration",
-                    args: "{that}.options.freq"
+                    args: "{that}.freq"
                 }
             }
         },
@@ -52,6 +52,12 @@
 
         events: {
             onTick: null
+        },
+
+        listeners: {
+            onDestroy: [
+                "{that}.stop()"
+            ]
         }
     });
 
@@ -81,14 +87,8 @@
         }
     });
 
-    berg.clock.offline.round = function (time) {
-        // 15 decimal places.
-        return Math.round(time * 100000000000000) / 100000000000000;
-    };
-
     berg.clock.offline.tick = function (that) {
-        var time = that.time + that.tickDuration;
-        that.time = berg.clock.offline.round(time); // TODO: Accuracy and performance issues.
+        that.time = that.time + that.tickDuration;
         that.events.onTick.fire(that.time, that.freq);
     };
 
@@ -144,7 +144,7 @@
  * Copyright 2015 Colin Clark
  */
 /*global fluid, berg*/
-(function() {
+(function () {
     "use strict";
 
     fluid.registerNamespace("berg");
@@ -271,7 +271,7 @@
                     parent = that.items[parentN];
                 // If the parent has a lesser score, things are in order and we
                 // are done.
-                if (parent.priority <= item.priority){
+                if (parent.priority <= item.priority) {
                     break;
                 }
 
@@ -302,7 +302,7 @@
                     child1 = that.items[child1N];
 
                     // If the score is less than our element's, we need to swap.
-                    if (child1.priority < item.priority){
+                    if (child1.priority < item.priority) {
                         swap = child1N;
                     }
                 }
@@ -312,7 +312,7 @@
                     var child2 = that.items[child2N],
                         right = swap === null ? item : child1;
 
-                    if (child2.priority < right.priority){
+                    if (child2.priority < right.priority) {
                         swap = child2N;
                     }
                 }
@@ -478,11 +478,13 @@
      *        callback: callback
      *    }
      *
-     * Note: the Bergson scheduler operates a "late"
+     * Note: the Bergson scheduler operates a simple "rounding"
      * scheduling algorithm for changes that are finer-grained
      * than the resolution of its clock. So, for example, if the
      * clock is running at a freq of 1 tick/second, an event scheduled
-     * at time 1.1 seconds will be invoked at the 2 second tick.
+     * at time 1.5 seconds or less will be invoked at the 1 second tick, while
+     * events scheduled at a time greater than half a tick
+     * will be invoked at the 2 second tick.
      *
      * The order of events scheduled for the same clock time is indeterminate.
      *
@@ -491,7 +493,10 @@
         gradeNames: ["fluid.standardRelayComponent", "autoInit"],
 
         members: {
-            queue: "@expand:berg.priorityQueue()"
+            queue: "@expand:berg.priorityQueue()",
+
+            // By default, we schedule ahead by half a tick's duration.
+            lookahead: "@expand:berg.scheduler.calcLookahead({clock})"
         },
 
         model: {
@@ -617,6 +622,10 @@
         }
     });
 
+    berg.scheduler.calcLookahead = function (clock) {
+        return clock.tickDuration / 2;
+    };
+
     // Unsupported, non-API function.
     berg.scheduler.calcPriority = function (baseTime, timeOffset, timeScale) {
         return baseTime + (timeOffset * timeScale);
@@ -669,16 +678,24 @@
         }
     };
 
-    // Unsupported, non-API function.
-    berg.scheduler.scheduleEvent = function (eventSpec, that) {
-        var now = that.clock.time,
-            timeScale = that.model.timeScale;
-
+    berg.scheduler.expandEventSpec = function (eventSpec) {
         // TODO: Should we warn on omitted type?
         if (!eventSpec.type) {
             eventSpec.type = "once";
         }
 
+        // Ensure all event specs have IDs (for debugging and complex scheduling cases).
+        if (!eventSpec.id) {
+            eventSpec.id = fluid.allocateGuid();
+        }
+    };
+
+    // Unsupported, non-API function.
+    berg.scheduler.scheduleEvent = function (eventSpec, that) {
+        var now = that.clock.time,
+            timeScale = that.model.timeScale;
+
+        berg.scheduler.expandEventSpec(eventSpec);
         if (eventSpec.type === "repeat") {
             berg.scheduler.expandRepeatingEventSpec(now, eventSpec);
         }
@@ -741,7 +758,7 @@
 
         // Check to see if this event should fire now
         // (or should have fired earlier!)
-        while (next && next.priority <= now) {
+        while (next && next.priority <= now + that.lookahead) {
             // Take it out of the queue and invoke its callback.
             that.queue.pop();
             berg.scheduler.evaluateScoreEvent(now, next, that);
@@ -812,14 +829,14 @@
                 clock: {
                     type: "berg.clock.setInterval",
                     options: {
-                        freq: 1/100 // Tick every 10 ms by default.
+                        freq: 1 / 100 // Tick every 10 ms by default.
                     }
                 }
             }
         },
 
         members: {
-            callbackMap: {},
+            eventSpecMap: {},
             worker: "@expand:berg.scheduler.workerProxy.createWorker({that}.options.scriptPath)",
             messageTarget: "{that}.worker",
             messageSource: "{that}.worker"
@@ -863,25 +880,31 @@
         return new Worker(scriptPath);
     };
 
-    berg.scheduler.workerProxy.invokeCallback = function (now, scoreEvent, that) {
-        var callback = that.callbackMap[scoreEvent.id];
+    berg.scheduler.workerProxy.invokeCallback = function (now, scoreEventSpecFromWorker, that) {
+        var localEventSpec = that.eventSpecMap[scoreEventSpecFromWorker.id],
+            callback = localEventSpec.callback;
 
         if (typeof callback === "function") {
-            callback(now, scoreEvent);
+            callback(now, scoreEventSpecFromWorker);
         } else {
             that.events.onError.fire("A callback function was not found for score event: " +
-                fluid.prettyPrintJSON(scoreEvent));
+                fluid.prettyPrintJSON(localEventSpec));
         }
     };
 
-    berg.scheduler.workerProxy.scheduleEvent = function (eventSpec, that) {
-        if (!eventSpec.id) {
-            eventSpec.id = fluid.allocateGuid();
-        }
-        that.callbackMap[eventSpec.id] = eventSpec.callback;
-        delete eventSpec.callback;
+    berg.scheduler.workerProxy.makeTransferrableCopy = function (eventSpec) {
+        var toTransfer = fluid.copy(eventSpec);
+        delete toTransfer.callback; // Functions can't survive the journey to the other universe.
 
-        that.postMessage("scheduleEvent", eventSpec);
+        return toTransfer;
+    };
+
+    berg.scheduler.workerProxy.scheduleEvent = function (eventSpec, that) {
+        berg.scheduler.expandEventSpec(eventSpec);
+        that.eventSpecMap[eventSpec.id] = eventSpec;
+
+        var toTransfer = berg.scheduler.workerProxy.makeTransferrableCopy(eventSpec);
+        that.postMessage("scheduleEvent", toTransfer);
     };
 
 }());
@@ -984,6 +1007,64 @@
 
     berg.clock.setInterval.stop = function (that) {
         clearInterval(that.intervalID);
+    };
+}());
+;/*
+ * Bergson Clock Logger
+ * http://github.com/colinbdclark/bergson
+ *
+ * Copyright 2015, Colin Clark
+ * Dual licensed under the MIT and GPL Version 2 licenses.
+ */
+ /*global fluid, berg*/
+(function () {
+    "use strict";
+
+    /**
+     * Interval Logger logs the interval between ticks over time
+     * into a typed array that can be used to analyse the realtime
+     * performance of a clock instance (e.g. to determine definitively
+     * if the clock is dropping frames).
+     */
+    fluid.defaults("berg.clock.logger", {
+        gradeNames: ["fluid.eventedComponent", "autoInit"],
+
+        numTicksToLog: 60 * 60 * 20, // Twenty minutes at 60 fps by default.
+
+        members: {
+            tickCounter: 0,
+            lastTickTime: null,
+            interval: 0,
+            intervalLog: "@expand:berg.clock.logger.initLog({that}.options.numTicksToLog)"
+        },
+
+        invokers: {
+            log: "berg.clock.logger.log({that})"
+        },
+
+        listeners: {
+            "{clock}.events.onTick": [
+                "{that}.log()"
+            ]
+        }
+    });
+
+    berg.clock.logger.initLog = function (numTicksToLog) {
+        return new Float32Array(numTicksToLog);
+    };
+
+    berg.clock.logger.log = function (that) {
+        if (that.lastTickTime === null) {
+            that.lastTickTime = that.time;
+            return;
+        }
+
+        that.tickCounter++;
+        that.interval = that.time - that.lastTickTime;
+
+        if (that.tickCounter < that.options.numTicksToLog) {
+            that.intervalLog[that.tickCounter] = that.interval;
+        }
     };
 }());
 ;/*
@@ -1113,64 +1194,6 @@
                 self.close();
             }
         }, false);
-    };
-}());
-;/*
- * Bergson Clock Logger
- * http://github.com/colinbdclark/bergson
- *
- * Copyright 2015, Colin Clark
- * Dual licensed under the MIT and GPL Version 2 licenses.
- */
- /*global fluid, berg*/
-(function () {
-    "use strict";
-
-    /**
-     * Interval Logger logs the interval between ticks over time
-     * into a typed array that can be used to analyse the realtime
-     * performance of a clock instance (e.g. to determine definitively
-     * if the clock is dropping frames).
-     */
-    fluid.defaults("berg.clock.logger", {
-        gradeNames: ["fluid.eventedComponent", "autoInit"],
-
-        numTicksToLog: 60 * 60 * 20, // Twenty minutes at 60 fps by default.
-
-        members: {
-            tickCounter: 0,
-            lastTickTime: null,
-            interval: 0,
-            intervalLog: "@expand:berg.clock.logger.initLog({that}.options.numTicksToLog)"
-        },
-
-        invokers: {
-            log: "berg.clock.logger.log({that})"
-        },
-
-        listeners: {
-            "{clock}.events.onTick": [
-                "{that}.log()"
-            ]
-        }
-    });
-
-    berg.clock.logger.initLog = function (numTicksToLog) {
-        return new Float32Array(numTicksToLog);
-    };
-
-    berg.clock.logger.log = function (that) {
-        if (that.lastTickTime === null) {
-            that.lastTickTime = that.time;
-            return;
-        }
-
-        that.tickCounter++;
-        that.interval = that.time - that.lastTickTime;
-
-        if (that.tickCounter < that.options.numTicksToLog) {
-            that.intervalLog[that.tickCounter] = that.interval;
-        }
     };
 }());
 ;/*

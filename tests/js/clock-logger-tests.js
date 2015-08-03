@@ -66,7 +66,7 @@
                     options: {
                         expected: {
                             freq: 240,
-                            tickDuration: 1/240
+                            tickDuration: 1 / 240
                         }
                     }
                 }
