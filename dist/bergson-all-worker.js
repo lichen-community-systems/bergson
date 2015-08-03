@@ -7127,7 +7127,10 @@ var fluid_2_0 = fluid_2_0 || {};
  * Copyright 2015, Colin Clark
  * Dual licensed under the MIT and GPL Version 2 licenses.
  */
-/*global fluid, berg, performance*/
+/*global require, performance*/
+var fluid = fluid || require("infusion"),
+    berg = fluid.registerNamespace("berg");
+
 (function () {
     "use strict";
 
@@ -7263,7 +7266,10 @@ var fluid_2_0 = fluid_2_0 || {};
  * Copyright 2013 Marijn Haverbeke
  * Copyright 2015 Colin Clark
  */
-/*global fluid, berg*/
+/*global require*/
+var fluid = fluid || require("infusion"),
+    berg = fluid.registerNamespace("berg");
+
 (function () {
     "use strict";
 
@@ -7460,7 +7466,10 @@ var fluid_2_0 = fluid_2_0 || {};
  * Copyright 2015, Colin Clark
  * Dual licensed under the MIT and GPL Version 2 licenses.
  */
-/*global fluid, berg, self*/
+/*global require, self*/
+var fluid = fluid || require("infusion"),
+    berg = fluid.registerNamespace("berg");
+
 (function () {
     "use strict";
 
@@ -7551,7 +7560,10 @@ var fluid_2_0 = fluid_2_0 || {};
  * Copyright 2015, Colin Clark
  * Dual licensed under the MIT and GPL Version 2 licenses.
  */
-/*global fluid, berg*/
+/*global require*/
+var fluid = fluid || require("infusion"),
+    berg = fluid.registerNamespace("berg");
+
 (function () {
     "use strict";
 
@@ -7894,7 +7906,10 @@ var fluid_2_0 = fluid_2_0 || {};
  * Copyright 2015, Colin Clark
  * Dual licensed under the MIT and GPL Version 2 licenses.
  */
-/*global fluid, berg*/
+/*global require*/
+var fluid = fluid || require("infusion"),
+    berg = fluid.registerNamespace("berg");
+
 (function () {
     "use strict";
 
@@ -8035,7 +8050,10 @@ var fluid_2_0 = fluid_2_0 || {};
  * Copyright 2015, Colin Clark
  * Dual licensed under the MIT and GPL Version 2 licenses.
  */
-/*global fluid, berg, requestAnimationFrame, cancelAnimationFrame, performance*/
+/*global require, requestAnimationFrame, cancelAnimationFrame, performance*/
+var fluid = fluid || require("infusion"),
+    berg = fluid.registerNamespace("berg");
+
 (function () {
     "use strict";
 
@@ -8095,7 +8113,10 @@ var fluid_2_0 = fluid_2_0 || {};
  * Copyright 2015, Colin Clark
  * Dual licensed under the MIT and GPL Version 2 licenses.
  */
-/*global fluid, berg*/
+/*global require*/
+var fluid = fluid || require("infusion"),
+    berg = fluid.registerNamespace("berg");
+
 (function () {
     "use strict";
 
@@ -8136,7 +8157,10 @@ var fluid_2_0 = fluid_2_0 || {};
  * Copyright 2015, Colin Clark
  * Dual licensed under the MIT and GPL Version 2 licenses.
  */
- /*global fluid, berg*/
+ /*global require*/
+var fluid = fluid || require("infusion"),
+    berg = fluid.registerNamespace("berg");
+
 (function () {
     "use strict";
 

@@ -8,7 +8,10 @@
  * Copyright 2013 Marijn Haverbeke
  * Copyright 2015 Colin Clark
  */
-/*global fluid, berg*/
+/*global require*/
+var fluid = fluid || require("infusion"),
+    berg = fluid.registerNamespace("berg");
+
 (function () {
     "use strict";
 

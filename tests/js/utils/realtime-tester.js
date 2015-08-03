@@ -5,10 +5,16 @@
  * Copyright 2015, Colin Clark
  * Dual licensed under the MIT and GPL Version 2 licenses.
  */
-/*global QUnit, fluid, berg, performance*/
+/*global require*/
+var fluid = fluid || require("infusion"),
+    jqUnit = jqUnit || fluid.require("jqUnit"),
+    berg = fluid.registerNamespace("berg");
+
 (function () {
 
     "use strict";
+
+    var QUnit = fluid.registerNamespace("QUnit");
 
     fluid.defaults("berg.test.clock.testCase.realtime", {
         gradeNames: ["berg.test.clock.testCase", "autoInit"],
@@ -27,7 +33,7 @@
     });
 
     berg.test.clock.testCase.realtime.testInitial = function (clock, tester, maxJitter) {
-        var now = performance.now();
+        var now = berg.clock.realtime.now();
 
         QUnit.equal(clock.freq, tester.options.expected.freq,
             "The clock should be initialized with a freq of " +
@@ -37,7 +43,7 @@
     };
 
     berg.test.clock.testCase.realtime.testTick = function (clock, time, maxJitter) {
-        var now = performance.now();
+        var now = berg.clock.realtime.now();
         berg.test.assertTimeEqual(clock.time, now, maxJitter,
             "The clock's time should reflect the current real time.");
         QUnit.equal(time, clock.time,

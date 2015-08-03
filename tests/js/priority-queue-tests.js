@@ -5,9 +5,15 @@
  * Copyright 2015, Colin Clark
  * Dual licensed under the MIT and GPL Version 2 licenses.
  */
-/*global QUnit, fluid, berg*/
+/*global require*/
+var fluid = fluid || require("infusion"),
+    jqUnit = jqUnit || fluid.require("jqUnit"),
+    berg = fluid.registerNamespace("berg");
+
 (function () {
     "use strict";
+
+    var QUnit = fluid.registerNamespace("QUnit");
 
     fluid.registerNamespace("berg.test.priorityQueue");
 

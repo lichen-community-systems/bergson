@@ -5,7 +5,10 @@
  * Copyright 2015, Colin Clark
  * Dual licensed under the MIT and GPL Version 2 licenses.
  */
-/*global fluid, berg, self*/
+/*global require, self*/
+var fluid = fluid || require("infusion"),
+    berg = fluid.registerNamespace("berg");
+
 (function () {
     "use strict";
 

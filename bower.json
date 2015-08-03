@@ -11,10 +11,12 @@
     "license": "(MIT OR GPL-2.0)",
     "main": "dist/bergson-all.min.js",
     "ignore": [
+        ".jshintrc",
         "tests",
         "GPL-LICENSE.txt",
         "Gruntfile.js",
         "MIT-LICENSE.txt",
-        "package.json"
+        "package.json",
+        "index.js"
     ]
 }
