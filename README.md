@@ -311,7 +311,7 @@ Community
 Bergson is supported by the Flocking community and uses its forums:
 
 ### Mailing List
-The [flocking mailing list](http://lists.idrc.ocadu.ca/mailman/listinfo/flocking)
+The [Flocking mailing list](http://lists.idrc.ocadu.ca/mailman/listinfo/flocking)
 is the place to ask questions, share code, and request new features.
 
 ### Chat
