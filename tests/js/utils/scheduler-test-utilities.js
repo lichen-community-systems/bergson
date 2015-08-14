@@ -47,7 +47,7 @@ var fluid = fluid || require("infusion"),
     };
 
     fluid.defaults("berg.test.scheduler.testSequencer", {
-        gradeNames: ["fluid.standardRelayComponent", "autoInit"],
+        gradeNames: ["fluid.modelComponent"],
 
         name: "No test name was defined!",
         scoreEventSpecs: {},
@@ -95,7 +95,6 @@ var fluid = fluid || require("infusion"),
 
             testQueue: {
                 funcName: "berg.test.scheduler.testQueue",
-                dynamic: true,
                 args: [
                     "{scheduler}",
                     "{that}.options.expectedSequence",
@@ -207,7 +206,7 @@ var fluid = fluid || require("infusion"),
 
 
     fluid.defaults("berg.test.scheduler.testSequencer.offline", {
-        gradeNames: ["fluid.standardRelayComponent", "autoInit"],
+        gradeNames: ["fluid.modelComponent"],
 
         invokers: {
             startClock: {
@@ -226,13 +225,12 @@ var fluid = fluid || require("infusion"),
     fluid.defaults("berg.test.scheduler.offlineTestSequencer", {
         gradeNames: [
             "berg.test.scheduler.testSequencer",
-            "berg.test.scheduler.testSequencer.offline",
-            "autoInit"
+            "berg.test.scheduler.testSequencer.offline"
         ]
     });
 
     fluid.defaults("berg.test.scheduler.onceTestSequencer", {
-        gradeNames: ["berg.test.scheduler.offlineTestSequencer", "autoInit"],
+        gradeNames: ["berg.test.scheduler.offlineTestSequencer"],
 
         schedulerOptions: {
             components: {
@@ -261,7 +259,7 @@ var fluid = fluid || require("infusion"),
     };
 
     fluid.defaults("berg.test.scheduler.repeatTestSequencer", {
-        gradeNames: ["berg.test.scheduler.offlineTestSequencer", "autoInit"],
+        gradeNames: ["berg.test.scheduler.offlineTestSequencer"],
 
         invokers: {
             scheduleEvent: {

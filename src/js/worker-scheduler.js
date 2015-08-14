@@ -21,8 +21,7 @@ var fluid = fluid || require("infusion"),
         gradeNames: [
             "berg.postMessageListener",
             "berg.postMessageSender",
-            "berg.scheduler",
-            "autoInit"
+            "berg.scheduler"
         ],
 
         invokers: {
@@ -52,8 +51,7 @@ var fluid = fluid || require("infusion"),
         gradeNames: [
             "berg.scheduler",
             "berg.postMessageListener",
-            "berg.postMessageSender",
-            "autoInit"
+            "berg.postMessageSender"
         ],
 
         scriptPath: "../../dist/bergson-all-worker.js",

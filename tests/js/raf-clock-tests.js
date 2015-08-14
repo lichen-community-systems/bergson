@@ -20,8 +20,7 @@ var fluid = fluid || require("infusion"),
     fluid.defaults("berg.test.clock.tester.raf", {
         gradeNames: [
             "berg.test.clock.tester.external",
-            "berg.test.clock.tester.realtime",
-            "autoInit"
+            "berg.test.clock.tester.realtime"
         ],
 
         maxJitter: 20, // Anything calling back to the main thread
@@ -35,9 +34,8 @@ var fluid = fluid || require("infusion"),
 
     fluid.defaults("berg.test.clock.raf.refreshRateTestCase", {
         gradeNames: [
-            "fluid.standardRelayComponent",
-            "berg.test.clock.testCase.realtime",
-            "autoInit"
+            "fluid.modelComponent",
+            "berg.test.clock.testCase.realtime"
         ],
 
         members: {
@@ -89,7 +87,7 @@ var fluid = fluid || require("infusion"),
 
 
     fluid.defaults("berg.test.clock.tester.raf.refreshRate", {
-        gradeNames: ["berg.test.clock.tester.raf", "autoInit"],
+        gradeNames: ["berg.test.clock.tester.raf"],
 
         components: {
             testCase: {
@@ -100,7 +98,7 @@ var fluid = fluid || require("infusion"),
 
 
     fluid.defaults("berg.test.clock.rafClockTestSuite", {
-        gradeNames: ["berg.test.clock.testSuite", "autoInit"],
+        gradeNames: ["berg.test.clock.testSuite"],
 
         tests: [
             {

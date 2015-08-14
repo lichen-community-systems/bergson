@@ -15,8 +15,7 @@ var fluid = fluid || require("infusion"),
     fluid.defaults("berg.test.clock.tester.workerSetInterval", {
         gradeNames: [
             "berg.test.clock.tester.external",
-            "berg.test.clock.tester.realtime",
-            "autoInit"
+            "berg.test.clock.tester.realtime"
         ],
 
         components: {
@@ -27,7 +26,7 @@ var fluid = fluid || require("infusion"),
     });
 
     fluid.defaults("berg.test.clock.tester.workerSetInterval.refreshfreq", {
-        gradeNames: ["berg.test.clock.tester.workerSetInterval", "autoInit"],
+        gradeNames: ["berg.test.clock.tester.workerSetInterval"],
 
         components: {
             testCase: {
@@ -37,7 +36,7 @@ var fluid = fluid || require("infusion"),
     });
 
     fluid.defaults("berg.test.clock.workerSetIntervalClockTestSuite", {
-        gradeNames: ["berg.test.clock.testSuite", "autoInit"],
+        gradeNames: ["berg.test.clock.testSuite"],
 
         tests: [
             {

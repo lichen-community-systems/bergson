@@ -16,7 +16,7 @@ var fluid = fluid || require("infusion"),
      * Clock is the base grade for all Clocks.
      */
     fluid.defaults("berg.clock", {
-        gradeNames: ["fluid.eventedComponent", "autoInit"],
+        gradeNames: ["fluid.component"],
 
         freq: 1, // Ticks per second.
 
@@ -78,7 +78,7 @@ var fluid = fluid || require("infusion"),
      * by invoking its tick() method.
      */
     fluid.defaults("berg.clock.offline", {
-        gradeNames: ["berg.clock", "autoInit"],
+        gradeNames: ["berg.clock"],
 
         invokers: {
             tick: {
@@ -99,7 +99,7 @@ var fluid = fluid || require("infusion"),
      * (i.e. performance.now)
      */
     fluid.defaults("berg.clock.realtime", {
-        gradeNames: ["berg.clock", "autoInit"],
+        gradeNames: ["berg.clock"],
 
         members: {
             time: "@expand:berg.clock.realtime.now()"

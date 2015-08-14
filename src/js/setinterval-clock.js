@@ -13,7 +13,7 @@ var fluid = fluid || require("infusion"),
     "use strict";
 
     fluid.defaults("berg.clock.setInterval", {
-        gradeNames: ["berg.clock.realtime", "autoInit"],
+        gradeNames: ["berg.clock.realtime"],
 
         freq: 10,
 

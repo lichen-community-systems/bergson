@@ -18,7 +18,7 @@ var fluid = fluid || require("infusion"),
     QUnit.module("Realtime clock");
 
     fluid.defaults("berg.test.clock.realtimeClockTestSuite", {
-        gradeNames: ["berg.test.clock.testSuite", "autoInit"],
+        gradeNames: ["berg.test.clock.testSuite"],
 
         tests: [
             {

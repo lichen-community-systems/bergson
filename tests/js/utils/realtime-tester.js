@@ -17,7 +17,7 @@ var fluid = fluid || require("infusion"),
     var QUnit = fluid.registerNamespace("QUnit");
 
     fluid.defaults("berg.test.clock.testCase.realtime", {
-        gradeNames: ["berg.test.clock.testCase", "autoInit"],
+        gradeNames: ["berg.test.clock.testCase"],
 
         invokers: {
             testInitState: {
@@ -52,7 +52,7 @@ var fluid = fluid || require("infusion"),
 
 
     fluid.defaults("berg.test.clock.tester.realtime", {
-        gradeNames: ["berg.test.clock.tester", "autoInit"],
+        gradeNames: ["berg.test.clock.tester"],
 
         maxJitter: 20,
 
@@ -70,8 +70,7 @@ var fluid = fluid || require("infusion"),
     fluid.defaults("berg.test.clock.tester.realtimeManual", {
         gradeNames: [
             "berg.test.clock.tester.manual",
-            "berg.test.clock.tester.realtime",
-            "autoInit"
+            "berg.test.clock.tester.realtime"
         ]
     });
 }());

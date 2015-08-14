@@ -20,7 +20,7 @@ var fluid = fluid || require("infusion"),
     };
 
     fluid.defaults("berg.postMessageSender", {
-        gradeNames: ["fluid.eventedComponent", "autoInit"],
+        gradeNames: ["fluid.component"],
 
         members: {
             messageTarget: "@expand:berg.getGlobalSelf()"
@@ -46,7 +46,7 @@ var fluid = fluid || require("infusion"),
 
 
     fluid.defaults("berg.postMessageListener", {
-        gradeNames: ["fluid.eventedComponent", "autoInit"],
+        gradeNames: ["fluid.component"],
 
         members: {
             messageSource: "@expand:berg.getGlobalSelf()"

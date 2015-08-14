@@ -13,7 +13,7 @@
     fluid.registerNamespace("berg.test.clock");
 
     fluid.defaults("berg.test.clock.testCase.audioContext", {
-        gradeNames: ["berg.test.clock.testCase.realtime", "autoInit"],
+        gradeNames: ["berg.test.clock.testCase.realtime"],
 
         invokers: {
             testInitState: {
@@ -55,8 +55,7 @@
         gradeNames: [
             // TODO: The order of these two grades matters crucially. Why?
             "berg.test.clock.tester.external",
-            "berg.test.clock.tester.realtime",
-            "autoInit"
+            "berg.test.clock.tester.realtime"
         ],
 
         maxJitter: 0.05,

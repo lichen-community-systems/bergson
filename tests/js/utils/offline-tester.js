@@ -19,7 +19,7 @@ var fluid = fluid || require("infusion"),
     fluid.registerNamespace("berg.test.clock");
 
     fluid.defaults("berg.test.clock.testCase.offline", {
-        gradeNames: ["berg.test.clock.testCase", "autoInit"],
+        gradeNames: ["berg.test.clock.testCase"],
 
         invokers: {
             testInitState: {
@@ -59,7 +59,7 @@ var fluid = fluid || require("infusion"),
 
 
     fluid.defaults("berg.test.clock.tester.offline", {
-        gradeNames: ["berg.test.clock.tester", "autoInit"],
+        gradeNames: ["berg.test.clock.tester"],
 
         model: {
             expectedTime: 0
@@ -83,8 +83,7 @@ var fluid = fluid || require("infusion"),
     fluid.defaults("berg.test.clock.tester.offlineManual", {
         gradeNames: [
             "berg.test.clock.tester.offline",
-            "berg.test.clock.tester.manual",
-            "autoInit"
+            "berg.test.clock.tester.manual"
         ]
     });
 

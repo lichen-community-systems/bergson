@@ -43,7 +43,7 @@ var fluid = fluid || require("infusion"),
     };
 
     fluid.defaults("berg.test.clock.tester.manual", {
-        gradeNames: ["fluid.standardRelayComponent", "autoInit"],
+        gradeNames: ["fluid.modelComponent"],
 
         invokers: {
             start: {
@@ -57,7 +57,7 @@ var fluid = fluid || require("infusion"),
     //   a) run asynchronously and need to signal QUnit to resume.
     //   b) need to be explicitly stopped.
     fluid.defaults("berg.test.clock.tester.external", {
-        gradeNames: ["fluid.standardRelayComponent", "autoInit"],
+        gradeNames: ["fluid.modelComponent"],
 
         invokers: {
             start: "{clock}.start()"
