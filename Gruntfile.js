@@ -5,11 +5,11 @@ module.exports = function(grunt) {
 
     var files = {
         infusion: [
-            "third-party/infusion/js/jquery.standalone.js",
-            "third-party/infusion/js/Fluid.js",
-            "third-party/infusion/js/FluidDebugging.js",
-            "third-party/infusion/js/FluidIoC.js",
-            "third-party/infusion/js/DataBinding.js"
+            "node_modules/infusion/src/framework/core/js/jquery.standalone.js",
+            "node_modules/infusion/src/framework/core/js/Fluid.js",
+            "node_modules/infusion/src/framework/core/js/FluidDebugging.js",
+            "node_modules/infusion/src/framework/core/js/FluidIoC.js",
+            "node_modules/infusion/src/framework/core/js/DataBinding.js"
         ],
 
         bergson: [
