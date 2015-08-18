@@ -19,7 +19,11 @@
     ],
     "readmeFilename": "README.md",
     "devDependencies": {
-        "jqUnit": "git://github.com/fluid-project/node-jqUnit.git",
+        "jqUnit": "git://github.com/fluid-project/node-jqUnit.git"
+    },
+    "dependencies": {
+        "infusion": "colinbdclark/infusion#FLUID-5711-1.9.x",
+        
         "grunt-gpii": "git://github.com/GPII/grunt-gpii.git",
         "grunt": "^0.4.5",
         "grunt-contrib-clean": "~0.4.1",
@@ -27,9 +31,6 @@
         "grunt-contrib-jshint": "~0.8.0",
         "grunt-contrib-uglify": "~0.3.2",
         "grunt-contrib-watch": "^0.6.1"
-    },
-    "dependencies": {
-        "infusion": "colinbdclark/infusion#FLUID-5711-1.9.x"
     },
     "engines": {
         "node": ">=0.10.0"
