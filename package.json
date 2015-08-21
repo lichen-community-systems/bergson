@@ -22,7 +22,7 @@
         "jqUnit": "git://github.com/fluid-project/node-jqUnit.git"
     },
     "dependencies": {
-        "infusion": "colinbdclark/infusion#FLUID-5711",
+        "infusion": "fluid-project/infusion#6f88f9f4b925a5d3da9e7cd8862e5bd4c9a02b45",
 
         "grunt-gpii": "git://github.com/GPII/grunt-gpii.git",
         "grunt": "^0.4.5",
