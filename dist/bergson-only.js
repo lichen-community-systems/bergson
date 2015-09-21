@@ -626,11 +626,7 @@ var fluid = fluid || require("infusion"),
         listeners: {
             "{clock}.events.onTick": {
                 func: "{scheduler}.tick"
-            },
-
-            onCreate: [
-                "{that}.start()"
-            ]
+            }
         }
     });
 

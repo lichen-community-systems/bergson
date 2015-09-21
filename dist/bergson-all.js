@@ -31,19 +31,12 @@ var fluid = fluid || fluid_2_0;
     // Save a reference to some core methods
     var toString = Object.prototype.toString;
     var hasOwn = Object.prototype.hasOwnProperty;
-    var indexOf = Array.prototype.indexOf;
-
     var globalScope = typeof window !== "undefined" ? window :
         typeof self !== "undefined" ? self : global;
-
     // Map over jQuery in case of overwrite
     var _jQuery = globalScope.jQuery;
     // Map over the $ in case of overwrite
     var _$ = globalScope.$;
-    // Used for trimming whitespace
-    var trimLeft = /^\s+/,
-        trimRight = /\s+$/,
-        trim = String.prototype.trim;
 
     var jQuery = fluid.jQueryStandalone = {
 
@@ -62,15 +55,6 @@ var fluid = fluid || fluid_2_0;
 
         isArray: Array.isArray || function (obj) {
             return toString.call(obj) === "[object Array]";
-        },
-
-        // Use native String.trim function wherever possible
-        trim: trim ? function( text ) {
-            return text === null ? "" : trim.call( text );
-        } :
-        // Otherwise use our own trimming functionality
-        function( text ) {
-            return text === null ? "" : text.toString().replace( trimLeft, "" ).replace( trimRight, "" );
         },
 
         // A crude way of determining if an object is a window
@@ -100,24 +84,16 @@ var fluid = fluid || fluid_2_0;
             return key === undefined || hasOwn.call( obj, key );
         },
 
+        trim: function (str) {
+            return str.trim();
+        },
+
         isEmptyObject: function (obj) {
             var name;
             for ( name in obj ) {
                 return false;
             }
             return true;
-        },
-
-        inArray: function (elem, array) {
-            if (indexOf) {
-                return indexOf.call( array, elem );
-            }
-            for (var i = 0, length = array.length; i < length; i++) {
-                if (array[i] === elem) {
-                    return i;
-                }
-            }
-            return -1;
         },
 
         extend: function () {
@@ -1763,7 +1739,8 @@ var fluid = fluid || fluid_2_0;
         else {
             gradeNames = fluid.makeArray(gradeNames);
         }
-        fluid.each(gradeNames, function (gradeName) {
+        for (var i = gradeNames.length - 1; i >= 0; -- i) {
+            var gradeName = gradeNames[i];
             if (gradeName && !gs.gradeHash[gradeName]) {
                 var isDynamic = gradeName.charAt(0) === "{";
                 var options = (isDynamic ? null : (raw ? fluid.rawDefaults(gradeName) : fluid.getGradedDefaults(gradeName))) || {};
@@ -1773,8 +1750,8 @@ var fluid = fluid || fluid_2_0;
                 gs.gradeChain.push(gradeName);
                 gs.optionsChain.push(options);
                 var oGradeNames = fluid.makeArray(options.gradeNames);
-                for (var i = 0; i < oGradeNames.length; ++ i) {
-                    var oGradeName = oGradeNames[i];
+                for (var j = oGradeNames.length - 1; j >= 0; -- j) { // from stronger to weaker grades
+                    var oGradeName = oGradeNames[j];
                     if (raw) {
                         resolveGradesImpl(gs, oGradeName);
                     } else {
@@ -1785,7 +1762,7 @@ var fluid = fluid || fluid_2_0;
                     }
                 }
             }
-        });
+        }
         return gs;
     };
 
@@ -1797,8 +1774,9 @@ var fluid = fluid || fluid_2_0;
             gradeHash: {},
             optionsChain: []
         };
-        // stronger grades appear to the left in defaults - dynamic grades are stronger still - FLUID-5085
-        return resolveGradesImpl(gradeStruct, (fluid.makeArray(gradeNames).reverse() || []).concat([defaultName]), true);
+        // stronger grades appear to the right in defaults - dynamic grades are stronger still - FLUID-5085 
+        // we supply these in reverse order to resolveGradesImpl with weak grades at the right
+        return resolveGradesImpl(gradeStruct, [defaultName].concat(fluid.makeArray(gradeNames)), true);
     };
 
     var mergedDefaultsCache = {};
@@ -1824,7 +1802,7 @@ var fluid = fluid || fluid_2_0;
         }
         mergeArgs = [mergePolicy, {}].concat(mergeArgs);
         var mergedDefaults = fluid.merge.apply(null, mergeArgs);
-        mergedDefaults.gradeNames = gradeStruct.gradeChain;
+        mergedDefaults.gradeNames = gradeStruct.gradeChain.reverse();
         return {defaults: mergedDefaults, lastTick: gradeStruct && gradeStruct.lastTick};
     };
 
@@ -2771,7 +2749,7 @@ var fluid = fluid || fluid_2_0;
     // unsupported, non-API function
     fluid.parseSelector = function (selstring, strategy) {
         var togo = [];
-        selstring = $.trim(selstring);
+        selstring = selstring.trim();
         //ws-(ss*)[ws/>]
         var regexp = strategy.regexp;
         regexp.lastIndex = 0;
@@ -7363,11 +7341,7 @@ var fluid = fluid || require("infusion"),
         listeners: {
             "{clock}.events.onTick": {
                 func: "{scheduler}.tick"
-            },
-
-            onCreate: [
-                "{that}.start()"
-            ]
+            }
         }
     });
 
