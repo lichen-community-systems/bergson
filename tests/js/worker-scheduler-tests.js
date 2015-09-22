@@ -41,6 +41,8 @@ var fluid = fluid || require("infusion"),
 
     QUnit.asyncTest("Once callback", function () {
         var scheduler = berg.test.scheduler.workerProxy.createScheduler();
+        scheduler.start();
+
         var expectedEventSpec = {
             id: "my-event",
             type: "once",

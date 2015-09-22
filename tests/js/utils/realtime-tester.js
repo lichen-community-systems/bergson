@@ -5,7 +5,7 @@
  * Copyright 2015, Colin Clark
  * Dual licensed under the MIT and GPL Version 2 licenses.
  */
-/*global require*/
+/*global require, performance*/
 var fluid = fluid || require("infusion"),
     jqUnit = jqUnit || fluid.require("jqUnit"),
     berg = fluid.registerNamespace("berg");
@@ -43,7 +43,7 @@ var fluid = fluid || require("infusion"),
     };
 
     berg.test.clock.testCase.realtime.testTick = function (clock, time, maxJitter) {
-        var now = berg.clock.realtime.now();
+        var now = (typeof performance !== "undefined" ? performance : Date).now() / 1000;
         berg.test.assertTimeEqual(clock.time, now, maxJitter,
             "The clock's time should reflect the current real time.");
         QUnit.equal(time, clock.time,
