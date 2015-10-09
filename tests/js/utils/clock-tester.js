@@ -17,7 +17,7 @@ var fluid = fluid || require("infusion"),
     var QUnit = fluid.registerNamespace("QUnit");
 
     fluid.defaults("berg.test.clock.testCase", {
-        gradeNames: ["fluid.eventedComponent"],
+        gradeNames: ["fluid.component"],
 
         invokers: {
             testInitState: "fluid.identity()",
@@ -26,7 +26,7 @@ var fluid = fluid || require("infusion"),
     });
 
     fluid.defaults("berg.test.clock.tester", {
-        gradeNames: ["fluid.standardRelayComponent", "autoInit"],
+        gradeNames: ["fluid.modelComponent"],
 
         numTicks: 60,
 
@@ -104,7 +104,7 @@ var fluid = fluid || require("infusion"),
 
 
     fluid.defaults("berg.test.clock.testSuite", {
-        gradeNames: ["fluid.standardRelayComponent", "autoInit"],
+        gradeNames: ["fluid.modelComponent"],
 
         tests: [],
 

@@ -15,8 +15,7 @@ var fluid = fluid || require("infusion"),
     fluid.defaults("berg.test.clock.tester.setInterval", {
         gradeNames: [
             "berg.test.clock.tester.external",
-            "berg.test.clock.tester.realtime",
-            "autoInit"
+            "berg.test.clock.tester.realtime"
         ],
 
         maxJitter: 15, // setInterval is jittery at the best of times.
@@ -29,7 +28,7 @@ var fluid = fluid || require("infusion"),
     });
 
     fluid.defaults("berg.test.clock.setIntervalClockTestSuite", {
-        gradeNames: ["berg.test.clock.testSuite", "autoInit"],
+        gradeNames: ["berg.test.clock.testSuite"],
 
         tests: [
             {

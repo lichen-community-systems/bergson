@@ -67,7 +67,7 @@ var fluid = fluid || require("infusion"),
      *
      */
     fluid.defaults("berg.scheduler", {
-        gradeNames: ["fluid.standardRelayComponent", "autoInit"],
+        gradeNames: ["fluid.modelComponent"],
 
         members: {
             queue: "@expand:berg.priorityQueue()",
@@ -191,11 +191,7 @@ var fluid = fluid || require("infusion"),
         listeners: {
             "{clock}.events.onTick": {
                 func: "{scheduler}.tick"
-            },
-
-            onCreate: [
-                "{that}.start()"
-            ]
+            }
         }
     });
 

@@ -19,7 +19,7 @@ var fluid = fluid || require("infusion"),
      * if the clock is dropping frames).
      */
     fluid.defaults("berg.clock.logger", {
-        gradeNames: ["fluid.eventedComponent", "autoInit"],
+        gradeNames: ["fluid.component"],
 
         numTicksToLog: 60 * 60 * 20, // Twenty minutes at 60 fps by default.
 

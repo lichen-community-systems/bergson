@@ -17,7 +17,7 @@ var fluid = fluid || require("infusion"),
      * window.requestAnimationFrame()
      */
     fluid.defaults("berg.clock.raf", {
-        gradeNames: ["berg.clock.realtime", "autoInit"],
+        gradeNames: ["berg.clock.realtime"],
 
         freq: 60, // This should be overridden by the user
                   // to match the refresh rate of their display.
@@ -51,7 +51,7 @@ var fluid = fluid || require("infusion"),
     berg.clock.raf.tick = function (that) {
         berg.clock.raf.requestNextTick(that);
 
-        var now = performance.now();
+        var now = performance.now() / 1000;
         that.time = now;
         that.events.onTick.fire(now, that.freq);
     };

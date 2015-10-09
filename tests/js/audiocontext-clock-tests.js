@@ -17,7 +17,7 @@ var fluid = fluid || require("infusion"),
     QUnit.module("AudioContext clock");
 
     fluid.defaults("berg.test.clock.audioContextClockTestSuite", {
-        gradeNames: ["berg.test.clock.testSuite", "autoInit"],
+        gradeNames: ["berg.test.clock.testSuite"],
 
         tests: [
             {

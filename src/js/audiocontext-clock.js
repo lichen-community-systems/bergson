@@ -26,7 +26,7 @@ var fluid = fluid || require("infusion"),
      * implementation.
      */
     fluid.defaults("berg.clock.audioContext", {
-        gradeNames: ["berg.clock.realtime", "autoInit"],
+        gradeNames: ["berg.clock.realtime"],
 
         blockSize: 256,
 
@@ -71,7 +71,7 @@ var fluid = fluid || require("infusion"),
      * and configures a ScriptProcessorNode to drive the clock.
      */
     fluid.defaults("berg.clock.autoAudioContext", {
-        gradeNames: ["berg.clock.audioContext", "autoInit"],
+        gradeNames: ["berg.clock.audioContext"],
 
         mergePolicy: {
             "members.scriptNode": "noexpand"

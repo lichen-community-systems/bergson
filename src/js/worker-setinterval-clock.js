@@ -38,8 +38,7 @@ var fluid = fluid || require("infusion"),
         gradeNames: [
             "berg.clock.realtime",
             "berg.postMessageListener",
-            "berg.postMessageSender",
-            "autoInit"
+            "berg.postMessageSender"
         ],
 
         freq: 10,

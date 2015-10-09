@@ -24,7 +24,7 @@ var fluid = fluid || require("infusion"),
     };
 
     fluid.defaults("berg.test.clock.offlineClockTestSuite", {
-        gradeNames: ["berg.test.clock.testSuite", "autoInit"],
+        gradeNames: ["berg.test.clock.testSuite"],
 
         tests: [
             {

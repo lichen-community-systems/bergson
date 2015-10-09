@@ -17,12 +17,12 @@ var fluid = fluid || require("infusion"),
     QUnit.module("Clock Logger");
 
     fluid.defaults("berg.test.clock.testCase.clockLogger", {
-        gradeNames: ["berg.test.clock.testCase", "autoInit"]
+        gradeNames: ["berg.test.clock.testCase"]
     });
 
 
     fluid.defaults("berg.test.clock.tester.offlineClockLogger", {
-        gradeNames: ["berg.test.clock.tester.offlineManual", "autoInit"],
+        gradeNames: ["berg.test.clock.tester.offlineManual"],
 
         numTicks: 240,
 
@@ -60,7 +60,7 @@ var fluid = fluid || require("infusion"),
 
 
     fluid.defaults("berg.test.clock.clockLoggerTestSuite", {
-        gradeNames: ["berg.test.clock.testSuite", "autoInit"],
+        gradeNames: ["berg.test.clock.testSuite"],
 
         tests: [
             {

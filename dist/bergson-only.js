@@ -18,7 +18,7 @@ var fluid = fluid || require("infusion"),
      * Clock is the base grade for all Clocks.
      */
     fluid.defaults("berg.clock", {
-        gradeNames: ["fluid.eventedComponent", "autoInit"],
+        gradeNames: ["fluid.component"],
 
         freq: 1, // Ticks per second.
 
@@ -80,7 +80,7 @@ var fluid = fluid || require("infusion"),
      * by invoking its tick() method.
      */
     fluid.defaults("berg.clock.offline", {
-        gradeNames: ["berg.clock", "autoInit"],
+        gradeNames: ["berg.clock"],
 
         invokers: {
             tick: {
@@ -101,7 +101,7 @@ var fluid = fluid || require("infusion"),
      * (i.e. performance.now)
      */
     fluid.defaults("berg.clock.realtime", {
-        gradeNames: ["berg.clock", "autoInit"],
+        gradeNames: ["berg.clock"],
 
         members: {
             time: "@expand:berg.clock.realtime.now()"
@@ -119,7 +119,7 @@ var fluid = fluid || require("infusion"),
     // to performance.now() once Safari supports it
     // in Web Workers.
     berg.clock.realtime.now = function () {
-        return performance.now();
+        return performance.now() / 1000;
     };
 
     // Terrible hack to workaround Safari's lack of
@@ -361,7 +361,7 @@ var fluid = fluid || require("infusion"),
     };
 
     fluid.defaults("berg.postMessageSender", {
-        gradeNames: ["fluid.eventedComponent", "autoInit"],
+        gradeNames: ["fluid.component"],
 
         members: {
             messageTarget: "@expand:berg.getGlobalSelf()"
@@ -387,7 +387,7 @@ var fluid = fluid || require("infusion"),
 
 
     fluid.defaults("berg.postMessageListener", {
-        gradeNames: ["fluid.eventedComponent", "autoInit"],
+        gradeNames: ["fluid.component"],
 
         members: {
             messageSource: "@expand:berg.getGlobalSelf()"
@@ -502,7 +502,7 @@ var fluid = fluid || require("infusion"),
      *
      */
     fluid.defaults("berg.scheduler", {
-        gradeNames: ["fluid.standardRelayComponent", "autoInit"],
+        gradeNames: ["fluid.modelComponent"],
 
         members: {
             queue: "@expand:berg.priorityQueue()",
@@ -626,11 +626,7 @@ var fluid = fluid || require("infusion"),
         listeners: {
             "{clock}.events.onTick": {
                 func: "{scheduler}.tick"
-            },
-
-            onCreate: [
-                "{that}.start()"
-            ]
+            }
         }
     });
 
@@ -802,8 +798,7 @@ var fluid = fluid || require("infusion"),
         gradeNames: [
             "berg.postMessageListener",
             "berg.postMessageSender",
-            "berg.scheduler",
-            "autoInit"
+            "berg.scheduler"
         ],
 
         invokers: {
@@ -833,8 +828,7 @@ var fluid = fluid || require("infusion"),
         gradeNames: [
             "berg.scheduler",
             "berg.postMessageListener",
-            "berg.postMessageSender",
-            "autoInit"
+            "berg.postMessageSender"
         ],
 
         scriptPath: "../../dist/bergson-all-worker.js",
@@ -942,7 +936,7 @@ var fluid = fluid || require("infusion"),
      * window.requestAnimationFrame()
      */
     fluid.defaults("berg.clock.raf", {
-        gradeNames: ["berg.clock.realtime", "autoInit"],
+        gradeNames: ["berg.clock.realtime"],
 
         freq: 60, // This should be overridden by the user
                   // to match the refresh rate of their display.
@@ -976,7 +970,7 @@ var fluid = fluid || require("infusion"),
     berg.clock.raf.tick = function (that) {
         berg.clock.raf.requestNextTick(that);
 
-        var now = performance.now();
+        var now = performance.now() / 1000;
         that.time = now;
         that.events.onTick.fire(now, that.freq);
     };
@@ -1001,7 +995,7 @@ var fluid = fluid || require("infusion"),
     "use strict";
 
     fluid.defaults("berg.clock.setInterval", {
-        gradeNames: ["berg.clock.realtime", "autoInit"],
+        gradeNames: ["berg.clock.realtime"],
 
         freq: 10,
 
@@ -1051,7 +1045,7 @@ var fluid = fluid || require("infusion"),
      * if the clock is dropping frames).
      */
     fluid.defaults("berg.clock.logger", {
-        gradeNames: ["fluid.eventedComponent", "autoInit"],
+        gradeNames: ["fluid.component"],
 
         numTicksToLog: 60 * 60 * 20, // Twenty minutes at 60 fps by default.
 
@@ -1131,8 +1125,7 @@ var fluid = fluid || require("infusion"),
         gradeNames: [
             "berg.clock.realtime",
             "berg.postMessageListener",
-            "berg.postMessageSender",
-            "autoInit"
+            "berg.postMessageSender"
         ],
 
         freq: 10,
@@ -1251,7 +1244,7 @@ var fluid = fluid || require("infusion"),
      * implementation.
      */
     fluid.defaults("berg.clock.audioContext", {
-        gradeNames: ["berg.clock.realtime", "autoInit"],
+        gradeNames: ["berg.clock.realtime"],
 
         blockSize: 256,
 
@@ -1296,7 +1289,7 @@ var fluid = fluid || require("infusion"),
      * and configures a ScriptProcessorNode to drive the clock.
      */
     fluid.defaults("berg.clock.autoAudioContext", {
-        gradeNames: ["berg.clock.audioContext", "autoInit"],
+        gradeNames: ["berg.clock.audioContext"],
 
         mergePolicy: {
             "members.scriptNode": "noexpand"

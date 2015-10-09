@@ -5,7 +5,7 @@
  * Copyright 2015, Colin Clark
  * Dual licensed under the MIT and GPL Version 2 licenses.
  */
-/*global require*/
+/*global require, performance*/
 var fluid = fluid || require("infusion"),
     jqUnit = jqUnit || fluid.require("jqUnit"),
     berg = fluid.registerNamespace("berg");
@@ -17,7 +17,7 @@ var fluid = fluid || require("infusion"),
     var QUnit = fluid.registerNamespace("QUnit");
 
     fluid.defaults("berg.test.clock.testCase.realtime", {
-        gradeNames: ["berg.test.clock.testCase", "autoInit"],
+        gradeNames: ["berg.test.clock.testCase"],
 
         invokers: {
             testInitState: {
@@ -43,7 +43,7 @@ var fluid = fluid || require("infusion"),
     };
 
     berg.test.clock.testCase.realtime.testTick = function (clock, time, maxJitter) {
-        var now = berg.clock.realtime.now();
+        var now = (typeof performance !== "undefined" ? performance : Date).now() / 1000;
         berg.test.assertTimeEqual(clock.time, now, maxJitter,
             "The clock's time should reflect the current real time.");
         QUnit.equal(time, clock.time,
@@ -52,7 +52,7 @@ var fluid = fluid || require("infusion"),
 
 
     fluid.defaults("berg.test.clock.tester.realtime", {
-        gradeNames: ["berg.test.clock.tester", "autoInit"],
+        gradeNames: ["berg.test.clock.tester"],
 
         maxJitter: 20,
 
@@ -70,8 +70,7 @@ var fluid = fluid || require("infusion"),
     fluid.defaults("berg.test.clock.tester.realtimeManual", {
         gradeNames: [
             "berg.test.clock.tester.manual",
-            "berg.test.clock.tester.realtime",
-            "autoInit"
+            "berg.test.clock.tester.realtime"
         ]
     });
 }());
