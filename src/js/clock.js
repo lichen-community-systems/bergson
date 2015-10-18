@@ -47,7 +47,7 @@ var fluid = fluid || require("infusion"),
 
         invokers: {
             start: "fluid.identity()",
-            tick: "fluid.identity()",
+            tick: "fluid.notImplemented()",
             stop: "fluid.identity()"
         },
 

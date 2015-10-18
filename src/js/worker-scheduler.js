@@ -76,7 +76,7 @@ var fluid = fluid || require("infusion"),
 
         components: {
             clock: {
-                type: "berg.clock" // The real clock is in the other universe.
+                type: "berg.clock.offline" // The real clock is in the other universe.
             }
         },
 
