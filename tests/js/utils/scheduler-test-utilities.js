@@ -7,7 +7,7 @@
  */
 /*global require*/
 var fluid = fluid || require("infusion"),
-    jqUnit = jqUnit || fluid.require("jqUnit"),
+    jqUnit = jqUnit || require("node-jqunit"),
     berg = fluid.registerNamespace("berg");
 
 (function () {

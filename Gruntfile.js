@@ -40,8 +40,7 @@ module.exports = function(grunt) {
         jshint: {
             all: [
                 "src/**/*.js",
-                "tests/**/*js",
-                "!**/third-party/**"
+                "tests/**/*js"
             ],
             options: {
                 jshintrc: true
@@ -98,7 +97,7 @@ module.exports = function(grunt) {
 
         watch: {
             scripts: {
-                files: ["src/**/*.js", "third-party/**/*.js", "Gruntfile.js"],
+                files: ["src/**/*.js", "node_modules/**/*.js", "Gruntfile.js"],
                 tasks: ["default"],
                 options: {
                     spawn: false
