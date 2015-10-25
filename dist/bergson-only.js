@@ -1,4 +1,4 @@
-/*! Bergson 0.9.4, Copyright 2015 Colin Clark | github.com/colinbdclark/bergson */
+/*! Bergson 0.11.0, Copyright 2015 Colin Clark | github.com/colinbdclark/bergson */
 
 /*
  * Bergson Clocks
@@ -49,7 +49,7 @@ var fluid = fluid || require("infusion"),
 
         invokers: {
             start: "fluid.identity()",
-            tick: "fluid.identity()",
+            tick: "fluid.notImplemented()",
             stop: "fluid.identity()"
         },
 
@@ -853,7 +853,7 @@ var fluid = fluid || require("infusion"),
 
         components: {
             clock: {
-                type: "berg.clock" // The real clock is in the other universe.
+                type: "berg.clock.offline" // The real clock is in the other universe.
             }
         },
 
