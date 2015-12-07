@@ -27,9 +27,8 @@ var fluid = fluid || require("infusion"),
             time: 0,
 
             /**
-             * The frequency (in Hz) that the clock is
-             * running at.
-             * This value is not guaranteed to be precise all clocks.
+             * The number of times per second that this clock will tick.
+             * This value is not guaranteed to be precise for all clocks.
              */
             freq: "{that}.options.freq",
 
