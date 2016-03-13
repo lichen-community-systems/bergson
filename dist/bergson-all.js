@@ -1,4 +1,4 @@
-/*! Bergson 0.12.0, Copyright 2016 Colin Clark | github.com/colinbdclark/bergson */
+/*! Bergson 0.12.1, Copyright 2016 Colin Clark | github.com/colinbdclark/bergson */
 
 /*
  * Definitions in this file taken from:
