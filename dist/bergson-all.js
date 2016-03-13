@@ -8004,7 +8004,7 @@ var fluid = fluid || require("infusion"),
  * Copyright 2015, Colin Clark
  * Dual licensed under the MIT and GPL Version 2 licenses.
  */
-/*global require, requestAnimationFrame, cancelAnimationFrame, performance*/
+/*global require, requestAnimationFrame, cancelAnimationFrame*/
 var fluid = fluid || require("infusion"),
     berg = fluid.registerNamespace("berg");
 
@@ -8033,7 +8033,7 @@ var fluid = fluid || require("infusion"),
 
             tick: {
                 funcName: "berg.clock.raf.tick",
-                args: ["{that}"]
+                args: ["{that}", "{arguments}.0"]
             },
 
             stop: {
@@ -8047,12 +8047,12 @@ var fluid = fluid || require("infusion"),
         that.requestID = requestAnimationFrame(that.tick);
     };
 
-    berg.clock.raf.tick = function (that) {
+    berg.clock.raf.tick = function (that, now) {
         berg.clock.raf.requestNextTick(that);
 
-        var now = performance.now() / 1000;
-        that.time = now;
-        that.events.onTick.fire(now, that.freq);
+        var nowSecs = now / 1000;
+        that.time = nowSecs;
+        that.events.onTick.fire(nowSecs, that.freq);
     };
 
     berg.clock.raf.stop = function (that) {
@@ -8152,13 +8152,15 @@ var fluid = fluid || require("infusion"),
     };
 
     berg.clock.logger.log = function (that, clock) {
-        if (that.lastTickTime === null && clock.time !== undefined) {
+        // Don't log the first frame.
+        if (that.lastTickTime === null) {
             that.lastTickTime = clock.time;
             return;
         }
 
         that.tickCounter++;
         that.interval = clock.time - that.lastTickTime;
+        that.lastTickTime = clock.time;
 
         if (that.tickCounter < that.options.numTicksToLog) {
             that.intervalLog[that.tickCounter] = that.interval;
