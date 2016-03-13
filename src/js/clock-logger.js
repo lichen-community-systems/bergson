@@ -46,13 +46,15 @@ var fluid = fluid || require("infusion"),
     };
 
     berg.clock.logger.log = function (that, clock) {
-        if (that.lastTickTime === null && clock.time !== undefined) {
+        // Don't log the first frame.
+        if (that.lastTickTime === null) {
             that.lastTickTime = clock.time;
             return;
         }
 
         that.tickCounter++;
         that.interval = clock.time - that.lastTickTime;
+        that.lastTickTime = clock.time;
 
         if (that.tickCounter < that.options.numTicksToLog) {
             that.intervalLog[that.tickCounter] = that.interval;
