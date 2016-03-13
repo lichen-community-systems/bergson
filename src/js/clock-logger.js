@@ -31,7 +31,7 @@ var fluid = fluid || require("infusion"),
         },
 
         invokers: {
-            log: "berg.clock.logger.log({that})"
+            log: "berg.clock.logger.log({that}, {clock})"
         },
 
         listeners: {
@@ -45,14 +45,14 @@ var fluid = fluid || require("infusion"),
         return new Float32Array(numTicksToLog);
     };
 
-    berg.clock.logger.log = function (that) {
-        if (that.lastTickTime === null) {
-            that.lastTickTime = that.time;
+    berg.clock.logger.log = function (that, clock) {
+        if (that.lastTickTime === null && clock.time !== undefined) {
+            that.lastTickTime = clock.time;
             return;
         }
 
         that.tickCounter++;
-        that.interval = that.time - that.lastTickTime;
+        that.interval = clock.time - that.lastTickTime;
 
         if (that.tickCounter < that.options.numTicksToLog) {
             that.intervalLog[that.tickCounter] = that.interval;
