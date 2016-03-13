@@ -69,10 +69,14 @@ var fluid = fluid || require("infusion"),
             }
         },
 
+        distributeOptions: {
+            source: "{that}.options.schedulerOptions",
+            target: "{that}.options.components.scheduler.options"
+        },
+
         components: {
             scheduler: {
-                type: "berg.scheduler",
-                options: "{testSequencer}.options.schedulerOptions"
+                type: "berg.scheduler"
             }
         },
 
