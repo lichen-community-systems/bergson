@@ -52,11 +52,11 @@ var fluid = fluid || require("infusion"),
             return;
         }
 
-        that.tickCounter++;
-        that.interval = clock.time - that.lastTickTime;
-        that.lastTickTime = clock.time;
-
         if (that.tickCounter < that.options.numTicksToLog) {
+            that.tickCounter++;
+            that.interval = clock.time - that.lastTickTime;
+            that.lastTickTime = clock.time;
+
             that.intervalLog[that.tickCounter] = that.interval;
         }
     };
