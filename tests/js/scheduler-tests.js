@@ -607,4 +607,4 @@ var fluid = fluid || require("infusion"),
         testSequencerType: "berg.test.scheduler.offlineTestSequencer",
         testSpecs: berg.test.scheduler.timeScalingTestSpecs
     });
-}());
+})();

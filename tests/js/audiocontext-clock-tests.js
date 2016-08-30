@@ -39,5 +39,4 @@ var fluid = fluid || require("infusion"),
 
     var suite = berg.test.clock.audioContextClockTestSuite();
     suite.run();
-
-}());
+})();

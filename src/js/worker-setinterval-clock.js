@@ -87,7 +87,7 @@ var fluid = fluid || require("infusion"),
     // Note: This function is intended to be invoked as
     // an berg.worker only.
     berg.clock.workerSetInterval.workerImpl = function () {
-        "use strict"; // jshint ignore:line
+        "use strict"; // eslint-disable-line
 
         var berg = {};
 
@@ -128,4 +128,4 @@ var fluid = fluid || require("infusion"),
             }
         }, false);
     };
-}());
+})();

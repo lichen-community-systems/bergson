@@ -305,6 +305,40 @@ Types of Clocks
     </tr>
 </table>
 
+Building and Testing Bergson
+-----------------------------
+
+### How to Build Bergson
+
+You'll need Grunt installed globally if you don't already have it. Here's how:
+
+    npm install -g grunt-cli
+
+To download all of Bergson's dependencies, build them, and then build Bergson itself, run the following commands:
+
+    npm install
+    grunt
+
+### Running Bergson's Test Suite
+
+Bergson's test suite can be run both in Node.js and in all available browsers using Testem. To run the browser tests, you'll need to have Testem installed globally if you don't already. Here's how:
+
+    npm install testem -g
+
+Then, the whole test suite can be run on both Node.js and all of the browsers installed on your computer:
+
+    npm test
+
+If you'd like to run only the Node.js tests, run:
+
+    npm run node-test
+
+Or if you only want to run the browser tests:
+
+    npm run browser-test
+
+Alternatively, if you'd like to only run the tests in one browser, you can open the test suite ``tests/unit/all-tests.html`` file by hand in your browser.
+
 Community
 ---------
 

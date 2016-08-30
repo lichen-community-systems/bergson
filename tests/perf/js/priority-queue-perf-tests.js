@@ -108,5 +108,4 @@
     berg.test.perf.priorityQueue.run = function () {
         sheep.test(berg.test.perf.priorityQueue.testSpecs, true);
     };
-
-}());
+})();

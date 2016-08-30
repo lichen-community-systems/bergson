@@ -199,5 +199,4 @@ var fluid = fluid || require("infusion"),
 
         return that;
     };
-
-}());
+})();

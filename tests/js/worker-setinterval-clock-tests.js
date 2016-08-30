@@ -85,4 +85,4 @@ var fluid = fluid || require("infusion"),
 
     var testSuite = berg.test.clock.workerSetIntervalClockTestSuite();
     testSuite.run();
-}());
+})();

@@ -113,5 +113,4 @@ var fluid = fluid || require("infusion"),
         scriptNode.disconnect(context.destination);
         scriptNode.onaudioprocess = undefined;
     };
-
-}());
+})();

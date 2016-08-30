@@ -86,5 +86,4 @@ var fluid = fluid || require("infusion"),
             "berg.test.clock.tester.manual"
         ]
     });
-
-}());
+})();

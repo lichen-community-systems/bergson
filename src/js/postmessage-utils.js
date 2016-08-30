@@ -90,5 +90,4 @@ var fluid = fluid || require("infusion"),
             invoker.apply(null, args);
         }, false);
     };
-
-}());
+})();

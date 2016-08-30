@@ -147,4 +147,4 @@ var fluid = fluid || require("infusion"),
         QUnit.equal(q.size(), 3,
             "There should be only three items in the queue after remove the third-lowest priority one.");
     });
-}());
+})();
