@@ -41,4 +41,4 @@ var fluid = fluid || require("infusion"),
     berg.clock.setInterval.stop = function (that) {
         clearInterval(that.intervalID);
     };
-}());
+})();

@@ -76,5 +76,4 @@ var fluid = fluid || require("infusion"),
             ]
         }
     });
-
-}());
+})();

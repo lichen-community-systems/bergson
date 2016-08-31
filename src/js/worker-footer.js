@@ -17,4 +17,4 @@
             e.stopPropagation();
         }
     }, true);
-}());
+})();

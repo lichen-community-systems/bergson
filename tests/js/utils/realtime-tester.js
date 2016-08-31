@@ -11,7 +11,6 @@ var fluid = fluid || require("infusion"),
     berg = fluid.registerNamespace("berg");
 
 (function () {
-
     "use strict";
 
     var QUnit = fluid.registerNamespace("QUnit");
@@ -73,4 +72,4 @@ var fluid = fluid || require("infusion"),
             "berg.test.clock.tester.realtime"
         ]
     });
-}());
+})();

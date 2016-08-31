@@ -338,5 +338,4 @@ var fluid = fluid || require("infusion"),
             next = that.queue.peek();
         }
     };
-
-}());
+})();

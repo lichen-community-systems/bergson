@@ -98,5 +98,4 @@
     berg.test.clock.tester.audioContext.calcTickDuration = function (context, blockSize) {
         return blockSize / context.sampleRate;
     };
-
-}());
+})();

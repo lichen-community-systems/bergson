@@ -11,6 +11,7 @@ var fluid = fluid || require("infusion"),
     berg = fluid.registerNamespace("berg");
 
 (function () {
+
     "use strict";
 
     var QUnit = fluid.registerNamespace("QUnit");
@@ -280,5 +281,4 @@ var fluid = fluid || require("infusion"),
     berg.test.scheduler.repeatTestSequencer.scheduleEvent = function (s, eventSpec, onScheduledEvent) {
         s.repeat(eventSpec.freq, onScheduledEvent, eventSpec.time, eventSpec.end);
     };
-
-}());
+})();

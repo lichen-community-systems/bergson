@@ -132,4 +132,4 @@ var fluid = fluid || require("infusion"),
         that.events.onTick.fire(that.time, that.freq);
     };
 
-}());
+})();

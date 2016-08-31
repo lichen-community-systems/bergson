@@ -59,5 +59,4 @@ var fluid = fluid || require("infusion"),
     berg.clock.raf.stop = function (that) {
         cancelAnimationFrame(that.requestID);
     };
-
-}());
+})();

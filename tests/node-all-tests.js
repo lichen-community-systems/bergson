@@ -1,12 +1,12 @@
 /*
- * osc.js All Tests Runner
+ * Bergson All Tests Runner
  * http://github.com/colinbdclark/bergson
  *
  * Copyright 2015, Colin Clark
  * Dual licensed under the MIT and GPL Version 2 licenses.
  */
- /*jshint node:true*/
 
+/* eslint-env node */
 "use strict";
 
 require("../index.js");

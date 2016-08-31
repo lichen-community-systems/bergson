@@ -138,5 +138,4 @@ var fluid = fluid || require("infusion"),
         var toTransfer = berg.scheduler.workerProxy.makeTransferrableCopy(eventSpec);
         that.postMessage("scheduleEvent", toTransfer);
     };
-
-}());
+})();

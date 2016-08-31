@@ -5,7 +5,7 @@
  * Copyright 2015, Colin Clark
  * Dual licensed under the MIT and GPL Version 2 licenses.
  */
- /*global require*/
+ /*global require, Float32Array*/
 var fluid = fluid || require("infusion"),
     berg = fluid.registerNamespace("berg");
 
@@ -60,4 +60,4 @@ var fluid = fluid || require("infusion"),
             that.intervalLog[that.tickCounter] = that.interval;
         }
     };
-}());
+})();

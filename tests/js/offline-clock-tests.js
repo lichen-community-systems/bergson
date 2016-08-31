@@ -78,5 +78,4 @@ var fluid = fluid || require("infusion"),
 
     var suite = berg.test.clock.offlineClockTestSuite();
     suite.run();
-
-}());
+})();
