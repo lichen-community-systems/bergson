@@ -1,7 +1,7 @@
 {
     "name": "bergson",
     "main": "index.js",
-    "version": "0.12.2",
+    "version": "0.12.3",
     "description": "Time and scheduling for the web",
     "author": "Colin Clark",
     "homepage": "http://github.com/colinbdclark/bergson",
