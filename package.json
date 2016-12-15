@@ -1,7 +1,7 @@
 {
     "name": "bergson",
     "main": "index.js",
-    "version": "0.12.3",
+    "version": "0.13.0",
     "description": "Time and scheduling for the web",
     "author": "Colin Clark",
     "homepage": "http://github.com/colinbdclark/bergson",
@@ -30,7 +30,7 @@
     },
     "dependencies": {
         "jquery": "3.1.0",
-        "infusion": "2.0.0-dev.20160519T222603Z.754d2c6"
+        "infusion": "2.0.0"
     },
     "engines": {
         "node": ">=4.0.0"
@@ -39,6 +39,6 @@
         "prepublish": "grunt",
         "browser-test": "testem ci --file tests/testem.json",
         "node-test": "node tests/node-all-tests.js",
-        "test": "npm run node-test && npm run browser-test"
+        "test": "yarn run node-test && yarn run browser-test"
     }
 }
