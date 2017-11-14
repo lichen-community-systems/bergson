@@ -1,7 +1,7 @@
 {
     "name": "bergson",
     "main": "index.js",
-    "version": "0.13.0",
+    "version": "0.12.3",
     "description": "Time and scheduling for the web",
     "author": "Colin Clark",
     "homepage": "http://github.com/colinbdclark/bergson",
@@ -19,26 +19,26 @@
     ],
     "readmeFilename": "README.md",
     "devDependencies": {
-        "node-jqunit": "1.1.4",
+        "node-jqunit": "1.1.7",
         "sheep-benchmark": "colinbdclark/sheep.js",
         "grunt": "1.0.1",
-        "grunt-contrib-clean": "1.0.0",
+        "grunt-contrib-clean": "1.1.0",
         "grunt-contrib-concat": "1.0.1",
-        "fluid-grunt-eslint": "18.1.1",
-        "grunt-contrib-uglify": "1.0.1",
+        "fluid-grunt-eslint": "18.1.2",
+        "grunt-contrib-uglify": "3.1.0",
         "grunt-contrib-watch": "1.0.0"
     },
     "dependencies": {
-        "jquery": "3.1.0",
-        "infusion": "2.0.0"
+        "jquery": "3.2.1",
+        "infusion": "3.0.0-dev.20171102T191539Z.c0636b395"
     },
     "engines": {
         "node": ">=4.0.0"
     },
     "scripts": {
-        "prepublish": "grunt",
+        "prepare": "grunt",
         "browser-test": "testem ci --file tests/testem.json",
         "node-test": "node tests/node-all-tests.js",
-        "test": "yarn run node-test && yarn run browser-test"
+        "test": "npm run node-test && npm run browser-test"
     }
 }

@@ -310,34 +310,33 @@ Building and Testing Bergson
 
 ### Prerequisites
 
-Bergson uses Node.js, Yarn, Grunt, and Testem for its build and test tooling. Here's how to get set up:
+Bergson uses Node.js, npm, Grunt, and Testem for its build and test tooling. Here's how to get set up:
 
     1. Install the [Node.js](https://nodejs.org/en/) LTS release
-    2. Install Yarn: <code>npm install -g yarn</code>
-    3. Install Grunt: <code>yarn global add grunt-cli</code>
-    4. Install Testem: <code>yarn global add testem</code>
+    3. Install Grunt: <code>npm install -g grunt-cli</code>
+    4. Install Testem: <code>npm install -g testem</code>
 
 
 ### How to Build Bergson
 
 To download all of Bergson's dependencies, build them, and then build Bergson itself, run the following commands:
 
-    yarn install
+    npm install
     grunt
 
 ### Running Bergson's Test Suite
 
 Bergson's test suite can be run on both Node.js and all of the browsers installed on your computer using Testem:
 
-    yarn test
+    npm test
 
 If you'd like to run only the Node.js tests, run:
 
-    yarn run node-test
+    npm run node-test
 
 Or if you only want to run the browser tests:
 
-    yarn run browser-test
+    npm run browser-test
 
 Alternatively, if you'd like to only run the tests in one browser, you can open the test suite ``tests/unit/all-tests.html`` file by hand in your browser.
 
