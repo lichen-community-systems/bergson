@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title>AudioContext Clock Example</title>
+
+        <style>
+            #blinky {
+                width: 2em;
+                height: 2em;
+            }
+
+            .blink {
+                background-color: green;
+            }
+
+            .unblink {
+                background-color: white;
+                transition: all .25s ease-in;
+            }
+
+        </style>
+        <script type="text/javascript" src="../../node_modules/infusion/dist/infusion-framework.js"></script>
+        <script type="text/javascript" src="../../dist/bergson-only.js"></script>
+        <script type="text/javascript" src="audio-context-clock-example.js"></script>
+
+    </head>
+
+    <body>
+        <div id="blinky"></div>
+
+        <script>
+            berg.examples.autoAudioContextClock("#blinky");
+        </script>
+    </body>
+</html>

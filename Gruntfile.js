@@ -93,16 +93,6 @@ module.exports = function (grunt) {
             }
         },
 
-        watch: {
-            scripts: {
-                files: ["src/**/*.js", "node_modules/**/*.js", "Gruntfile.js"],
-                tasks: ["default"],
-                options: {
-                    spawn: false
-                }
-            }
-        },
-
         berg: {
             banners: {
                 short: "/*! Bergson <%= pkg.version %>, Copyright <%= grunt.template.today('yyyy') %> Colin Clark | github.com/colinbdclark/bergson */\n\n"
@@ -115,7 +105,6 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks("grunt-contrib-uglify");
     grunt.loadNpmTasks("grunt-contrib-clean");
     grunt.loadNpmTasks("fluid-grunt-eslint");
-    grunt.loadNpmTasks("grunt-contrib-watch");
 
     grunt.registerTask("default", ["clean", "eslint", "concat", "uglify"]);
 };
