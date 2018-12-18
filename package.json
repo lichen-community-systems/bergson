@@ -19,21 +19,17 @@
     ],
     "readmeFilename": "README.md",
     "devDependencies": {
-        "node-jqunit": "1.1.7",
+        "node-jqunit": "1.1.8",
         "sheep-benchmark": "colinbdclark/sheep.js",
         "grunt": "1.0.3",
-        "grunt-contrib-clean": "1.1.0",
+        "grunt-contrib-clean": "2.0.0",
         "grunt-contrib-concat": "1.0.1",
-        "grunt-contrib-uglify": "3.4.0",
+        "grunt-contrib-uglify": "4.0.0",
         "fluid-grunt-eslint": "18.1.2",
-        "testem": "2.9.0"
+        "testem": "2.14.0"
     },
     "dependencies": {
-        "jquery": "3.3.1",
-        "infusion": "3.0.0-dev.20180720T113347Z.272cf70"
-    },
-    "engines": {
-        "node": ">=4.0.0"
+        "infusion": "3.0.0-dev.20181204T213346Z.2ca90f6e6"
     },
     "scripts": {
         "prepare": "node_modules/.bin/grunt",

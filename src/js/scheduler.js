@@ -90,12 +90,12 @@ var fluid = fluid || require("infusion"),
             /**
              * Starts this scheduler's clock.
              */
-            start: "{clock}.start()",
+            start: "{that}.events.onStart.fire()",
 
             /**
              * Stops this scheduler's clock.
              */
-            stop: "{clock}.stop()",
+            stop: "{that}.events.onStop.fire()",
 
             /**
              * Causes the scheduler to evaluate its
@@ -188,10 +188,19 @@ var fluid = fluid || require("infusion"),
             }
         },
 
+        events: {
+            onStart: null,
+            onStop: null
+        },
+
         listeners: {
+            "onStart.startClock": "{clock}.start()",
+
             "{clock}.events.onTick": {
                 func: "{scheduler}.tick"
-            }
+            },
+
+            "onStop.stopClock": "{clock}.stop()"
         }
     });
 
@@ -277,6 +286,13 @@ var fluid = fluid || require("infusion"),
             eventSpec.scheduledAt = now;
         }
 
+        // TODO: Everything below is wrong in the case that the clock hasn't event started ticking yet.
+        // In that case, we need to defer the "concretizing"
+        // of time that references to "now" will cause
+        // until the clock actually starts ticking.
+        // So (I think) everything that gets scheduled prior
+        // to the clock starting should go into a list to be
+        // processed at the moment when time actually starts.
         berg.scheduler.validateEventSpec(eventSpec);
         eventSpec.priority = berg.scheduler.calcPriority(now, eventSpec.time, timeScale);
 

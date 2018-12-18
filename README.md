@@ -268,12 +268,12 @@ Types of Clocks
     <tr>
         <td><code>berg.clock.audioContext</code></td>
         <td>Uses the Web Audio API's <code>AudioContext</code> as a source of time. This clock
-        needs to be driven by your own ScriptProcessorNode code (i.e. by calling its <code>tick()</code> method within your <code>onaudioprocess</code> handler).</td>
+        needs to be driven by your own ScriptProcessorNode code (i.e. by calling its <code>tick()</code> method within your <code>onaudioprocess</code> handler). This clock will not start ticking until its <code>start()</code> method is invoked by a user action (such as a button click).</td>
         <td>Dynamically determined based on the AudioContext's <code>sampleRate</code> and this clock's <code>blockSize</code> option.</td>
     </tr>
     <tr>
         <td><code>berg.clock.autoAudioContext</code></td>
-        <td>An AudioContext-based clock that will automatically create a <code>ScriptProcessorNode</code> instance and wire it up correctly for you. Use this if you're not using the Web Audio API directly, but want a rock-solid clock for scheduling events in your application.</td>
+        <td>An AudioContext-based clock that will automatically create a <code>ScriptProcessorNode</code> instance and wire it up correctly for you. Use this if you're not using the Web Audio API directly, but want a rock-solid clock for scheduling events in your application. This clock will not start ticking until its <code>start()</code> method is invoked by a user action (such as a button click).</td>
         <td>Dynamically determined based on the AudioContext's <code>sampleRate</code> and this clock's <code>blockSize</code> option.</td>
     </tr>
     <tr>

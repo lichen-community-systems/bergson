@@ -1,3 +1,7 @@
+// TODO: This demo doesn't work!
+// This is due, at least, to a bug in the Scheduler
+// where it tries to evaluate scheduled events immediatey
+// even if the clock hasn't started ticking yet.
 fluid.defaults("berg.examples.autoAudioContextClock", {
     gradeNames: "fluid.viewComponent",
 
@@ -21,18 +25,29 @@ fluid.defaults("berg.examples.autoAudioContextClock", {
     invokers: {
         blink: {
             funcName: "berg.examples.autoAudioContextClock.blink",
-            args: "{that}.container"
+            args: "{that}.dom.blinky"
         },
 
         unblink: {
             funcName: "berg.examples.autoAudioContextClock.unblink",
-            args: "{that}.container"
+            args: "{that}.dom.blinky"
+        },
+
+        toggleButtonState: {
+            funcName: "berg.examples.autoAudioContextClock.toggleButtonState",
+            args: "{that}"
         }
     },
 
+    events: {
+        onButtonClick: null
+    },
+
     listeners: {
-        "onCreate.startScheduler": {
-            func: "{that}.scheduler.start"
+        "onCreate.bindButton": {
+            "this": "{that}.dom.button",
+            method: "on",
+            args: ["click", "{that}.toggleButtonState"]
         },
 
         "onCreate.scheduleBlink": {
@@ -68,7 +83,16 @@ fluid.defaults("berg.examples.autoAudioContextClock", {
                     callback: "{that}.scheduler.stop"
                 }
             ]
+        },
+
+        "onButtonClick.toggleButtonState": {
+            func: "{that}.toggleButtonState"
         }
+    },
+
+    selectors: {
+        blinky: "#blinky",
+        button: "button"
     }
 });
 
@@ -80,4 +104,14 @@ berg.examples.autoAudioContextClock.blink = function (blinky) {
 berg.examples.autoAudioContextClock.unblink = function (blinky) {
     blinky.removeClass("blink");
     blinky.addClass("unblink");
+};
+
+berg.examples.autoAudioContextClock.toggleButtonState = function (that) {
+    if (that.scheduler.clock.model.isPlaying) {
+        that.scheduler.stop();
+        that.locate("button").text("Start");
+    } else {
+        that.scheduler.start();
+        that.locate("button").text("Stop");
+    }
 };

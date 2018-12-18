@@ -21,13 +21,15 @@ var fluid = fluid || require("infusion"),
             intervalID: null
         },
 
-        invokers: {
-            start: {
+        listeners: {
+            "onStart.setInterval": {
+                priority: "after:updateState",
                 funcName: "berg.clock.setInterval.start",
                 args: ["{that}"]
             },
 
-            stop: {
+            "onStop.clearInterval": {
+                priority: "after:updateState",
                 funcName: "berg.clock.setInterval.stop",
                 args: ["{that}"]
             }

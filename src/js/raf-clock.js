@@ -27,18 +27,22 @@ var fluid = fluid || require("infusion"),
         },
 
         invokers: {
-            start: {
+            tick: {
+                funcName: "berg.clock.raf.tick",
+                args: ["{that}", "{arguments}.0"]
+            }
+        },
+
+        listeners: {
+            "onStart.requestNextTick": {
+                priority: "after:updateState",
                 funcName: "berg.clock.raf.requestNextTick",
                 args: ["{that}"]
             },
 
-            tick: {
-                funcName: "berg.clock.raf.tick",
-                args: ["{that}", "{arguments}.0"]
-            },
-
-            stop: {
-                funcName: "berg.clock.raf.stop",
+            "onStop.cancelNextTick": {
+                priority: "after:updateState",
+                funcName: "berg.clock.raf.cancelNextTick",
                 args: ["{that}"]
             }
         }
@@ -56,7 +60,7 @@ var fluid = fluid || require("infusion"),
         that.events.onTick.fire(nowSecs, that.freq);
     };
 
-    berg.clock.raf.stop = function (that) {
+    berg.clock.raf.cancelNextTick = function (that) {
         cancelAnimationFrame(that.requestID);
     };
 })();

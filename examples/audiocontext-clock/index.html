@@ -8,6 +8,7 @@
             #blinky {
                 width: 2em;
                 height: 2em;
+                margin-top: 1em;
             }
 
             .blink {
@@ -27,10 +28,12 @@
     </head>
 
     <body>
-        <div id="blinky"></div>
-
+        <div id="blink-example">
+            <button>Start</button>
+            <div id="blinky"></div>
+        </div>
         <script>
-            berg.examples.autoAudioContextClock("#blinky");
+            berg.examples.autoAudioContextClock("#blink-example");
         </script>
     </body>
 </html>

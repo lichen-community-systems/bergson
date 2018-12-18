@@ -16,7 +16,7 @@ var fluid = fluid || require("infusion"),
      * Clock is the base grade for all Clocks.
      */
     fluid.defaults("berg.clock", {
-        gradeNames: ["fluid.component"],
+        gradeNames: ["fluid.modelComponent"],
 
         freq: 1, // Ticks per second.
 
@@ -44,26 +44,41 @@ var fluid = fluid || require("infusion"),
             }
         },
 
+        model: {
+            isPlaying: false
+        },
+
         invokers: {
-            start: "fluid.identity()",
+            start: "{that}.events.onStart.fire()",
             tick: "fluid.notImplemented()",
-            stop: "fluid.identity()"
+            stop: "{that}.events.onStop.fire()"
         },
 
         events: {
-            onTick: null
+            onStart: null,
+            onTick: null,
+            onStop: null
         },
 
         listeners: {
-            onDestroy: [
-                "{that}.stop()"
-            ]
+            "onStart.updateState": {
+                changePath: "isPlaying",
+                value: true
+            },
+
+            "onStop.updateState": {
+                changePath: "isPlaying",
+                value: false
+            },
+
+            "onDestroy.stop": "{that}.stop()"
         }
     });
 
     berg.clock.calcTickDuration = function (freq) {
         return 1.0 / freq;
     };
+
 
     /**
      * Offline Clock

@@ -49,33 +49,26 @@ var fluid = fluid || require("infusion"),
             messageSource: "{that}.worker"
         },
 
-        invokers: {
-            start: "{that}.events.onStart.fire",
-            stop: "{that}.events.onStop.fire"
-        },
-
-        events: {
-            onStart: null,
-            onStop: null
-        },
-
         listeners: {
-            onStart: [
-                {
-                    func: "{that}.postMessage",
-                    args: ["start", {
-                        freq: "{that}.freq"
-                    }]
-                }
-            ],
+            "onStart.postStart": {
+                priority: "after:updateState",
+                func: "{that}.postMessage",
+                args: ["start", {
+                    freq: "{that}.freq"
+                }]
+            },
 
-            onStop: [
-                "{that}.postMessage(stop)",
-                {
-                    this: "{that}.worker",
-                    method: "terminate"
-                }
-            ]
+            "onStop.postStop": {
+                priority: "after:updateState",
+                func: "{that}.postMessage",
+                args: ["stop"]
+            },
+
+            "onStop.terminateWorker": {
+                priority: "after:postStop",
+                this: "{that}.worker",
+                method: "terminate"
+            }
         }
     });
 
