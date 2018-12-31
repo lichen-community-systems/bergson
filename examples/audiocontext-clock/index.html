@@ -4,36 +4,24 @@
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <title>AudioContext Clock Example</title>
 
-        <style>
-            #blinky {
-                width: 2em;
-                height: 2em;
-                margin-top: 1em;
-            }
+        <link rel="stylesheet" media="screen" href="blinker.css" />
 
-            .blink {
-                background-color: green;
-            }
-
-            .unblink {
-                background-color: white;
-                transition: all .25s ease-in;
-            }
-
-        </style>
         <script type="text/javascript" src="../../node_modules/infusion/dist/infusion-framework.js"></script>
         <script type="text/javascript" src="../../dist/bergson-only.js"></script>
+        <script type="text/javascript" src="scheduler-toggle-button.js"></script>
+        <script type="text/javascript" src="blinker.js"></script>
+        <script type="text/javascript" src="second-counter.js"></script>
         <script type="text/javascript" src="audio-context-clock-example.js"></script>
-
     </head>
 
     <body>
         <div id="blink-example">
             <button>Start</button>
-            <div id="blinky"></div>
+            <div class="blinky"></div>
+            The clock has been ticking for <span class="counter"></span> ticks.
         </div>
         <script>
-            berg.examples.autoAudioContextClock("#blink-example");
+            window.example = berg.examples.autoAudioContextClock("#blink-example");
         </script>
     </body>
 </html>

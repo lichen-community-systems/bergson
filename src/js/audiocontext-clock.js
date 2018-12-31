@@ -81,7 +81,7 @@ var fluid = fluid || require("infusion"),
             scriptNode: {
                 expander: {
                     funcName: "berg.clock.autoAudioContext.createScriptNode",
-                    args: ["{that}.context", "{that}.options.blockSize", "{that}.tick"]
+                    args: ["{that}.context", "{that}.options.blockSize"]
                 }
             }
         },
@@ -90,7 +90,7 @@ var fluid = fluid || require("infusion"),
             "onStart.startAudioContext": {
                 priority: "after:updateState",
                 funcName: "berg.clock.autoAudioContext.start",
-                args: ["{that}.context", "{that}.scriptNode"]
+                args: ["{that}.context", "{that}.scriptNode", "{that}.tick"]
             },
 
             "onStop.stopAudioContext": {
@@ -101,13 +101,13 @@ var fluid = fluid || require("infusion"),
         }
     });
 
-    berg.clock.autoAudioContext.createScriptNode = function (context, blockSize, tick) {
+    berg.clock.autoAudioContext.createScriptNode = function (context, blockSize) {
         var sp = context.createScriptProcessor(blockSize, 1, 1);
-        sp.onaudioprocess = tick;
         return sp;
     };
 
-    berg.clock.autoAudioContext.start = function (context, scriptNode) {
+    berg.clock.autoAudioContext.start = function (context, scriptNode, tick) {
+        scriptNode.onaudioprocess = tick;
         scriptNode.connect(context.destination);
         context.resume();
     };

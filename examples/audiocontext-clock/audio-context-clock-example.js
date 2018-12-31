@@ -1,9 +1,25 @@
-// TODO: This demo doesn't work!
-// This is due, at least, to a bug in the Scheduler
-// where it tries to evaluate scheduled events immediatey
-// even if the clock hasn't started ticking yet.
 fluid.defaults("berg.examples.autoAudioContextClock", {
     gradeNames: "fluid.viewComponent",
+
+    blinkSchedule: {
+        type: "repeat",
+        freq: 1,
+        time: 0,
+        end: 15,
+        callback: "{blinker}.blink"
+    },
+
+    unblinkSchedule: {
+        type: "repeat",
+        freq: 1,
+        time: 0.5,
+        end: 15.5,
+        callback: "{blinker}.unblink"
+    },
+
+    model: {
+        isPlaying: false
+    },
 
     components: {
         scheduler: {
@@ -19,99 +35,75 @@ fluid.defaults("berg.examples.autoAudioContextClock", {
                     }
                 }
             }
+        },
+
+        button: {
+            type: "berg.examples.schedulerToggleButton",
+            container: "{autoAudioContextClock}.dom.button"
+        },
+
+        blinker: {
+            type: "berg.examples.blinker",
+            container: "{autoAudioContextClock}.dom.blinky"
+        },
+
+        counter: {
+            type: "berg.examples.tickCounter",
+            container: "{autoAudioContextClock}.dom.counter"
         }
     },
 
     invokers: {
-        blink: {
-            funcName: "berg.examples.autoAudioContextClock.blink",
-            args: "{that}.dom.blinky"
-        },
-
-        unblink: {
-            funcName: "berg.examples.autoAudioContextClock.unblink",
-            args: "{that}.dom.blinky"
-        },
-
-        toggleButtonState: {
-            funcName: "berg.examples.autoAudioContextClock.toggleButtonState",
-            args: "{that}"
+        stop: {
+            changePath: "isPlaying",
+            value: false
         }
     },
 
     events: {
-        onButtonClick: null
+        onStart: "{scheduler}.events.onStart",
+        onStop: "{scheduler}.events.onStop"
     },
 
     listeners: {
-        "onCreate.bindButton": {
-            "this": "{that}.dom.button",
-            method: "on",
-            args: ["click", "{that}.toggleButtonState"]
-        },
-
-        "onCreate.scheduleBlink": {
-            func: "{that}.scheduler.schedule",
+        "onCreate.scheduleCounter": {
+            func: "{scheduler}.schedule",
             args: [
                 {
                     type: "repeat",
                     freq: 1,
-                    time: 0,
-                    callback: "{that}.blink"
+                    time: 1,
+                    callback: "{counter}.count"
                 }
             ]
         },
 
-        "onCreate.scheduleUnblink": {
-            func: "{that}.scheduler.schedule",
-            args: [
-                {
-                    type: "repeat",
-                    freq: 1,
-                    time: 0.5,
-                    callback: "{that}.unblink"
-                }
-            ]
+        "onStart.scheduleBlink": {
+            priority: "before:updateState",
+            func: "{scheduler}.schedule",
+            args: ["{that}.options.blinkSchedule"]
         },
 
-        "onCreate.scheduleEnd": {
-            func: "{that}.scheduler.schedule",
-            args: [
-                {
-                    type: "once",
-                    time: 15,
-                    callback: "{that}.scheduler.stop"
-                }
-            ]
+        "onStart.scheduleUnblink": {
+            priority: "before:updateState",
+            func: "{scheduler}.schedule",
+            args: ["{that}.options.unblinkSchedule"]
         },
 
-        "onButtonClick.toggleButtonState": {
-            func: "{that}.toggleButtonState"
+        "onStop.unscheduleBlink": {
+            func: "{scheduler}.clear",
+            args: ["{that}.options.blinkSchedule"]
+        },
+
+        "onStop.unscheduleUnblink": {
+            func: "{scheduler}.clear",
+            args: ["{that}.options.unblinkSchedule"]
         }
     },
 
     selectors: {
-        blinky: "#blinky",
-        button: "button"
+        blinky: ".blinky",
+        button: "button",
+        counter: ".counter"
     }
 });
-
-berg.examples.autoAudioContextClock.blink = function (blinky) {
-    blinky.addClass("blink");
-    blinky.removeClass("unblink");
-
-};
-berg.examples.autoAudioContextClock.unblink = function (blinky) {
-    blinky.removeClass("blink");
-    blinky.addClass("unblink");
-};
-
-berg.examples.autoAudioContextClock.toggleButtonState = function (that) {
-    if (that.scheduler.clock.model.isPlaying) {
-        that.scheduler.stop();
-        that.locate("button").text("Start");
-    } else {
-        that.scheduler.start();
-        that.locate("button").text("Stop");
-    }
-};

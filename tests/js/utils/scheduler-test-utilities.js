@@ -222,6 +222,7 @@ var fluid = fluid || require("infusion"),
     });
 
     berg.test.scheduler.testSequencer.offline.driveClockSync = function (clock, numTicks) {
+        clock.start();
         for (var i = 0; i < numTicks; i++) {
             clock.tick();
         }

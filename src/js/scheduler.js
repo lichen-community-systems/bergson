@@ -73,11 +73,14 @@ var fluid = fluid || require("infusion"),
             queue: "@expand:berg.priorityQueue()",
 
             // By default, we schedule ahead by half a tick's duration.
-            lookahead: "@expand:berg.scheduler.calcLookahead({clock})"
+            lookahead: "@expand:berg.scheduler.calcLookahead({clock})",
+
+            deferredEvents: []
         },
 
         model: {
-            timeScale: 1.0
+            timeScale: 1.0,
+            stoppedAtTime: undefined
         },
 
         components: {
@@ -155,7 +158,7 @@ var fluid = fluid || require("infusion"),
             /**
              * Clears all scheduled events.
              */
-            clearAll: "{that}.queue.clear()",
+            clearAll: "{that}.events.onClearAll.fire()",
 
             /**
              * Scales the scheduled time of all currently and future events.
@@ -190,20 +193,53 @@ var fluid = fluid || require("infusion"),
 
         events: {
             onStart: null,
-            onStop: null
+            onStop: null,
+            onClearAll: null
         },
 
         listeners: {
             "onStart.startClock": "{clock}.start()",
 
+            "onStart.reprioritizeCurrentEvents": {
+                priority: "after:startClock",
+                funcName: "berg.scheduler.reprioritizeCurrentEvents",
+                args: "{that}"
+            },
+
+            "onStart.scheduleDeferredEvents": {
+                priority: "after:reprioritizeCurrentEvents",
+                funcName: "berg.scheduler.scheduleDeferredEvents",
+                args: "{that}"
+            },
+
+            "onStart.unmarkStopTime": {
+                priority: "after:scheduleDeferredEvents",
+                changePath: "stoppedAtTime",
+                type: "DELETE"
+            },
+
             "{clock}.events.onTick": {
                 func: "{scheduler}.tick"
             },
 
-            "onStop.stopClock": "{clock}.stop()"
+            "onStop.stopClock": "{clock}.stop()",
+
+            "onStop.markStopTime": {
+                priority: "after:stopClock",
+                changePath: "stoppedAtTime",
+                value: "{that}.clock.time"
+            },
+
+            "onClearAll.clearQueue": "{that}.queue.clear()",
+
+            "onClearAll.clearDeferred": {
+                funcName: "berg.scheduler.clearDeferredEvents",
+                args: "{that}.deferredEvents"
+            }
         }
     });
 
+    // Unsupported, non-API function.
     berg.scheduler.calcLookahead = function (clock) {
         return clock.tickDuration / 2;
     };
@@ -211,6 +247,42 @@ var fluid = fluid || require("infusion"),
     // Unsupported, non-API function.
     berg.scheduler.calcPriority = function (baseTime, timeOffset, timeScale) {
         return baseTime + (timeOffset * timeScale);
+    };
+
+    // Unsupported, non-API function.
+    berg.scheduler.reprioritizeEvent = function (item, now, stoppedAtTime) {
+        item.priority = berg.scheduler.recalcTime(now, stoppedAtTime, item.priority);
+        if (item.end !== undefined && item.end !== Infinity) {
+            item.end = berg.scheduler.recalcTime(now, stoppedAtTime, item.end);
+        }
+    };
+
+    // Unsupported, non-API function.
+    berg.scheduler.reprioritizeCurrentEvents = function (that) {
+        var now = that.clock.time,
+            stoppedAtTime = that.model.stoppedAtTime;
+
+        // No reason to reprioritize if the clock wasn't stopped or
+        // time hasn't passed.
+        if (stoppedAtTime === undefined || stoppedAtTime === now) {
+            return;
+        }
+
+        var reprioritized = fluid.transform(that.queue.items, function (item) {
+            berg.scheduler.reprioritizeEvent(now, stoppedAtTime, item);
+        });
+
+        // TODO: The queue should still be ordered correctly
+        // even if we didn't clear it and readd each item, right?
+        // Verify and remove this if possible.
+        that.queue.clear();
+        fluid.each(reprioritized, that.queue.push);
+    };
+
+    // Unsupported, non-API function.
+    berg.scheduler.recalcTime = function (clockStopTime, now, scheduledTime) {
+        var timeRemaining = clockStopTime - scheduledTime;
+        return timeRemaining > 0 ? now + timeRemaining : scheduledTime;
     };
 
     // Unsupported, non-API function.
@@ -272,8 +344,25 @@ var fluid = fluid || require("infusion"),
         }
     };
 
+    berg.scheduler.deferEvent = function (eventSpec, that) {
+        that.deferredEvents.push(eventSpec);
+    };
+
+    berg.scheduler.scheduleDeferredEvents = function (that) {
+        fluid.each(that.deferredEvents, function (eventSpec) {
+            berg.scheduler.scheduleEvent(eventSpec, that);
+        });
+
+        berg.scheduler.clearDeferredEvents(that.deferredEvents);
+    };
+
     // Unsupported, non-API function.
     berg.scheduler.scheduleEvent = function (eventSpec, that) {
+        if (!that.clock.model.isPlaying) {
+            berg.scheduler.deferEvent(eventSpec, that);
+            return;
+        }
+
         var now = that.clock.time,
             timeScale = that.model.timeScale;
 
@@ -282,17 +371,8 @@ var fluid = fluid || require("infusion"),
             berg.scheduler.expandRepeatingEventSpec(now, eventSpec);
         }
 
-        if (typeof eventSpec.scheduledAt !== "number") {
-            eventSpec.scheduledAt = now;
-        }
-
-        // TODO: Everything below is wrong in the case that the clock hasn't event started ticking yet.
-        // In that case, we need to defer the "concretizing"
-        // of time that references to "now" will cause
-        // until the clock actually starts ticking.
-        // So (I think) everything that gets scheduled prior
-        // to the clock starting should go into a list to be
-        // processed at the moment when time actually starts.
+        // TODO: Mutation of eventSpec!
+        eventSpec.scheduledAt = now;
         berg.scheduler.validateEventSpec(eventSpec);
         eventSpec.priority = berg.scheduler.calcPriority(now, eventSpec.time, timeScale);
 
@@ -353,5 +433,9 @@ var fluid = fluid || require("infusion"),
             berg.scheduler.evaluateScoreEvent(now, next, that);
             next = that.queue.peek();
         }
+    };
+
+    berg.scheduler.clearDeferredEvents = function (deferredEvents) {
+        deferredEvents.length = 0;
     };
 })();

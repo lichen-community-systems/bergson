@@ -1,0 +1,14 @@
+.blinky {
+    width: 2em;
+    height: 2em;
+    margin-top: 1em;
+}
+
+.blink {
+    background-color: green;
+}
+
+.unblink {
+    background-color: white;
+    transition: all .1s ease-in;
+}
