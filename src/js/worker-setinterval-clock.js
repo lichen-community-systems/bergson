@@ -53,9 +53,14 @@ var fluid = fluid || require("infusion"),
             "onStart.postStart": {
                 priority: "after:updateState",
                 func: "{that}.postMessage",
-                args: ["start", {
-                    freq: "{that}.freq"
-                }]
+                args: [
+                    "start",
+                    [
+                        {
+                            freq: "{that}.options.freq"
+                        }
+                    ]
+                ]
             },
 
             "onStop.postStop": {
@@ -64,8 +69,7 @@ var fluid = fluid || require("infusion"),
                 args: ["stop"]
             },
 
-            "onStop.terminateWorker": {
-                priority: "after:postStop",
+            "onDestroy.terminateWorker": {
                 this: "{that}.worker",
                 method: "terminate"
             }
@@ -110,14 +114,13 @@ var fluid = fluid || require("infusion"),
         self.addEventListener("message", function (e) {
             if (e.data.type === "start") {
                 berg.clock = berg.workerClock({
-                    freq: e.data.value
+                    freq: e.data.args[0].freq
                 });
                 berg.clock.start();
             } else if (e.data.type === "stop") {
                 if (berg.clock) {
                     berg.clock.stop();
                 }
-                self.close();
             }
         }, false);
     };
