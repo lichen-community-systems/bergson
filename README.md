@@ -84,9 +84,14 @@ A _score event specification_ is a JSON-type (i.e. plain old, non-prototypal) ob
         <td>The future time in seconds when the scheduled event should occur.</td>
     </tr>
     <tr>
+        <td>interval</td>
+        <td>Number</td>
+        <td>(Only for repeating events) The time interval, in seconds, between repetitions. This option takes precendence over <code>freq</code> if both are provided.</td>
+    </tr>
+    <tr>
         <td>freq</td>
         <td>Number</td>
-        <td>(Only for repeating events) The frequency at which the event should repeat.</td>
+        <td>(Only for repeating events) The frequency at which the event should repeat. This option will be overridden by <code>interval</code> if both are provided.</td>
     </tr>
     <tr>
         <td>end</td>
