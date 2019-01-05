@@ -298,7 +298,11 @@ var fluid = fluid || require("infusion"),
         if (typeof eventSpec.time !== "number") {
             eventSpec.time = 0;
         }
-        eventSpec.interval = 1.0 / eventSpec.freq;
+
+        if (typeof eventSpec.interval !== "number") {
+            eventSpec.interval = 1.0 / eventSpec.freq;
+        }
+
         eventSpec.end = typeof eventSpec.end !== "number" ?
             Infinity : eventSpec.end + now;
     };
@@ -306,9 +310,10 @@ var fluid = fluid || require("infusion"),
     // Unsupported, non-API function.
     berg.scheduler.validateEventSpec = function (eventSpec) {
         // TODO: Provide a means to perform implementation-specific validation.
-        if (eventSpec.type === "repeat" && typeof eventSpec.freq !== "number") {
-            throw new Error("No freq was specified for scheduled event: " +
-                fluid.prettyPrintJSON(eventSpec));
+        if (eventSpec.type === "repeat") {
+            if (typeof eventSpec.freq !== "number" && typeof eventSpec.interval !== "number") {
+                throw new Error("No freq or interval was specified for a repeating event: " + fluid.prettyPrintJSON(eventSpec));
+            }
         }
 
         if (typeof eventSpec.time !== "number") {

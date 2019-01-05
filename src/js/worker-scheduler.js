@@ -92,19 +92,21 @@ var fluid = fluid || require("infusion"),
         },
 
         listeners: {
-            onCreate: [
-                {
-                    func: "{that}.postMessage",
-                    args: ["create", ["berg.scheduler.postMessage", "{that}.options.remoteSchedulerOptions"]]
-                }
-            ],
+            "onCreate.postSchedulerOptions": {
+                func: "{that}.postMessage",
+                args: [
+                    "create",
+                    [
+                        "berg.scheduler.postMessage",
+                        "{that}.options.remoteSchedulerOptions"
+                    ]
+                ]
+            },
 
-            onDestroy: [
-                {
-                    this: "{that}.worker",
-                    method: "terminate"
-                }
-            ]
+            "onDestroy.terminateWorker": {
+                this: "{that}.worker",
+                method: "terminate"
+            }
         }
     });
 

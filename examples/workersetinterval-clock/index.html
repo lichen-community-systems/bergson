@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title>WorkerSetInterval Clock Example</title>
+
+        <script type="text/javascript" src="../../node_modules/infusion/dist/infusion-framework.js"></script>
+        <script type="text/javascript" src="../../dist/bergson-only.js"></script>
+        <script type="text/javascript" src="workersetinterval-example.js"></script>
+
+    </head>
+
+    <body>
+        <div id="worker-example">
+            <div><button>Count to 10</button></div>
+            <br />
+            <div>Tick count: <span class="tickCounter"></span></div>
+        </div>
+        <script>
+            berg.examples.workerSetIntervalClock("#worker-example");
+        </script>
+    </body>
+</html>
