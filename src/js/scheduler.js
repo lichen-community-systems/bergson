@@ -93,12 +93,12 @@ var fluid = fluid || require("infusion"),
             /**
              * Starts this scheduler's clock.
              */
-            start: "{that}.events.onStart.fire()",
+            start: "{that}.clock.start()",
 
             /**
              * Stops this scheduler's clock.
              */
-            stop: "{that}.events.onStop.fire()",
+            stop: "{that}.clock.stop()",
 
             /**
              * Causes the scheduler to evaluate its
@@ -192,14 +192,13 @@ var fluid = fluid || require("infusion"),
         },
 
         events: {
-            onStart: null,
-            onStop: null,
+            onTick: "{clock}.events.onTick",
+            onStart: "{clock}.events.onStart",
+            onStop: "{clock}.events.onStop",
             onClearAll: null
         },
 
         listeners: {
-            "onStart.startClock": "{clock}.start()",
-
             "onStart.reprioritizeCurrentEvents": {
                 priority: "after:startClock",
                 funcName: "berg.scheduler.reprioritizeCurrentEvents",
@@ -218,11 +217,10 @@ var fluid = fluid || require("infusion"),
                 type: "DELETE"
             },
 
-            "{clock}.events.onTick": {
-                func: "{scheduler}.tick"
+            "onTick.tick": {
+                funcName: "berg.scheduler.tick",
+                args: ["{arguments}.0", "{that}"]
             },
-
-            "onStop.stopClock": "{clock}.stop()",
 
             "onStop.markStopTime": {
                 priority: "after:stopClock",
