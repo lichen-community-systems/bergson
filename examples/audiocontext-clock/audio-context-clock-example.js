@@ -2,6 +2,7 @@ fluid.defaults("berg.examples.autoAudioContextClock", {
     gradeNames: "fluid.viewComponent",
 
     blinkSchedule: {
+        id: "blink",
         type: "repeat",
         freq: 1,
         time: 0,
@@ -10,15 +11,12 @@ fluid.defaults("berg.examples.autoAudioContextClock", {
     },
 
     unblinkSchedule: {
+        id: "unblink",
         type: "repeat",
         freq: 1,
         time: 0.5,
         end: 15.5,
         callback: "{blinker}.unblink"
-    },
-
-    model: {
-        isPlaying: false
     },
 
     components: {
@@ -28,10 +26,7 @@ fluid.defaults("berg.examples.autoAudioContextClock", {
             options: {
                 components: {
                     clock: {
-                        type: "berg.clock.autoAudioContext",
-                        options: {
-                            freq: 1
-                        }
+                        type: "berg.clock.autoAudioContext"
                     }
                 }
             }
@@ -53,13 +48,6 @@ fluid.defaults("berg.examples.autoAudioContextClock", {
         }
     },
 
-    invokers: {
-        stop: {
-            changePath: "isPlaying",
-            value: false
-        }
-    },
-
     events: {
         onStart: "{scheduler}.events.onStart",
         onStop: "{scheduler}.events.onStop"
@@ -70,6 +58,7 @@ fluid.defaults("berg.examples.autoAudioContextClock", {
             func: "{scheduler}.schedule",
             args: [
                 {
+                    id: "count",
                     type: "repeat",
                     freq: 1,
                     time: 1,
@@ -79,13 +68,11 @@ fluid.defaults("berg.examples.autoAudioContextClock", {
         },
 
         "onStart.scheduleBlink": {
-            priority: "before:updateState",
             func: "{scheduler}.schedule",
             args: ["{that}.options.blinkSchedule"]
         },
 
         "onStart.scheduleUnblink": {
-            priority: "before:updateState",
             func: "{scheduler}.schedule",
             args: ["{that}.options.unblinkSchedule"]
         },

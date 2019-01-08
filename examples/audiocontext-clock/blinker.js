@@ -2,35 +2,43 @@ fluid.defaults("berg.examples.blinker", {
     gradeNames: "fluid.viewComponent",
 
     invokers: {
-        blink: {
-            funcName: "berg.examples.blinker.blink",
-            args: ["{that}.container"]
-        },
-
-        unblink: {
-            funcName: "berg.examples.blinker.unblink",
-            args: ["{that}.container"]
-        }
+        blink: "{that}.events.onBlink.fire()",
+        unblink: "{that}.events.onUnblink.fire()"
     },
 
     events: {
-        onStart: "{autoAudioContextClock}.events.onStart",
-        onStop: "{autoAudioContextClock}.events.onStop"
+        onStop: "{autoAudioContextClock}.events.onStop",
+        onBlink: null,
+        onUnblink: null
     },
 
     listeners: {
         "onStop.unblink": {
             func: "{that}.unblink"
+        },
+
+        "onBlink.addBlinkClass": {
+            "this": "{that}.container",
+            method: "addClass",
+            args: ["blink"]
+        },
+
+        "onBlink.removeUnblinkClass": {
+            "this": "{that}.container",
+            method: "removeClass",
+            args: ["unblink"]
+        },
+
+        "onUnblink.addUnblinkClass": {
+            "this": "{that}.container",
+            method: "addClass",
+            args: ["unblink"]
+        },
+
+        "onUnblink.removeBlinkClass": {
+            "this": "{that}.container",
+            method: "removeClass",
+            args: ["blink"]
         }
     }
 });
-
-berg.examples.blinker.blink = function (blinky) {
-    blinky.addClass("blink");
-    blinky.removeClass("unblink");
-
-};
-berg.examples.blinker.unblink = function (blinky) {
-    blinky.removeClass("blink");
-    blinky.addClass("unblink");
-};

@@ -87,6 +87,11 @@ var fluid = fluid || require("infusion"),
         },
 
         listeners: {
+            "onCreate.suspendContext": {
+                "this": "{that}.context",
+                method: "suspend"
+            },
+
             "onStart.startAudioContext": {
                 priority: "after:updateState",
                 funcName: "berg.clock.autoAudioContext.start",
@@ -115,5 +120,6 @@ var fluid = fluid || require("infusion"),
     berg.clock.autoAudioContext.stop = function (context, scriptNode) {
         scriptNode.disconnect(context.destination);
         scriptNode.onaudioprocess = undefined;
+        context.suspend();
     };
 })();

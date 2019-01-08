@@ -192,15 +192,17 @@ var fluid = fluid || require("infusion"),
         },
 
         events: {
+            // A Scheduler should always start and stop
+            // after its clock finishes doing so.
+            onStart: "{clock}.events.afterStart",
+            onStop: "{clock}.events.afterStop",
+
             onTick: "{clock}.events.onTick",
-            onStart: "{clock}.events.onStart",
-            onStop: "{clock}.events.onStop",
             onClearAll: null
         },
 
         listeners: {
             "onStart.reprioritizeCurrentEvents": {
-                priority: "after:startClock",
                 funcName: "berg.scheduler.reprioritizeCurrentEvents",
                 args: "{that}"
             },
@@ -223,7 +225,6 @@ var fluid = fluid || require("infusion"),
             },
 
             "onStop.markStopTime": {
-                priority: "after:stopClock",
                 changePath: "stoppedAtTime",
                 value: "{that}.clock.time"
             },

@@ -2,7 +2,7 @@ fluid.defaults("berg.examples.schedulerToggleButton", {
     gradeNames: "fluid.viewComponent",
 
     model: {
-        isPlaying: "{autoAudioContextClock}.model.isPlaying",
+        isPlaying: false,
         buttonLabel: "Start"
     },
 
@@ -17,8 +17,8 @@ fluid.defaults("berg.examples.schedulerToggleButton", {
 
     modelListeners: {
         isPlaying: {
-            funcName: "berg.examples.schedulerToggleButton.firePlayStateEvent",
-            args: ["{change}.value", "{that}"],
+            funcName: "berg.examples.schedulerToggleButton.fireStateEvent",
+            args: ["{change}.value", "{scheduler}"],
             excludeSource: "init"
         },
 
@@ -37,9 +37,7 @@ fluid.defaults("berg.examples.schedulerToggleButton", {
     },
 
     events: {
-        onButtonClick: null,
-        onStart: "{autoAudioContextClock}.events.onStart",
-        onStop: "{autoAudioContextClock}.events.onStop"
+        onButtonClick: null
     },
 
     listeners: {
@@ -63,10 +61,10 @@ berg.examples.schedulerToggleButton.toggle = function (that) {
     that.applier.change("isPlaying", !that.model.isPlaying);
 };
 
-berg.examples.schedulerToggleButton.firePlayStateEvent = function (isPlaying, that) {
+berg.examples.schedulerToggleButton.fireStateEvent = function (isPlaying, scheduler) {
     if (isPlaying) {
-        that.events.onStart.fire();
+        scheduler.start();
     } else {
-        that.events.onStop.fire();
+        scheduler.stop();
     }
 };

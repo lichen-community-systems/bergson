@@ -56,8 +56,10 @@ var fluid = fluid || require("infusion"),
 
         events: {
             onStart: null,
+            afterStart: null,
             onTick: null,
-            onStop: null
+            onStop: null,
+            afterStop: null
         },
 
         listeners: {
@@ -66,9 +68,19 @@ var fluid = fluid || require("infusion"),
                 value: true
             },
 
+            "onStart.fireAfterStart": {
+                priority: "last",
+                func: "{that}.events.afterStart.fire"
+            },
+
             "onStop.updateState": {
                 changePath: "isPlaying",
                 value: false
+            },
+
+            "onStop.fireAfterStop": {
+                priority: "last",
+                func: "{that}.events.afterStop.fire"
             },
 
             "onDestroy.stop": "{that}.stop()"
