@@ -8,6 +8,7 @@ module.exports = function (grunt) {
         infusion: [
             "node_modules/infusion/src/framework/core/js/jquery.standalone.js",
             "node_modules/infusion/src/framework/core/js/Fluid.js",
+            "node_modules/infusion/src/framework/core/js/FluidPromises.js",
             "node_modules/infusion/src/framework/core/js/FluidDebugging.js",
             "node_modules/infusion/src/framework/core/js/FluidIoC.js",
             "node_modules/infusion/src/framework/core/js/DataBinding.js"

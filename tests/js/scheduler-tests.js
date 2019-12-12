@@ -160,7 +160,7 @@ var fluid = fluid || require("infusion"),
                 {
                     name: "first",
                     time: 10,
-                    queueSize: 1
+                    queueSize: 2
                 },
                 {
                     name: "scheduledSecondRunsLast",

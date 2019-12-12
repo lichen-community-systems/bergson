@@ -79,6 +79,12 @@ var fluid = fluid || require("infusion"),
                     fluid.prettyPrintJSON(msg));
             }
 
+            if (msg.type === "create") {
+                // Work around a bug in Safari where stopPropagation()
+                // doesn't seem to work in a Worker postMessage listener.
+                return;
+            }
+
             var invoker = that[msg.type];
             if (!that.options.invokers[msg.type] || !invoker) {
                 that.events.onError.fire("Received a message of type " + msg.type +
