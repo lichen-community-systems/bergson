@@ -1,7 +1,7 @@
 {
     "name": "bergson",
     "main": "index.js",
-    "version": "0.14.0",
+    "version": "0.14.1",
     "description": "Time and scheduling for the web",
     "author": "Colin Clark",
     "homepage": "http://github.com/colinbdclark/bergson",
@@ -21,15 +21,15 @@
     "devDependencies": {
         "node-jqunit": "1.1.8",
         "sheep-benchmark": "colinbdclark/sheep.js",
-        "grunt": "1.0.3",
+        "grunt": "1.0.4",
         "grunt-contrib-clean": "2.0.0",
         "grunt-contrib-concat": "1.0.1",
-        "grunt-contrib-uglify": "4.0.0",
+        "grunt-contrib-uglify": "4.0.1",
         "fluid-grunt-eslint": "18.1.2",
-        "testem": "2.14.0"
+        "testem": "3.0.2"
     },
     "dependencies": {
-        "infusion": "3.0.0-dev.20181204T213346Z.2ca90f6e6"
+        "infusion": "3.0.0-dev.20191107T164711Z.332e92c33.FLUID-6148"
     },
     "scripts": {
         "prepare": "node_modules/.bin/grunt",
