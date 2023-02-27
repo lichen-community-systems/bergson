@@ -191,12 +191,13 @@ var fluid = fluid || require("infusion"),
         }
 
         fluid.each(that.options.registrationSequence[that.model.tick], function (eventSpecName) {
-            var eventSpec = that.options.scoreEventSpecs[eventSpecName];
-            if (!eventSpec) {
+            var eventSpecTemplate = that.options.scoreEventSpecs[eventSpecName];
+            if (!eventSpecTemplate) {
                 QUnit.ok(false, "The registrationSequence was misconfigured. No scoreEventSpec named '" +
                     eventSpecName + "' was found. Registration sequence was: " +
                     fluid.prettyPrintJSON(that.options.registrationSequence));
             }
+            var eventSpec = fluid.copy(eventSpecTemplate);
             eventSpec.callback = that.events.onScheduledEvent.fire;
             that.scheduleEvent(eventSpec);
         });

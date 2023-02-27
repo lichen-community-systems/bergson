@@ -19,21 +19,21 @@
     ],
     "readmeFilename": "README.md",
     "devDependencies": {
-        "node-jqunit": "1.1.8",
+        "node-jqunit": "1.1.9",
         "sheep-benchmark": "colinbdclark/sheep.js",
-        "grunt": "1.0.4",
-        "grunt-contrib-clean": "2.0.0",
-        "grunt-contrib-concat": "1.0.1",
-        "grunt-contrib-uglify": "4.0.1",
+        "grunt": "1.6.1",
+        "grunt-contrib-clean": "2.0.1",
+        "grunt-contrib-concat": "2.1.0",
+        "grunt-contrib-uglify": "5.2.2",
         "fluid-grunt-eslint": "18.1.2",
-        "testem": "3.0.2"
+        "testem": "3.10.1"
     },
     "dependencies": {
-        "infusion": "3.0.0-dev.20191107T164711Z.332e92c33.FLUID-6148"
+        "infusion": "4.6.0"
     },
     "scripts": {
-        "prepare": "node_modules/.bin/grunt",
-        "browser-test": "node_modules/.bin/testem ci --file tests/testem.json",
+        "prepare": "npx grunt",
+        "browser-test": "npx testem ci --file tests/testem.json",
         "node-test": "node tests/node-all-tests.js",
         "test": "npm run node-test && npm run browser-test"
     }
