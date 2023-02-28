@@ -81,7 +81,7 @@ var fluid = fluid || require("infusion"),
             scriptNode: {
                 expander: {
                     funcName: "berg.clock.autoAudioContext.createScriptNode",
-                    args: ["{that}.context", "{that}.options.blockSize", "{that}.tick"]
+                    args: ["{that}.context", "{that}.options.blockSize"]
                 }
             }
         },
@@ -90,30 +90,36 @@ var fluid = fluid || require("infusion"),
             "onStart.startAudioContext": {
                 priority: "after:updateState",
                 funcName: "berg.clock.autoAudioContext.start",
-                args: ["{that}.context", "{that}.scriptNode"]
+                args: ["{that}"]
             },
 
             "onStop.stopAudioContext": {
                 priority: "after:updateState",
                 funcName: "berg.clock.autoAudioContext.stop",
-                args: ["{that}.context", "{that}.scriptNode"]
+                args: ["{that}"]
             }
         }
     });
 
-    berg.clock.autoAudioContext.createScriptNode = function (context, blockSize, tick) {
-        var sp = context.createScriptProcessor(blockSize, 1, 1);
-        sp.onaudioprocess = tick;
-        return sp;
+    berg.clock.autoAudioContext.createScriptNode = function (context,
+        blockSize) {
+        var scriptNode = context.createScriptProcessor(blockSize, 1, 1);
+        return scriptNode;
     };
 
-    berg.clock.autoAudioContext.start = function (context, scriptNode) {
-        scriptNode.connect(context.destination);
-        context.resume();
+    berg.clock.autoAudioContext.start = function (that) {
+        if (!that.model.isPlaying) {
+            that.scriptNode.connect(context.destination);
+            that.scriptNode.onaudioprocess = that.tick;
+            that.context.resume();
+        }
     };
 
-    berg.clock.autoAudioContext.stop = function (context, scriptNode) {
-        scriptNode.disconnect(context.destination);
-        scriptNode.onaudioprocess = undefined;
+    berg.clock.autoAudioContext.stop = function (that) {
+        if (that.model.isPlaying) {
+            that.scriptNode.disconnect(context.destination);
+            that.scriptNode.onaudioprocess = undefined;
+            that.audioContext.suspend();
+        }
     };
 })();

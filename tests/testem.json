@@ -1,5 +1,13 @@
 {
     "test_page": "tests/all-tests.html",
     "timeout": 300,
-    "skip": "PhantomJS,IE,Headless Chrome"
+    "skip": "PhantomJS,IE",
+    "browser_args": {
+        "Chrome": [
+            "--autoplay-policy=no-user-gesture-required"
+        ],
+        "Chrome Canary": [
+            "--autoplay-policy=no-user-gesture-required"
+        ]
+    }
 }
