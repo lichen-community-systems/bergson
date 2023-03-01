@@ -108,18 +108,24 @@ var fluid = fluid || require("infusion"),
     };
 
     berg.clock.autoAudioContext.start = function (that) {
-        if (!that.model.isPlaying) {
-            that.scriptNode.connect(context.destination);
-            that.scriptNode.onaudioprocess = that.tick;
-            that.context.resume();
-        }
+        that.scriptNode.connect(that.context.destination);
+        that.scriptNode.onaudioprocess = that.tick;
+        that.context.resume();
     };
 
     berg.clock.autoAudioContext.stop = function (that) {
-        if (that.model.isPlaying) {
-            that.scriptNode.disconnect(context.destination);
-            that.scriptNode.onaudioprocess = undefined;
-            that.audioContext.suspend();
+        try {
+            that.scriptNode.disconnect(that.context.destination);
+        } catch (e) {
+            // Only swallow the error if was thrown because
+            // the script node wasn't connected,
+            // which can occur if stop() is called before start().
+            if (e.name !== "InvalidAccessError")  {
+                throw e;
+            }
         }
+
+        that.scriptNode.onaudioprocess = undefined;
+        that.context.suspend();
     };
 })();

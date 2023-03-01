@@ -1,0 +1,10 @@
+{
+    "test_page": "tests/html/audiocontext-clock-tests.html",
+    "timeout": 300,
+    "skip": "PhantomJS,IE,Firefox,Headless Firefox,Safari,Brave,Headless Brave,Headless Chrome",
+    "browser_args": {
+        "Chrome": [
+            "--autoplay-policy=no-user-gesture-required"
+        ]
+    }
+}

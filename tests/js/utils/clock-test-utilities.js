@@ -33,7 +33,7 @@ var fluid = fluid || require("infusion"),
             " Expected time: " + expected +
             ", actual time was: " + actual +
             " Tolerance is " + tolerance +
-            "; difference was: " + diff + "ms.");
+            "; difference was: " + diff);
     };
 
     berg.test.clock.manualTicker = function (numTicks, clock) {

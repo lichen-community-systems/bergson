@@ -18,56 +18,35 @@ var fluid = fluid || require("infusion"),
 
     QUnit.module("AudioContext Clock Tests");
 
-    fluid.defaults("berg.test.clock.audioContext", {
-        gradeNames: "fluid.component",
-
-        components: {
-            clock: {
-                type: "berg.clock.autoAudioContext",
-                options: {
-                    freq: 1
-                }
-            }
-        }
-    });
-
     QUnit.test("Instantiation", function () {
-        let clock = berg.clock.autoAudioContext({
-            freq: 1
-        });
+        var clock = berg.clock.autoAudioContext();
         QUnit.ok(clock, "Clock was successfully instantiated.");
     });
 
     QUnit.test("Start", function () {
-        let clock = berg.clock.autoAudioContext({
-            freq: 1
-        });
+        var clock = berg.clock.autoAudioContext();
 
         try {
             clock.start();
-            QUnit.ok(true, "Clock successfully started.")
+            QUnit.ok(true, "Clock successfully started.");
         } catch (e) {
             QUnit.ok(false, "Clock failed to start successfully", e);
         }
     });
 
     QUnit.test("Stop before start", function () {
-        let clock = berg.clock.autoAudioContext({
-            freq: 1
-        });
+        var clock = berg.clock.autoAudioContext();
 
         try {
             clock.stop();
             QUnit.ok(true, "Calling stop() before starting has no effect.");
         } catch (e) {
-            QUnit.ok(false, "Calling stop() before starting failed.", e);
+            QUnit.ok(false, "Calling stop() before starting failed: " + e.message);
         }
     });
 
     QUnit.test("Stop after start", function () {
-        let clock = berg.clock.autoAudioContext({
-            freq: 1
-        });
+        var clock = berg.clock.autoAudioContext();
 
         try {
             clock.start();
@@ -77,4 +56,29 @@ var fluid = fluid || require("infusion"),
             QUnit.ok(false, "Calling stop() after starting failed.", e);
         }
     });
+
+
+    fluid.defaults("berg.test.clock.autoAudioContextClockTestSuite", {
+        gradeNames: ["berg.test.clock.testSuite"],
+
+        tests: [
+            {
+                name: "Initial state, default options",
+                initOnly: true,
+                tester: {
+                    type: "berg.test.clock.tester.audioContext"
+                }
+            },
+
+            {
+                name: "tick() time update",
+                tester: {
+                    type: "berg.test.clock.tester.audioContext"
+                }
+            }
+        ]
+    });
+
+    var testSuite = berg.test.clock.autoAudioContextClockTestSuite();
+    testSuite.run();
 })();

@@ -29,19 +29,24 @@
     });
 
     berg.test.clock.testCase.audioContext.testInitial = function (clock, tester, maxJitter) {
-        QUnit.equal(clock.freq, tester.model.expectedFreq,
+        QUnit.equal(clock.freq, tester.options.expectedFreq,
             "The clock should be initialized with a freq of " +
-            tester.model.expectedFreq + ".");
-        berg.test.assertTimeEqual(clock.time, tester.model.expectedTime, maxJitter,
+            tester.options.expectedFreq + ".");
+
+        berg.test.assertTimeEqual(clock.time,
+            tester.options.expectedInitialTime,
+            maxJitter,
             "The clock should be initialized with the current time.");
 
-        QUnit.equal(clock.tickDuration, tester.model.expectedTickDuration,
+        QUnit.equal(clock.tickDuration,
+            tester.options.expectedTickDuration,
             "The clock should have been initialized with a tick duration of " +
-            tester.model.expectedTickDuration + " seconds.");
+            tester.options.expectedTickDuration + " seconds.");
     };
 
     berg.test.clock.testCase.audioContext.testTick = function (clock, time, maxJitter, tester) {
-        var expectedTime = tester.model.expectedTime + tester.model.expectedTickDuration;
+        var expectedTime = tester.model.expectedTime +
+            tester.options.expectedTickDuration;
 
         berg.test.assertTimeEqual(clock.time, expectedTime, maxJitter,
             "The clock's time should reflect the current expected time.");
@@ -53,30 +58,30 @@
 
     fluid.defaults("berg.test.clock.tester.audioContext", {
         gradeNames: [
-            // TODO: The order of these two grades matters crucially. Why?
             "berg.test.clock.tester.external",
             "berg.test.clock.tester.realtime"
         ],
 
-        maxJitter: 0.05,
+        maxJitter: Number.EPSILON,
 
-        // TODO: These were moved into the model (instead of options)
-        // do to expansion issues. But all other testers expect to find
-        // these in the options. This should be normalized.
-        model: {
-            expectedTime: "{clock}.context.currentTime",
-            expectedFreq: {
-                expander: {
-                    funcName: "berg.test.clock.tester.audioContext.calcFreq",
-                    args: ["{clock}.context", "{clock}.options.blockSize"]
-                }
-            },
-            expectedTickDuration: {
-                expander: {
-                    funcName: "berg.test.clock.tester.audioContext.calcTickDuration",
-                    args: ["{clock}.context", "{clock}.options.blockSize"]
-                }
+        expectedInitialTime: "{clock}.context.currentTime",
+
+        expectedFreq: {
+            expander: {
+                funcName: "berg.test.clock.tester.audioContext.calcFreq",
+                args: ["{clock}.context", "{clock}.options.blockSize"]
             }
+        },
+
+        expectedTickDuration: {
+            expander: {
+                funcName: "berg.test.clock.tester.audioContext.calcTickDuration",
+                args: ["{clock}.context", "{clock}.options.blockSize"]
+            }
+        },
+
+        model: {
+            expectedTime: 0
         },
 
         components: {

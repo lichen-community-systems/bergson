@@ -33,7 +33,8 @@
     },
     "scripts": {
         "prepare": "npx grunt",
-        "browser-test": "npx testem ci --file tests/testem.json",
+        "browser-webaudio-test": "npx testem ci --file tests/testem-webaudio.json",
+        "browser-test": "npm run browser-webaudio-test && npx testem ci --file tests/testem.json",
         "node-test": "node tests/node-all-tests.js",
         "test": "npm run node-test && npm run browser-test"
     }

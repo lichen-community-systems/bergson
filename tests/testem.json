@@ -1,13 +1,5 @@
 {
     "test_page": "tests/all-tests.html",
     "timeout": 300,
-    "skip": "PhantomJS,IE",
-    "browser_args": {
-        "Chrome": [
-            "--autoplay-policy=no-user-gesture-required"
-        ],
-        "Chrome Canary": [
-            "--autoplay-policy=no-user-gesture-required"
-        ]
-    }
+    "skip": "PhantomJS,IE"
 }
