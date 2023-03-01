@@ -1,5 +1,5 @@
 {
     "test_page": "tests/all-tests.html",
     "timeout": 300,
-    "skip": "PhantomJS,IE"
+    "launch": "Firefox,Chrome,Safari"
 }
