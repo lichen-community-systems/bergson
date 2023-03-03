@@ -90,13 +90,13 @@ var fluid = fluid || require("infusion"),
             "onStart.startAudioContext": {
                 priority: "after:updateState",
                 funcName: "berg.clock.autoAudioContext.start",
-                args: ["{that}"]
+                args: ["{that}.scriptNode", "{that}.context", "{that}.tick"]
             },
 
             "onStop.stopAudioContext": {
                 priority: "after:updateState",
                 funcName: "berg.clock.autoAudioContext.stop",
-                args: ["{that}"]
+                args: ["{that}.scriptNode", "{that}.context"]
             }
         }
     });
@@ -107,15 +107,15 @@ var fluid = fluid || require("infusion"),
         return scriptNode;
     };
 
-    berg.clock.autoAudioContext.start = function (that) {
-        that.scriptNode.connect(that.context.destination);
-        that.scriptNode.onaudioprocess = that.tick;
-        that.context.resume();
+    berg.clock.autoAudioContext.start = function (scriptNode, context, tickFn) {
+        scriptNode.connect(context.destination);
+        scriptNode.onaudioprocess = tickFn;
+        context.resume();
     };
 
-    berg.clock.autoAudioContext.stop = function (that) {
+    berg.clock.autoAudioContext.stop = function (scriptNode, context) {
         try {
-            that.scriptNode.disconnect(that.context.destination);
+            scriptNode.disconnect(context.destination);
         } catch (e) {
             // Only swallow the error if was thrown because
             // the script node wasn't connected,
@@ -125,7 +125,7 @@ var fluid = fluid || require("infusion"),
             }
         }
 
-        that.scriptNode.onaudioprocess = undefined;
-        that.context.suspend();
+        scriptNode.onaudioprocess = undefined;
+        context.suspend();
     };
 })();

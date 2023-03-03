@@ -1,5 +1,5 @@
 {
-    "test_page": "tests/all-tests.html",
+    "test_page": "tests/core-tests.html",
     "timeout": 300,
-    "launch": "Firefox,Chrome,Safari"
+    "skip": "Brave,Chrome Canary,Edge,Headless Brave,Headless Chrome,Headless Firefox,Headless Opera,IE,Opera"
 }
